@@ -2263,7 +2263,13 @@ const POSES = {
 class App {
   constructor() {
     this.store = new Store(); this.mailCfg = Object.assign({ to: DEFAULT_TO }, Persist.get('mailcfg', null) || {});
-    try { const q = new URLSearchParams(location.search).get('to'); if (q && EMAIL_RE.test(q.trim())) { this.mailCfg.to = q.trim(); Persist.set('mailcfg', this.mailCfg); } } catch (e) { /* no query string */ } this.sfx = new Sfx(); this.tweens = new Tweens(); this.hl = new Highlighter();
+    /* Recipient from the share link: ?k=<base64url of the address> (or plain ?to=). Read once, then wiped from the address bar. */
+    try {
+      const qs = new URLSearchParams(location.search); let q = qs.get('to') || '';
+      const k = qs.get('k'); if (k) { const b = k.replace(/-/g, '+').replace(/_/g, '/'); q = atob(b + '==='.slice((b.length + 3) % 4)); }
+      if (q && EMAIL_RE.test(q.trim())) { this.mailCfg.to = q.trim(); Persist.set('mailcfg', this.mailCfg); }
+      if (qs.has('k') || qs.has('to')) { qs.delete('k'); qs.delete('to'); const rest = qs.toString(); history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash); }
+    } catch (e) { /* no or bad query string */ } this.sfx = new Sfx(); this.tweens = new Tweens(); this.hl = new Highlighter();
     this.ui = document.documentElement.dataset.ui === 'real' ? 'real' : 'pixel';
     this.prevDone = {}; this.lastTap = null; this.hover = null; this.busy = false; this.panelFocus = false; this.started = false;
   }
