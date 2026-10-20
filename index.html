@@ -813,7 +813,8 @@ class Store extends EventTarget {
     this.emit('all');
   }
   async photosForRecord(id) { if (!this.recPhotos[id]) { const p = await PhotoDB.get('r:' + id); if (p) this.recPhotos[id] = p; } return this.recPhotos[id] || {}; }
-  markSent(id) { const r = this.saved.find(x => x.id === id); if (!r) return; r.sentAt = new Date().toISOString(); Persist.set('saved', this.saved); this.emit('log'); }
+  markSent(id) { const r = this.saved.find(x => x.id === id); if (!r) return; r.sentAt = new Date().toISOString(); r.queued = false; Persist.set('saved', this.saved); this.emit('log'); }
+  markQueued(id) { const r = this.saved.find(x => x.id === id); if (!r || r.sentAt) return; r.queued = true; Persist.set('saved', this.saved); this.emit('log'); }
   /* derived */
   section(key) {
     const sec = this.vehicle.sections[key]; let done = 0, dirty = false;
@@ -917,6 +918,10 @@ const PhotoDB = {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /* Optional: the shared inbox every phone sends to. A link with ?to=address overrides it and is remembered on the phone. */
 const DEFAULT_TO = '';
+/* One-tap sending: the AVS Google Apps Script web app (runs in the shared Gmail, recipient fixed there).
+   Empty = fall back to the phone's share sheet. */
+const SEND_URL = '';
+const SEND_TOKEN = 'tc-avs-7Qm2xK9pV4';
 /* Saving a file: inside claude.ai use its downloads capability; anywhere else use the browser's own download. */
 const FileSaver = {
   async get() {
@@ -2302,7 +2307,8 @@ class App {
       $('#bootstep').innerHTML = `<span class="boot-err">${esc(err.message || err)}</span>`; console.error(err); return;
     }
     this.setupUI(); this.setupInput();
-    this.store.restorePhotos().then(() => { this._sig = null; this.refreshHUD(true); }).catch(() => {});
+    this.store.restorePhotos().then(() => { this._sig = null; this.refreshHUD(true); this.flushQueue(); }).catch(() => {});
+    if (SEND_URL) { addEventListener('online', () => this.flushQueue()); setInterval(() => this.flushQueue(), 120000); }
     this.clock = performance.now(); requestAnimationFrame(t => this.loop(t));
     $('#boot').classList.add('gone'); setTimeout(() => $('#boot').remove(), 300);
     this.rig.omega = 1.35; this.rig.set(POSES.home);
@@ -2725,8 +2731,10 @@ class App {
     const box = $('[data-sendstate]', w.el); if (!box) return;
     const rec = this.store.saved.find(r => r.id === box.dataset.sendstate); if (!rec) return;
     box.innerHTML = rec.sentAt
-      ? `<span class="led on"></span><div><b>Sent to mail app</b><small>ส่งต่อให้แอปอีเมลแล้ว ${esc(fmtStamp(rec.sentAt))} · ถ้าไม่ได้อีเมลตอบกลับภายใน 10 นาที ให้กดส่งซ้ำ</small></div><span class="pill ok">ส่งแล้ว</span>`
-      : `<span class="led q"></span><div><b>Not sent yet</b><small>กด <b>ส่งผล ✉</b> แล้วเลือก Gmail ข้อมูลและรูปทุกส่วนจะอยู่ในอีเมล</small></div><span class="pill q">ยังไม่ส่ง</span>`;
+      ? `<span class="led on"></span><div><b>Sent to mail app</b><small>${SEND_URL ? 'ส่งเข้า Gmail กลางแล้ว' : 'ส่งต่อให้แอปอีเมลแล้ว'} ${esc(fmtStamp(rec.sentAt))}</small></div><span class="pill ok">ส่งแล้ว</span>`
+      : rec.queued
+        ? `<span class="led q"></span><div><b>Waiting for signal</b><small>เก็บไว้ในเครื่องแล้ว จะส่งให้เองเมื่อมีเน็ต</small></div><span class="pill q">รอส่ง</span>`
+        : `<span class="led q"></span><div><b>Not sent yet</b><small>${SEND_URL ? 'กด <b>ส่งผล ✉</b> ครั้งเดียว ข้อมูลและรูปทุกส่วนส่งเข้า Gmail กลางทันที' : 'กด <b>ส่งผล ✉</b> แล้วเลือก Gmail ข้อมูลและรูปทุกส่วนจะอยู่ในอีเมล'}</small></div><span class="pill q">ยังไม่ส่ง</span>`;
   }
   /* ---------- log + export ---------- */
   openLog(from) {
@@ -2792,9 +2800,9 @@ class App {
       build: (body) => {
         body.innerHTML = `
           <div class="conn" id="send-conn"></div>
-          <div class="field"><label for="m-to">Recipient<span class="th">Gmail กลางที่ Power Automate อ่าน</span></label>
+          ${SEND_URL ? '<p class="note">กด <b>ส่ง ✉</b> ครั้งเดียว ข้อมูลและรูปส่งเข้า Gmail กลางของ AVS ทันที ถ้าไม่มีสัญญาณ แอปจะเก็บไว้แล้วส่งให้เองเมื่อมีเน็ต</p>' : `<div class="field"><label for="m-to">Recipient<span class="th">Gmail กลางที่ Power Automate อ่าน</span></label>
             <input id="m-to" type="email" inputmode="email" value="${esc(this.mailCfg.to)}" placeholder="truckcheck.farm@gmail.com" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
-          <p class="note">กด <b>ส่ง ✉</b> แล้วเลือกแอป <b>Gmail</b> (หรือแอปอีเมลที่ใช้) ในเมนูแชร์ ระบบคัดลอกอีเมลผู้รับไว้ให้แล้ว ให้วางในช่อง To แล้วกดส่งในแอปอีเมลอีกครั้ง</p>
+          <p class="note">กด <b>ส่ง ✉</b> แล้วเลือกแอป <b>Gmail</b> (หรือแอปอีเมลที่ใช้) ในเมนูแชร์ ระบบคัดลอกอีเมลผู้รับไว้ให้แล้ว ให้วางในช่อง To แล้วกดส่งในแอปอีเมลอีกครั้ง</p>`}
           <div class="field"><span class="lbl">Trucks in this batch<span class="th">รถในรุ่นนี้</span></span><div id="send-list"></div></div>
           <div class="field"><span class="lbl">Email preview<span class="th">ตัวอย่างอีเมลของคันล่าสุด</span></span><pre id="send-prev"></pre></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" data-copy-prev>Copy preview</button><button type="button" class="btn" data-copy>Copy batch JSON</button><button type="button" class="btn go" data-xlsx>Export Excel</button></div>`;
@@ -2818,6 +2826,7 @@ class App {
   renderSendConn() {
     const w = this.wm.wins.get('send'); if (!w) return;
     const box = $('#send-conn', w.body), ok = EMAIL_RE.test(this.mailCfg.to || ''), pending = this.store.saved.filter(r => !r.sentAt).length;
+    if (SEND_URL) { box.innerHTML = `<span class="led ${navigator.onLine === false ? 'q' : 'on'}"></span><div><b>AVS · Gmail กลาง</b><small>ส่งตรงด้วยปุ่มเดียว · รูปทุกส่วนแนบไปด้วย</small></div><span class="pill ${pending ? 'q' : 'ok'}">${pending ? `รอส่ง ${pending}` : 'ส่งครบ'}</span>`; return; }
     box.innerHTML = `<span class="led ${ok ? 'on' : 'q'}"></span><div><b>Email · Gmail</b><small>${ok ? `ส่งถึง ${esc(this.mailCfg.to)}` : 'ใส่อีเมลผู้รับก่อนส่ง'} · รูปทุกส่วนแนบไปกับอีเมล</small></div><span class="pill ${pending ? 'q' : 'ok'}">${pending ? `รอส่ง ${pending}` : 'ส่งครบ'}</span>`;
   }
   renderSendList() {
@@ -2825,15 +2834,16 @@ class App {
     this.renderSendConn();
     const recs = this.store.saved, dot = r => `<span class="dot ${r}" title="${r}"></span>`;
     $('#send-list', w.body).innerHTML = recs.length
-      ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Plate</th><th title="Body · Module · Crates">B · M · C</th><th>Result</th><th class="wide">Photos</th><th>Status</th><th></th></tr></thead><tbody>${recs.map(r => `<tr><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td>${Mail.res(r.overall)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${r.sentAt ? `<span class="pill ok">ส่งแล้ว ${esc(fmtStamp(r.sentAt))}</span>` : '<span class="pill q">ยังไม่ส่ง</span>'}</td><td>${this.sendCell(r)}</td></tr>`).join('')}</tbody></table></div>`
+      ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Plate</th><th title="Body · Module · Crates">B · M · C</th><th>Result</th><th class="wide">Photos</th><th>Status</th><th></th></tr></thead><tbody>${recs.map(r => `<tr><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td>${Mail.res(r.overall)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${r.sentAt ? `<span class="pill ok">ส่งแล้ว ${esc(fmtStamp(r.sentAt))}</span>` : (r.queued ? '<span class="pill q">รอสัญญาณ</span>' : '<span class="pill q">ยังไม่ส่ง</span>')}</td><td>${this.sendCell(r)}</td></tr>`).join('')}</tbody></table></div>`
       : '<div class="empty">No trucks saved yet. Finish a truck first, then send it here.</div>';
     const last = recs[recs.length - 1], pre = $('#send-prev', w.body);
     if (!last) { pre.textContent = '// Finish a truck to preview its email'; return; }
     const p = this.store.recPhotos[last.id] || {}, names = Mail.names(p);
-    pre.textContent = `To: ${this.mailCfg.to || '(ยังไม่ได้ใส่)'}\nSubject: ${Mail.subject(last)}\nAttachments: ${Object.values(names).flat().join(', ') || '-'}\n\n${Mail.text(last, names, false)}`;
+    pre.textContent = `To: ${SEND_URL ? 'Gmail กลาง AVS (กำหนดในระบบ)' : (this.mailCfg.to || '(ยังไม่ได้ใส่)')}\nSubject: ${Mail.subject(last)}\nAttachments: ${Object.values(names).flat().join(', ') || '-'}\n\n${Mail.text(last, names, false)}`;
   }
   async sendRecord(id, btn) {
     const rec = this.store.saved.find(r => r.id === id); if (!rec) return;
+    if (SEND_URL) return this.sendDirect(rec, btn, false);
     const to = (this.mailCfg.to || '').trim();
     if (!EMAIL_RE.test(to)) {
       this.sfx.error(); Toast.show('ใส่อีเมลผู้รับก่อนส่ง · Add the recipient first', 'bad');
@@ -2857,6 +2867,37 @@ class App {
       }
     }
     this.openSendFallback(rec, pack, to);
+  }
+  /* One tap: post the report + photos to the AVS Apps Script, which mails it to the shared Gmail. */
+  async sendDirect(rec, btn, quiet) {
+    this._sending = this._sending || {};
+    if (this._sending[rec.id]) return; this._sending[rec.id] = true;
+    const label = btn ? btn.innerHTML : ''; if (btn) { btn.disabled = true; btn.textContent = 'กำลังส่ง…'; }
+    try {
+      const photos = this.store.recPhotos[rec.id] || await this.store.photosForRecord(rec.id);
+      const names = Mail.names(photos), files = [];
+      for (const k in SECTIONS) (photos[k] || []).forEach((u, i) => files.push({ name: names[k][i], type: (u.match(/^data:([^;,]+)/) || [])[1] || 'image/jpeg', data: u.slice(u.indexOf(',') + 1) }));
+      const body = JSON.stringify({ token: SEND_TOKEN, id: rec.id, subject: Mail.subject(rec), text: Mail.text(rec, names, false), files });
+      const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 90000);
+      const res = await fetch(SEND_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body, signal: ctrl.signal });
+      clearTimeout(timer);
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || !j.ok) throw new Error(j.error || 'HTTP ' + res.status);
+      this.store.markSent(rec.id);
+      if (!quiet) this.sfx.check();
+      Toast.show(`ส่งผลคันที่ <b>${pad2(rec.vehicleNo)}</b> · ${esc(rec.plate)} เข้าระบบแล้ว`, 'ok');
+    } catch (e) {
+      this.store.markQueued(rec.id);
+      if (!quiet) { this.sfx.error(); Toast.show(navigator.onLine === false ? 'ไม่มีสัญญาณ · เก็บไว้แล้ว จะส่งให้เองเมื่อมีเน็ต' : 'ส่งไม่สำเร็จ · จะลองส่งใหม่ให้เองอัตโนมัติ', 'bad'); }
+    } finally {
+      delete this._sending[rec.id];
+      if (btn && btn.isConnected) { btn.disabled = false; btn.innerHTML = label; }
+      this.renderSendList(); this.renderSavedState();
+    }
+  }
+  flushQueue() {
+    if (!SEND_URL || navigator.onLine === false) return;
+    this.store.saved.filter(r => r.queued && !r.sentAt).forEach(r => this.sendDirect(r, null, true));
   }
   openSendFallback(rec, pack, to) {
     const n = pack.files.length;
