@@ -13,7 +13,7 @@
 
 ## หน้าดูสรุปผล
 - ใส่ PIN ก่อนดู (PIN ตั้งไว้ใน Apps Script และตรวจที่สคริปต์ ไม่อยู่ในหน้าเว็บนี้) กดผิดหลายครั้งระบบล็อก 15 นาที
-- ข้อมูลมาจาก Microsoft List TruckInspections: Flow "TruckCheck-Snapshot" ส่งข้อมูลทั้ง List ทุก 30 นาที → Apps Script เก็บไว้ → หน้านี้ดึงไปทำกราฟ
+- ข้อมูลมาจาก Microsoft List TruckInspections: Flow "TruckCheck-Snapshot" ส่งข้อมูลทั้ง List ทุก 1 ชั่วโมง → Apps Script เก็บไว้ → หน้านี้ดึงไปทำกราฟ
   แก้หรือลบแถวใน List แล้ว กราฟเปลี่ยนตามในรอบถัดไป · อีเมลที่ Flow ส่งมาเป็นแค่ตัวขนส่ง สคริปต์ลบทิ้งเอง
 - ไม่มีเน็ต: แสดงข้อมูลชุดล่าสุดที่เคยโหลด · ถ้า List ไม่ส่งข้อมูลมาเกิน 26 ชั่วโมง หน้าจะเตือนให้ตรวจ Flow
 - ปุ่มส่งออก: Excel (Summary / Inspections / Checkpoints) หรือ CSV สองตาราง เชื่อมกันด้วย InspectionID ใน Power BI

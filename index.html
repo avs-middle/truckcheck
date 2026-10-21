@@ -613,7 +613,7 @@ const Dash = {
         const at = r.snapshotAt || r.generatedAt || new Date().toISOString();
         this.all = r.records.map(norm); this.src = { kind: 'server', at: new Date(at) };
         store.set(K_CACHE, JSON.stringify({ at, records: r.records }));
-        if (!r.snapshotAt) banner = ['info', '<b>ยังไม่ได้รับข้อมูลจาก Microsoft List</b> รอ Flow TruckCheck-Snapshot ส่งข้อมูลรอบแรก (ทุก 30 นาที)'];
+        if (!r.snapshotAt) banner = ['info', '<b>ยังไม่ได้รับข้อมูลจาก Microsoft List</b> รอ Flow TruckCheck-Snapshot ส่งข้อมูลรอบแรก (ทุก 1 ชั่วโมง)'];
         else if (r.warn) banner = ['info', esc(r.warn)];
         else if (Date.now() - new Date(r.snapshotAt) > 26 * 36e5) banner = ['warn', `<b>ข้อมูลไม่อัปเดต</b> List ส่งข้อมูลมาล่าสุด ${esc(fmtDT(new Date(r.snapshotAt)))} · ตรวจสอบ Flow TruckCheck-Snapshot`];
       } else if (r && r.ok) {
@@ -662,7 +662,7 @@ const Dash = {
     $('#d-banner').innerHTML = b ? `<div class="banner ${b[0]}"><div class="bt">${b[1]}</div>${b[2] ? `<button type="button" id="d-retry">${b[2]}</button>` : ''}</div>` : '';
     const rb = $('#d-retry'); rb && rb.addEventListener('click', () => this.load(true));
     const L = this.list();
-    if (!this.all.length) return this.renderEmpty('ยังไม่มีผลตรวจในระบบ', this.src.kind === 'device' ? 'ยังไม่มีรถที่บันทึกในเครื่องนี้ และยังดึงข้อมูลจาก Microsoft List ไม่ได้' : 'เมื่อข้อมูลเข้า Microsoft List แล้ว จะขึ้นที่หน้านี้ภายในประมาณ 30 นาที', true);
+    if (!this.all.length) return this.renderEmpty('ยังไม่มีผลตรวจในระบบ', this.src.kind === 'device' ? 'ยังไม่มีรถที่บันทึกในเครื่องนี้ และยังดึงข้อมูลจาก Microsoft List ไม่ได้' : 'เมื่อข้อมูลเข้า Microsoft List แล้ว จะขึ้นที่หน้านี้ภายในประมาณ 1 ชั่วโมง', true);
     if (!L.length) return this.renderEmpty('ไม่มีผลตรวจตามตัวกรองนี้', 'ลองเปลี่ยนช่วงเวลา หรือล้างตัวกรอง', false, true);
     $('#d-body').innerHTML = this.html(L);
     this.bindBody();
