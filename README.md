@@ -12,15 +12,17 @@
 | .nojekyll | สำหรับ GitHub Pages |
 
 ## หน้าดูสรุปผล
-- รหัสดูผลตั้งไว้ใน Apps Script (`VIEW_CODE`) สคริปต์ตรวจรหัสก่อนส่งข้อมูลทุกครั้ง โค้ด Apps Script ไม่อยู่ใน repo นี้เพราะมีรหัสและอีเมล ผู้ดูแลเก็บไว้เอง
-- ข้อมูลมาจากอีเมลป้าย TruckCheck ใน Gmail กลาง ย้อนหลัง 365 วัน (สคริปต์อ่านก้อน DATA ในอีเมล)
-- ไม่มีเน็ต: แสดงข้อมูลชุดล่าสุดที่เคยโหลด · สคริปต์ยังไม่อัปเดต: แสดงข้อมูลในเครื่อง
+- ใส่ PIN ก่อนดู (PIN ตั้งไว้ใน Apps Script และตรวจที่สคริปต์ ไม่อยู่ในหน้าเว็บนี้) กดผิดหลายครั้งระบบล็อก 15 นาที
+- ข้อมูลมาจาก Microsoft List TruckInspections: Flow "TruckCheck-Snapshot" ส่งข้อมูลทั้ง List ทุก 30 นาที → Apps Script เก็บไว้ → หน้านี้ดึงไปทำกราฟ
+  แก้หรือลบแถวใน List แล้ว กราฟเปลี่ยนตามในรอบถัดไป · อีเมลที่ Flow ส่งมาเป็นแค่ตัวขนส่ง สคริปต์ลบทิ้งเอง
+- ไม่มีเน็ต: แสดงข้อมูลชุดล่าสุดที่เคยโหลด · ถ้า List ไม่ส่งข้อมูลมาเกิน 26 ชั่วโมง หน้าจะเตือนให้ตรวจ Flow
 - ปุ่มส่งออก: Excel (Summary / Inspections / Checkpoints) หรือ CSV สองตาราง เชื่อมกันด้วย InspectionID ใน Power BI
+- ทุกเช้า 07:00 Apps Script ส่งอีเมลสรุปผลของเมื่อวานเข้า Gmail กลาง ป้าย TruckCheck-Summary
 
-## อัปเดต Apps Script (ทำครั้งเดียวหลังได้ไฟล์ .gs ใหม่จากผู้ดูแล)
-1. เปิดโปรเจกต์ Apps Script เดิมในบัญชี Gmail กลาง → วางโค้ดใหม่ทับทั้งหมด → บันทึก
-2. Deploy → Manage deployments → ✏️ Edit → Version: **New version** → Deploy
-3. ลิงก์ /exec เดิมใช้ต่อได้ ไม่ต้องแก้แอป · ทดสอบ: กด Run ฟังก์ชัน `testRead` แล้วดูจำนวนคันใน Execution log
+## อัปเดต Apps Script (เมื่อได้ไฟล์ .gs ใหม่จากผู้ดูแล)
+โค้ด Apps Script ไม่อยู่ใน repo นี้ เพราะมี PIN และอีเมลกลาง
+1. วางโค้ดใหม่ทับทั้งหมด → บันทึก → เลือกฟังก์ชัน `setup` → Run (อนุญาตสิทธิ์)
+2. Deploy → Manage deployments → ✏️ Edit → Version: **New version** → Deploy (ลิงก์ /exec เดิมใช้ต่อได้)
 
 ## วิธีที่ 1: GitHub Pages (ฟรี เร็วที่สุด)
 1. สร้าง repository ใหม่ใน GitHub เช่น `truckcheck` (Public สำหรับบัญชีฟรี)

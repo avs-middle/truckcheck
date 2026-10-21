@@ -62,9 +62,17 @@ button{font:inherit;color:inherit}
 .codecard .hd p{margin:0;font-size:14px;line-height:21px;color:var(--ink-3)}
 .fld{display:flex;flex-direction:column;gap:6px}
 .fld label{font-size:13px;font-weight:600}
-#vet-code{width:100%;height:52px;padding:0 16px;border-radius:12px;border:2px solid #c3cbe0;background:#fff;font:400 18px var(--f-th);letter-spacing:.2em;color:var(--ink);outline:none;text-transform:uppercase}
-#vet-code:focus{border-color:var(--ink-2)}
-#vet-code.bad{border-color:#d92d20;background:#fef3f2}
+.pin-dots{display:flex;justify-content:center;gap:14px;min-height:22px;padding:6px 0}
+.pin-dots i{width:16px;height:16px;border-radius:999px;border:2px solid #9aa6c6;background:transparent;transition:background .12s,border-color .12s,transform .12s}
+.pin-dots i.on{background:var(--ink);border-color:var(--ink);transform:scale(1.05)}
+.pin-dots.bad i{border-color:#d92d20}.pin-dots.bad i.on{background:#d92d20}
+.pin-dots.bad{animation:shake .32s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.keypad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.key{height:56px;border-radius:14px;border:0;background:#eef1f8;color:var(--ink);font:600 24px/1 var(--f-th);cursor:pointer;display:grid;place-items:center;touch-action:manipulation;transition:background .1s,transform .08s}
+.key:hover{background:#e3e8f4}.key:active{background:#d5dcee;transform:scale(.97)}
+.key.fn{background:transparent;font-size:14px;font-weight:600;color:var(--ink-3)}
+.key.fn:hover{background:#eef1f8}
 .err{display:flex;align-items:center;gap:6px;font-size:13px;line-height:19px;font-weight:600;color:var(--red)}
 .remember{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px;cursor:pointer}
 .remember input{width:20px;height:20px;accent-color:var(--ink);margin:0}
@@ -73,7 +81,9 @@ button{font:inherit;color:inherit}
 .spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (max-width:360px){.hero h1{font-size:22px;line-height:30px}.choice{gap:12px;padding:16px}.choice .t1{font-size:17px;line-height:24px}}
-@media (max-height:640px){.land-in{padding-top:calc(env(safe-area-inset-top,0px) + 24px)}.codecard{margin-top:12px}.choice{min-height:96px}}
+@media (max-height:640px){.land-in{padding-top:calc(env(safe-area-inset-top,0px) + 24px)}.codecard{margin-top:12px;gap:12px}.codecard .lock,.codecard .hd p{display:none}.key{height:46px}.choice{min-height:96px}}
+@media (max-height:760px){.codecard{margin-top:12px}}
+@media (max-height:500px){.land-in.code{gap:8px}.codecard{padding:14px 16px;gap:8px}.codecard h2{font-size:18px;line-height:24px}.keypad{gap:6px}.key{height:38px;font-size:20px}.remember{min-height:36px}.go{min-height:44px}.back{min-height:38px}}
 
 /* ---------------- Dashboard (MiniDash v2) ---------------- */
 .dash{min-height:100%;background:var(--d-bg);color:var(--d-tx);font:400 13px/20px var(--f-ui)}
@@ -304,18 +314,25 @@ button{font:inherit;color:inherit}
     <form class="codecard" id="codeform" novalidate>
       <div class="hd">
         <span class="lock"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
-        <h2>ใส่รหัสเพื่อดูสรุปผล</h2>
+        <h2>ใส่ PIN เพื่อดูสรุปผล</h2>
         <p>เฉพาะสัตวแพทย์และผู้ดูแลระบบ</p>
       </div>
-      <div class="fld">
-        <label for="vet-code">รหัสผ่าน</label>
-        <input id="vet-code" type="password" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="ใส่รหัส" aria-describedby="code-err">
-        <div class="err" id="code-err" role="alert" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg><span>รหัสไม่ถูกต้อง ลองใหม่อีกครั้ง</span></div>
+      <div class="fld" style="align-items:center">
+        <div class="pin-dots" id="pin-dots" aria-hidden="true"></div>
+        <span class="sr-only" id="pin-status" aria-live="polite">ยังไม่ได้ใส่ PIN</span>
+        <div class="err" id="code-err" role="alert" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg><span>PIN ไม่ถูกต้อง ลองใหม่อีกครั้ง</span></div>
       </div>
-      <label class="remember"><input type="checkbox" id="remember" checked>จำรหัสในเครื่องนี้</label>
+      <div class="keypad" id="keypad" role="group" aria-label="แป้นตัวเลข PIN">
+        <button type="button" class="key" data-k="1">1</button><button type="button" class="key" data-k="2">2</button><button type="button" class="key" data-k="3">3</button>
+        <button type="button" class="key" data-k="4">4</button><button type="button" class="key" data-k="5">5</button><button type="button" class="key" data-k="6">6</button>
+        <button type="button" class="key" data-k="7">7</button><button type="button" class="key" data-k="8">8</button><button type="button" class="key" data-k="9">9</button>
+        <button type="button" class="key fn" data-k="clear">ล้าง</button><button type="button" class="key" data-k="0">0</button>
+        <button type="button" class="key fn" data-k="del" aria-label="ลบตัวสุดท้าย"><svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2h15a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H8l-6-8z"/><path d="M12 7l6 6M18 7l-6 6"/></svg></button>
+      </div>
+      <label class="remember"><input type="checkbox" id="remember" checked>จำ PIN ในเครื่องนี้</label>
       <button class="go" id="code-go" type="submit">เข้าดูสรุปผล</button>
     </form>
-    <p class="foot" style="margin-top:0">ลืมรหัส ติดต่อสัตวแพทย์ผู้ดูแลระบบ</p>
+    <p class="foot" style="margin-top:0">ลืม PIN ติดต่อสัตวแพทย์ผู้ดูแลระบบ</p>
   </div>
 </main>
 
@@ -333,7 +350,7 @@ button{font:inherit;color:inherit}
     </header>
     <div id="d-banner"></div>
     <div id="d-body"></div>
-    <footer class="d-foot"><button type="button" id="d-forget">ลืมรหัสในเครื่องนี้</button></footer>
+    <footer class="d-foot"><button type="button" id="d-forget">ลืม PIN ในเครื่องนี้</button></footer>
   </div>
 </div>
 
@@ -349,10 +366,10 @@ button{font:inherit;color:inherit}
 'use strict';
 /* ===== Config ===== */
 const API = 'https://script.google.com/macros/s/AKfycbzUTYlTzEVQ5KhmYf1KrShl0CFHYNMpzJNdwrBPgYkEJGzntW7q0ctb5loK3gGUepc2/exec';
-const CODE_HASH = 'b3037e9072068997df1ae76cfa920469455106f8a610c8c095d35eaabe2374dd'; // sha256('tc-view:' + code)
 const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-const LOAD_DAYS = 365, TARGET = 90, SOP_MIN = 5;
-const K_CODE = 'tc:code', K_CACHE = 'tc:dashcache';
+const TARGET = 90, SOP_MIN = 5, PIN_MAX = 8;
+const K_CODE = 'tc:pin', K_CACHE = 'tc:listcache';
+try { localStorage.removeItem('tc:code'); localStorage.removeItem('tc:dashcache'); sessionStorage.removeItem('tc:code'); } catch (e) { /* keys from the earlier code gate */ }
 
 /* Same checkpoints as the recording app (record.html SECTIONS) */
 const SECTIONS = [
@@ -387,16 +404,12 @@ const weekStart = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.get
 const isoWeek = d => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const n = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - n); const y = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y) / DAY + 1) / 7); };
 const parseDate = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
 const toast = (() => { let t; return msg => { const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(t); t = setTimeout(() => el.classList.remove('show'), 2600); }; })();
-async function sha256(s) {
-  if (!(window.crypto && crypto.subtle && window.TextEncoder)) return null;
-  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
-}
-async function api(code, days, refresh) {
+/* Apps Script: ?action=check|data&pin=… (PIN is checked by the script, never stored in this page) */
+async function api(pin, action, refresh) {
   const ctl = 'AbortController' in window ? new AbortController() : null;
   const timer = ctl && setTimeout(() => ctl.abort(), 30000);
   try {
-    const r = await fetch(`${API}?action=data&code=${encodeURIComponent(code)}&days=${days}${refresh ? '&refresh=1' : ''}&_=${Date.now()}`, { signal: ctl && ctl.signal, cache: 'no-store' });
+    const r = await fetch(`${API}?action=${action}&pin=${encodeURIComponent(pin)}${refresh ? '&refresh=1' : ''}&_=${Date.now()}`, { signal: ctl && ctl.signal, cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return await r.json();
   } finally { clearTimeout(timer); }
@@ -418,7 +431,7 @@ function norm(d) {
     id: d.InspectionID, business: d.Business || '', farm: d.Farm || '(ไม่ระบุฟาร์ม)', batch: String(d.RearingBatch || '').trim() || '-', insp: d.Inspector || '',
     plate: d.Plate || '-', province: d.Province || '', carrier: d.Carrier || '(ไม่ระบุบริษัท)', time: d.CheckTime || '', vno: d.VehicleNo,
     date, saved: saved && !isNaN(saved) ? saved : date, overall, sec, items, F: d.F || {}, crate: d.Crate || '',
-    photos: +d.PhotoCount || 0, raw: d,
+    photos: +d.PhotoCount || 0, folder: /^https?:\/\//.test(d.PhotoFolder || '') ? d.PhotoFolder : '', x: d._x || null, raw: d,
   };
 }
 /* Records saved on this phone by the recording app (current batch) */
@@ -496,7 +509,7 @@ function route() {
     show('dash'); Dash.open();
   } else if (h === '#code') {
     if (getCode()) { history.replaceState(history.state, '', '#dash'); return route(); }
-    show('code'); setTimeout(() => { const i = $('#vet-code'); if (matchMedia('(pointer:fine)').matches) i.focus(); }, 60);
+    show('code'); Pin.reset();
   } else show('home');
 }
 /* Entries pushed from the landing page carry {fromHome:true}, so "home" can simply step back */
@@ -509,26 +522,51 @@ document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click'
 $('#go-record').href = 'record.html' + location.search;   // keep old share-link parameters (?k=) for the recording app
 $('#go-dash').addEventListener('click', () => { history.pushState({ fromHome: true }, '', getCode() ? '#dash' : '#code'); route(); });
 
-/* ===== Code gate ===== */
-const codeIn = $('#vet-code'), codeErr = $('#code-err'), codeGo = $('#code-go');
-const setErr = msg => { codeErr.hidden = !msg; if (msg) $('span', codeErr).textContent = msg; codeIn.classList.toggle('bad', !!msg); codeIn.setAttribute('aria-invalid', msg ? 'true' : 'false'); };
-codeIn.addEventListener('input', () => setErr(''));
+/* ===== PIN gate ===== */
+const codeErr = $('#code-err'), codeGo = $('#code-go');
+const Pin = {
+  v: '', busy: false,
+  draw() {
+    const n = Math.max(5, this.v.length);
+    $('#pin-dots').innerHTML = Array.from({ length: n }, (_, i) => `<i class="${i < this.v.length ? 'on' : ''}"></i>`).join('');
+    $('#pin-status').textContent = this.v.length ? `ใส่แล้ว ${this.v.length} หลัก` : 'ยังไม่ได้ใส่ PIN';
+  },
+  reset() { this.v = ''; setErr(''); this.draw(); },
+  press(k) {
+    if (this.busy) return;
+    if (k === 'del') this.v = this.v.slice(0, -1);
+    else if (k === 'clear') this.v = '';
+    else if (/^\d$/.test(k) && this.v.length < PIN_MAX) this.v += k;
+    setErr(''); this.draw();
+  },
+};
+const setErr = msg => { codeErr.hidden = !msg; if (msg) $('span', codeErr).textContent = msg; const d = $('#pin-dots'); d.classList.remove('bad'); if (msg) { void d.offsetWidth; d.classList.add('bad'); } };
+$('#keypad').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) Pin.press(b.dataset.k); });
+addEventListener('keydown', e => {
+  if (views.code.hidden || $('#land').hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (/^\d$/.test(e.key)) { Pin.press(e.key); e.preventDefault(); }
+  else if (e.key === 'Backspace') { Pin.press('del'); e.preventDefault(); }
+  else if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { $('#codeform').requestSubmit ? $('#codeform').requestSubmit() : codeGo.click(); e.preventDefault(); }
+});
 $('#codeform').addEventListener('submit', async e => {
   e.preventDefault();
-  const code = codeIn.value.trim().toUpperCase();
-  if (!code) { setErr('กรุณาใส่รหัส'); codeIn.focus(); return; }
-  codeGo.disabled = true; codeGo.innerHTML = '<span class="spin" aria-hidden="true"></span>กำลังตรวจรหัส';
-  let ok = false;
-  try {
-    ok = (await sha256('tc-view:' + code)) === CODE_HASH;
-    // A code changed later in the Apps Script is checked by the script itself
-    if (!ok && navigator.onLine !== false) { try { const r = await api(code, 1); ok = !!(r && r.ok && Array.isArray(r.records)); } catch (err) { ok = false; } }
-  } finally { codeGo.disabled = false; codeGo.textContent = 'เข้าดูสรุปผล'; }
-  if (!ok) { setErr('รหัสไม่ถูกต้อง ลองใหม่อีกครั้ง'); codeIn.select(); return; }
-  setCode(code, $('#remember').checked); codeIn.value = ''; setErr('');
+  if (Pin.busy) return;
+  const pin = Pin.v;
+  if (!pin) { setErr('กรุณาใส่ PIN'); return; }
+  if (navigator.onLine === false) { setErr('ต้องต่ออินเทอร์เน็ตเพื่อตรวจ PIN'); return; }
+  Pin.busy = true; codeGo.disabled = true; codeGo.innerHTML = '<span class="spin" aria-hidden="true"></span>กำลังตรวจ PIN';
+  let r = null;
+  try { r = await api(pin, 'check'); } catch (err) { r = { ok: false, error: 'network' }; }
+  finally { Pin.busy = false; codeGo.disabled = false; codeGo.textContent = 'เข้าดูสรุปผล'; }
+  if (!(r && r.ok && r.v >= 3 && !r.service)) {
+    Pin.v = ''; Pin.draw();
+    setErr(r && r.error === 'locked' ? 'ใส่ PIN ผิดหลายครั้ง ระบบล็อกไว้ 15 นาที' : r && r.error === 'network' ? 'เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง' : r && r.service ? 'ระบบยังไม่พร้อม: ต้องอัปเดต Apps Script ก่อน' : 'PIN ไม่ถูกต้อง ลองใหม่อีกครั้ง');
+    return;
+  }
+  setCode(pin, $('#remember').checked); Pin.v = ''; setErr('');
   history.replaceState(history.state, '', '#dash'); route();
 });
-$('#d-forget').addEventListener('click', () => { store.del(K_CODE); store.del(K_CACHE); Dash.reset(); toast('ลบรหัสออกจากเครื่องนี้แล้ว'); history.replaceState(null, '', location.pathname + location.search); route(); });
+$('#d-forget').addEventListener('click', () => { store.del(K_CODE); store.del(K_CACHE); Dash.reset(); toast('ลบ PIN ออกจากเครื่องนี้แล้ว'); history.replaceState(null, '', location.pathname + location.search); route(); });
 
 /* ===== Bottom sheet ===== */
 let lastFocus = null;
@@ -566,16 +604,20 @@ const Dash = {
     if (!this.all) this.skeleton();
     let banner = null;
     try {
-      const r = await api(code, LOAD_DAYS, force);
-      if (r && r.ok === false && r.error === 'bad code') {
+      const r = await api(code, 'data', force);
+      if (r && r.ok === false && (r.error === 'bad pin' || r.error === 'locked')) {
         store.del(K_CODE); store.del(K_CACHE); this.reset();
-        history.replaceState(history.state, '', '#code'); route(); setErr('รหัสถูกเปลี่ยนแล้ว กรุณาใส่รหัสใหม่'); return;
+        history.replaceState(history.state, '', '#code'); route(); setErr(r.error === 'locked' ? 'ใส่ PIN ผิดหลายครั้ง ระบบล็อกไว้ 15 นาที' : 'PIN ถูกเปลี่ยนแล้ว กรุณาใส่ PIN ใหม่'); return;
       }
       if (r && r.ok && Array.isArray(r.records)) {
-        this.all = r.records.map(norm); this.src = { kind: 'server', at: new Date(r.generatedAt || Date.now()) };
-        store.set(K_CACHE, JSON.stringify({ at: r.generatedAt || new Date().toISOString(), records: r.records }));
+        const at = r.snapshotAt || r.generatedAt || new Date().toISOString();
+        this.all = r.records.map(norm); this.src = { kind: 'server', at: new Date(at) };
+        store.set(K_CACHE, JSON.stringify({ at, records: r.records }));
+        if (!r.snapshotAt) banner = ['info', '<b>ยังไม่ได้รับข้อมูลจาก Microsoft List</b> รอ Flow TruckCheck-Snapshot ส่งข้อมูลรอบแรก (ทุก 30 นาที)'];
+        else if (r.warn) banner = ['info', esc(r.warn)];
+        else if (Date.now() - new Date(r.snapshotAt) > 26 * 36e5) banner = ['warn', `<b>ข้อมูลไม่อัปเดต</b> List ส่งข้อมูลมาล่าสุด ${esc(fmtDT(new Date(r.snapshotAt)))} · ตรวจสอบ Flow TruckCheck-Snapshot`];
       } else if (r && r.ok) {
-        banner = ['info', '<b>สคริปต์ส่งผลยังเป็นรุ่นเก่า</b> ต้องอัปเดต Apps Script ก่อน จึงจะดึงผลตรวจจาก Gmail กลางได้ ตอนนี้แสดงข้อมูลที่บันทึกไว้ในเครื่องนี้'];
+        banner = ['info', '<b>Apps Script ยังเป็นรุ่นเก่า</b> ต้องอัปเดตก่อน จึงจะดึงข้อมูลจาก Microsoft List ได้ ตอนนี้แสดงข้อมูลที่บันทึกไว้ในเครื่องนี้'];
         this.fallback();
       } else throw new Error((r && r.error) || 'no data');
     } catch (err) {
@@ -620,7 +662,7 @@ const Dash = {
     $('#d-banner').innerHTML = b ? `<div class="banner ${b[0]}"><div class="bt">${b[1]}</div>${b[2] ? `<button type="button" id="d-retry">${b[2]}</button>` : ''}</div>` : '';
     const rb = $('#d-retry'); rb && rb.addEventListener('click', () => this.load(true));
     const L = this.list();
-    if (!this.all.length) return this.renderEmpty('ยังไม่มีผลตรวจในระบบ', this.src.kind === 'device' ? 'ยังไม่มีรถที่บันทึกในเครื่องนี้ และยังดึงข้อมูลจาก Gmail กลางไม่ได้' : 'เมื่อผู้ตรวจกดส่งผล ข้อมูลจะขึ้นที่หน้านี้', true);
+    if (!this.all.length) return this.renderEmpty('ยังไม่มีผลตรวจในระบบ', this.src.kind === 'device' ? 'ยังไม่มีรถที่บันทึกในเครื่องนี้ และยังดึงข้อมูลจาก Microsoft List ไม่ได้' : 'เมื่อข้อมูลเข้า Microsoft List แล้ว จะขึ้นที่หน้านี้ภายในประมาณ 30 นาที', true);
     if (!L.length) return this.renderEmpty('ไม่มีผลตรวจตามตัวกรองนี้', 'ลองเปลี่ยนช่วงเวลา หรือล้างตัวกรอง', false, true);
     $('#d-body').innerHTML = this.html(L);
     this.bindBody();
@@ -637,8 +679,8 @@ const Dash = {
   },
   renderSrc() {
     const s = this.src, n = this.all.length;
-    const label = { server: ['#10B981', 'ข้อมูลจาก Gmail กลาง'], cache: ['#F59E0B', 'ข้อมูลที่เคยโหลดไว้'], device: ['#9CA3AF', 'ข้อมูลในเครื่องนี้ (รุ่นปัจจุบัน)'], sample: ['#6366F1', 'ข้อมูลตัวอย่าง'] }[s.kind];
-    $('#d-src').innerHTML = `<span style="display:inline-flex;align-items:center;gap:5px"><span class="dot" style="background:${label[0]}"></span>${label[1]}</span><span>· อัปเดต ${esc(fmtDT(s.at))}</span><span>· ${n} คันในระบบ</span>${s.kind === 'sample' ? '<button type="button" class="lnk" id="d-real" style="min-height:20px">กลับไปข้อมูลจริง</button>' : ''}`;
+    const label = { server: ['#10B981', 'ข้อมูลจาก Microsoft List'], cache: ['#F59E0B', 'ข้อมูลที่เคยโหลดไว้'], device: ['#9CA3AF', 'ข้อมูลในเครื่องนี้ (รุ่นปัจจุบัน)'], sample: ['#6366F1', 'ข้อมูลตัวอย่าง'] }[s.kind];
+    $('#d-src').innerHTML = `<span style="display:inline-flex;align-items:center;gap:5px"><span class="dot" style="background:${label[0]}"></span>${label[1]}</span><span>· ${s.kind === 'server' || s.kind === 'cache' ? 'List ส่งมาเมื่อ' : 'อัปเดต'} ${esc(fmtDT(s.at))}</span><span>· ${n} คันในระบบ</span>${s.kind === 'sample' ? '<button type="button" class="lnk" id="d-real" style="min-height:20px">กลับไปข้อมูลจริง</button>' : ''}`;
     const rr = $('#d-real'); rr && rr.addEventListener('click', () => { this.all = null; this.load(true); });
   },
   renderChips() {
@@ -764,7 +806,8 @@ const Dash = {
     const secs = SECTIONS.map(s => `<div class="dsec"><h4><span>${s.th}</span><span style="color:${r.sec[s.tag] === 'fail' ? 'var(--amb-d)' : r.sec[s.tag] === 'pass' ? 'var(--grn)' : 'var(--d-mute)'}">${r.sec[s.tag] === 'fail' ? 'ไม่ผ่าน' : r.sec[s.tag] === 'pass' ? 'ผ่าน' : '-'}</span></h4><ul>
       ${s.items.map(([iid, th]) => { const v = r.items[`${s.tag}_${iid}`], fnd = r.F[th] || []; return `<li><span class="s ${v === 'dirty' ? 'd' : v === 'clean' ? 'c' : 'n'}">${v === 'dirty' ? 'สกปรก' : v === 'clean' ? 'สะอาด' : '-'}</span><span>${esc(th)}${v === 'dirty' && fnd.length ? ' · พบ ' + esc(fnd.join(', ')) : ''}</span></li>`; }).join('')}</ul></div>`).join('');
     openSheet(`${r.plate} ${r.province}`.trim(), `<dl class="dl">${row('ผลรวม', r.overall === 'fail' ? 'ไม่ผ่าน' : r.overall === 'pass' ? 'ผ่าน' : '-')}${row('ฟาร์ม', r.farm)}${row('รุ่นการเลี้ยง', r.batch)}${row('วันที่ตรวจ', r.date ? `${r.date.getDate()} ${MON[r.date.getMonth()]} ${r.date.getFullYear()}${r.time ? ' · ' + r.time : ''}` : '')}
-      ${row('บริษัทขนส่ง', r.carrier)}${row('ผู้ตรวจ', r.insp)}${row('คันที่', r.vno ? String(r.vno) : '')}${row('สีกล่อง', r.crate)}${row('รูปถ่าย', r.photos ? `${r.photos} รูป · SharePoint › TruckPhotos/${r.id}` : 'ไม่มีรูป')}</dl>${secs}`);
+      ${row('บริษัทขนส่ง', r.carrier)}${row('ผู้ตรวจ', r.insp)}${row('คันที่', r.vno ? String(r.vno) : '')}${row('สีกล่อง', r.crate)}${row('รูปถ่าย', r.photos ? `${r.photos} รูป` : 'ไม่มีรูป')}${r.x ? Object.entries(r.x).map(([k, v]) => row(k, String(v))).join('') : ''}</dl>
+      ${r.folder ? `<a class="pbtn sec2" style="text-decoration:none;align-self:flex-start;margin-bottom:6px" href="${esc(r.folder)}" target="_blank" rel="noopener">เปิดโฟลเดอร์รูปใน SharePoint ↗</a>` : ''}${secs}`);
   },
 
   /* ===== Export: Excel report + CSV tables for Power BI ===== */
@@ -779,7 +822,7 @@ const Dash = {
         <button type="button" class="xbtn" data-x="xlsx"><span class="xi" style="background:#107C41">XLSX</span><span class="xt"><b>Excel รายงาน</b><span>3 ชีต: สรุป · ผลตรวจรายคัน · จุดตรวจ</span></span></button>
         <button type="button" class="xbtn" data-x="csv-ins"><span class="xi" style="background:#C19C00">CSV</span><span class="xt"><b>Power BI · ตารางผลตรวจ</b><span>Inspections.csv หนึ่งแถวต่อหนึ่งคัน</span></span></button>
         <button type="button" class="xbtn" data-x="csv-cp"><span class="xi" style="background:#C19C00">CSV</span><span class="xt"><b>Power BI · ตารางจุดตรวจ</b><span>Checkpoints.csv หนึ่งแถวต่อจุดตรวจ</span></span></button>
-        <div class="note">ใช้ใน Power BI Desktop: <b>Get data → Excel</b> (เลือกตาราง Inspections และ Checkpoints) หรือ <b>Text/CSV</b> แล้วเชื่อมสองตารางด้วย InspectionID<br>รายงานประจำควรต่อ Power BI กับ SharePoint List TruckInspections โดยตรง ไฟล์นี้เหมาะกับงานด่วนหรือส่งต่อ</div>`;
+        <div class="note">ใช้ใน Power BI Desktop: <b>Get data → Excel</b> (เลือกตาราง Inspections และ Checkpoints) หรือ <b>Text/CSV</b> แล้วเชื่อมสองตารางด้วย InspectionID<br>ข้อมูลชุดเดียวกับ Microsoft List TruckInspections ตามรอบล่าสุดที่ Flow ส่งมา</div>`;
       b.querySelectorAll('[data-scope]').forEach(x => x.addEventListener('click', () => { this.xScope = x.dataset.scope; draw(b); }));
       b.querySelectorAll('[data-x]').forEach(x => x.addEventListener('click', () => this.doExport(x.dataset.x, x)));
     };
@@ -788,6 +831,8 @@ const Dash = {
   exportRows(L) {
     const yn = v => v === 'pass' ? 'ผ่าน' : v === 'fail' ? 'ไม่ผ่าน' : '';
     const sv = v => v === 'dirty' ? 'สกปรก' : v === 'clean' ? 'สะอาด' : '';
+    const hasF = L.some(r => Object.keys(r.F).length);
+    const extraKeys = [...new Set(L.flatMap(r => r.x ? Object.keys(r.x) : []))];
     const ins = L.map(r => {
       const o = { InspectionID: r.id, InspectionDate: isoD(r.date), Year: r.date ? r.date.getFullYear() : '', Week: r.date ? isoWeek(r.date) : '', Business: r.business, Farm: r.farm, RearingBatch: r.batch,
         Inspector: r.insp, Plate: r.plate, Province: r.province, Carrier: r.carrier, CheckTime: r.time, VehicleNo: r.vno == null ? '' : r.vno,
@@ -795,8 +840,10 @@ const Dash = {
       SECTIONS.forEach(s => { o[s.tag + 'Result'] = yn(r.sec[s.tag]); });
       CPS.forEach(c => { o[c.key] = sv(r.items[c.key]); });
       o.DirtyPoints = CPS.filter(c => r.items[c.key] === 'dirty').length;
-      o.Findings = Object.entries(r.F).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' | ');
-      o.CrateColour = r.crate; o.PhotoCount = r.photos;
+      if (hasF) o.Findings = Object.entries(r.F).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' | ');
+      if (hasF) o.CrateColour = r.crate;
+      o.PhotoCount = r.photos; o.PhotoFolder = r.folder;
+      extraKeys.forEach(k => { o[k] = r.x && r.x[k] != null ? r.x[k] : ''; });
       return o;
     });
     const cps = [];
@@ -804,7 +851,7 @@ const Dash = {
       const fnd = r.F[c.th] || [];
       cps.push({ InspectionID: r.id, InspectionDate: isoD(r.date), Farm: r.farm, RearingBatch: r.batch, Carrier: r.carrier, Section: c.sec, SectionTH: SECTIONS.find(s => s.tag === c.sec).th,
         CheckpointKey: c.key, Checkpoint: c.th, Status: sv(r.items[c.key]), Dirty: r.items[c.key] === 'dirty' ? 1 : 0,
-        Feather: fnd.includes('ขนไก่') ? 1 : 0, Manure: fnd.includes('ขี้ไก่') ? 1 : 0, OldLitter: fnd.includes('แกลบเก่า') ? 1 : 0 });
+        ...(hasF ? { Feather: fnd.includes('ขนไก่') ? 1 : 0, Manure: fnd.includes('ขี้ไก่') ? 1 : 0, OldLitter: fnd.includes('แกลบเก่า') ? 1 : 0 } : {}) });
     }));
     return { ins, cps };
   },
@@ -826,7 +873,7 @@ const Dash = {
       try {
         const XLSX = await loadXLSX();
         const S = this.stats(L), f = this.f;
-        const sum = [['TruckCheck · สรุปผลตรวจรถจับไก่'], [], ['ส่งออกเมื่อ', fmtDT(new Date()) + ' ' + new Date().getFullYear()], ['แหล่งข้อมูล', { server: 'Gmail กลาง (Apps Script)', cache: 'ข้อมูลที่เคยโหลดไว้', device: 'ข้อมูลในเครื่อง', sample: 'ข้อมูลตัวอย่าง' }[this.src.kind]],
+        const sum = [['TruckCheck · สรุปผลตรวจรถจับไก่'], [], ['ส่งออกเมื่อ', fmtDT(new Date()) + ' ' + new Date().getFullYear()], ['แหล่งข้อมูล', { server: 'Microsoft List (ผ่าน Flow TruckCheck-Snapshot)', cache: 'ข้อมูลที่เคยโหลดไว้', device: 'ข้อมูลในเครื่อง', sample: 'ข้อมูลตัวอย่าง' }[this.src.kind]],
           ['ช่วงข้อมูล', this.xScope === 'all' ? 'ทั้งหมดที่โหลด' : (PERIODS.find(p => p[0] === f.weeks)[1] + (f.farm ? ' · ' + f.farm : '') + (f.batch ? ' · รุ่น ' + f.batch : '') + (f.carrier ? ' · ' + f.carrier : ''))], [],
           ['รถที่ตรวจ (คัน)', S.n], ['ผ่าน (คัน)', S.pass], ['ไม่ผ่าน (คัน)', S.fail], ['อัตราผ่าน (%)', Math.round(S.rate * 10) / 10], ['เป้าหมาย (%)', TARGET], ['รุ่นที่ตรวจครบ SOP', `${S.batches.filter(x => x >= SOP_MIN).length}/${S.batches.length}`], [],
           ['จุดตรวจ', 'ส่วน', 'สกปรก (คัน)', '% ของรถ', 'สิ่งที่พบบ่อย']].concat(S.cps.map(c => [c.th, c.secTh, c.dirty, Math.round(c.p * 10) / 10, c.finds.slice(0, 3).join(', ')]));
