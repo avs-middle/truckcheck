@@ -95,6 +95,17 @@ tr.going{opacity:0;transition:opacity .25s}
 .cell small{display:block;font:700 9px/1.2 var(--f-display);letter-spacing:.07em;color:var(--muted);text-transform:uppercase}
 .cell b{display:block;font:700 15px/1.25 var(--f-thai);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cell.req b{color:var(--signal);font-weight:600}
+.cell.alert b{color:var(--dirty)}
+.cell.alert b::before{content:"⚠ "}
+.plate-alert{margin:10px 0 0;padding:10px 12px;border-radius:var(--r-md);background:var(--dirty-bg);color:var(--dirty);border:1px solid rgba(232,35,63,.35);font:600 13px/1.5 var(--f-thai)}
+.plate-alert b{font-weight:700}
+#editbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 80px);z-index:7;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-radius:999px;background:#fff4dc;border:1px solid #f2c27a;color:#7a4a05;font:600 13px/1.3 var(--f-thai);box-shadow:0 6px 18px rgba(13,27,76,.18);max-width:calc(100vw - 24px);white-space:nowrap}
+#editbar span{overflow:hidden;text-overflow:ellipsis}
+#editbar .btn{flex:none}
+.saved-edit{margin-top:4px}
+td.ed{white-space:nowrap}
+#app.editing #toasts{margin-top:46px}
+@media (max-width:639px){#editbar{top:calc(env(safe-area-inset-top,0px) + 96px);font-size:12px;gap:6px;padding-left:12px}}
 .vstrip.flash .cell.req{animation:reqflash .9s steps(2) 2}
 @keyframes reqflash{50%{background:#ffe3cf}}
 .vcount{background:var(--ink);color:#fff;border:2px solid var(--ink);box-shadow:var(--shadow);padding:6px 10px 7px;text-align:center;flex:none}
@@ -291,7 +302,7 @@ a.btn{text-decoration:none;align-self:flex-start}
 
 /* ---------- toasts ---------- */
 #toasts{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 86px);translate:-50% 0;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;z-index:30;width:max-content;max-width:calc(100vw - 32px)}
-.toast{background:var(--ink);color:#fff;border:2px solid var(--ink);box-shadow:var(--shadow);padding:9px 14px;font:600 14px/1.35 var(--f-thai);display:flex;gap:8px;align-items:center;animation:tin .45s var(--ease-pop)}
+.toast{background:var(--ink);color:#fff;border:2px solid var(--ink);box-shadow:var(--shadow);padding:9px 14px;font:600 14px/1.45 var(--f-thai);display:block;text-align:center;animation:tin .45s var(--ease-pop)}
 .toast.bad{background:var(--dirty)}
 .toast.ok{background:var(--clean)}
 .toast.out{animation:tout .35s var(--ease-out) forwards}
@@ -452,7 +463,7 @@ a.btn{text-decoration:none;align-self:flex-start}
 :root[data-ui="real"] .co-s{border-radius:999px;font:600 11px/1 var(--f-body);padding:4px 8px}
 :root[data-ui="real"] .burst{border-radius:50%;border:0;box-shadow:0 10px 24px rgba(20,153,90,.45)}
 /* misc */
-:root[data-ui="real"] .toast{border-radius:999px;border:0;background:rgba(15,29,51,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font:500 14px/1.35 var(--f-body);padding:10px 16px}
+:root[data-ui="real"] .toast{border-radius:18px;border:0;background:rgba(15,29,51,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font:500 14px/1.35 var(--f-body);padding:10px 16px}
 :root[data-ui="real"] .toast.ok{background:rgba(20,153,90,.94)}
 :root[data-ui="real"] .toast.bad{background:rgba(217,45,60,.94)}
 :root[data-ui="real"] .cal{border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:0 10px 24px rgba(12,28,56,.12)}
@@ -606,6 +617,7 @@ a.btn{text-decoration:none;align-self:flex-start}
     <div class="vcount" aria-live="polite"><small>คันที่</small><b id="vno">01</b><span class="sop" id="sopdots" title="SOP: ตรวจอย่างน้อย 5 คันต่อรุ่น"></span></div>
   </header>
 
+  <div id="editbar" role="status" hidden><span>✎ กำลังแก้ไขคันที่ <b id="edit-no"></b> · <span id="edit-plate"></span></span><button type="button" class="btn small" id="edit-cancel">ยกเลิก</button></div>
   <div id="hint">ลากเพื่อหมุนมุมมอง · หมุนล้อเมาส์หรือถ่างนิ้วเพื่อซูม · แตะสองครั้งที่ชิ้นส่วนเพื่อตรวจ</div>
   <div id="desk"></div>
 
@@ -776,7 +788,48 @@ class Store extends EventTarget {
     this.recPhotos = {}; // saved record id -> {section: [dataURL]} for sending
     const draft = Persist.get('draft', null);
     this.vehicle = draft && draft.sections ? draft : this.blankVehicle();
+    this.editing = Persist.get('edit', null);   // { id, stash: { vehicle, awaitingNext } } while a saved truck is being edited
+    if (this.editing && !this.saved.some(r => r.id === this.editing.id)) { this.editing = null; Persist.set('edit', null); }
     this._t = 0;
+  }
+  get editingId() { return this.editing ? this.editing.id : null; }
+  /* load a saved (not yet sent) truck back into the editor; the truck in progress is parked and comes back afterwards */
+  startEdit(id, awaitingNext) {
+    const r = this.saved.find(x => x.id === id); if (!r || this.editing || r.sentAt) return false;
+    clearTimeout(this._t); Persist.set('draft', this.vehicle);
+    // the truck just finished is the same record: come back to a fresh truck instead of the stale copy
+    const parked = this.saved.some(x => x.id === this.vehicle.id) ? null : this.vehicle;
+    this.editing = { id, stash: { vehicle: parked, awaitingNext: parked ? !!awaitingNext : false } };
+    const sections = {};
+    for (const k in SECTIONS) sections[k] = { items: JSON.parse(JSON.stringify((r.sections[k] || {}).items || {})), note: (r.sections[k] || {}).note || '' };
+    this.vehicle = { id: r.id, plate: r.plate, province: r.province, company: r.company, time: r.time, crate: r.crate || 'red', sections };
+    this.photos[r.id] = JSON.parse(JSON.stringify(this.recPhotos[r.id] || {}));
+    PhotoDB.put('v:' + r.id, this.photos[r.id]);
+    Persist.set('edit', this.editing); this.emit('all');
+    return true;
+  }
+  saveEdit() {
+    const ed = this.editing; if (!ed) return null;
+    const i = this.saved.findIndex(x => x.id === ed.id); if (i < 0) { this.cancelEdit(); return null; }
+    const v = this.vehicle, old = this.saved[i];
+    const rec = Object.assign({}, old, { plate: v.plate.trim(), province: v.province.trim(), company: v.company.trim(), time: v.time, crate: v.crate, sections: {}, editedAt: new Date().toISOString() });
+    for (const k in SECTIONS) {
+      const st = this.section(k);
+      rec.sections[k] = { result: st.result, items: JSON.parse(JSON.stringify(v.sections[k].items)), note: v.sections[k].note || '', photoCount: st.photos };
+    }
+    rec.overall = Object.values(rec.sections).some(x => x.result === 'dirty') ? 'dirty' : 'clean';
+    this.recPhotos[rec.id] = JSON.parse(JSON.stringify(this.photos[v.id] || {}));
+    PhotoDB.put('r:' + rec.id, this.recPhotos[rec.id]); PhotoDB.del('v:' + rec.id);
+    this.saved[i] = rec; Persist.set('saved', this.saved);
+    const stash = ed.stash; this.endEdit(stash);
+    return { rec, awaitingNext: stash.awaitingNext };
+  }
+  cancelEdit() { const ed = this.editing; if (!ed) return null; PhotoDB.del('v:' + ed.id); this.endEdit(ed.stash); return ed.stash; }
+  endEdit(stash) {
+    delete this.photos[this.vehicle.id];
+    this.vehicle = stash.vehicle && stash.vehicle.sections ? stash.vehicle : this.blankVehicle();
+    this.editing = null; Persist.set('edit', null); Persist.set('draft', this.vehicle);
+    this.emit('all');
   }
   static defaultLists() { return { business: ['Saraburi Broiler Chicken'], farm: FARMS.slice(), carrier: ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)'] }; }
   static defaultBatch() { return { business: 'Saraburi Broiler Chicken', farm: 'ท่าคล้อ', batchNo: '', inspector: '', date: todayISO() }; }
@@ -960,6 +1013,36 @@ const dataUrlToFile = (url, name) => {
   return new File([a], name, { type: mime });
 };
 const copyText = t => { try { return navigator.clipboard.writeText(t).then(() => true, () => false); } catch (e) { return Promise.resolve(false); } };
+
+/* Trucks that failed in the last 30 days: list from Microsoft List (via the Apps Script) + this phone's own saved trucks */
+const Alerts = {
+  data: Persist.get('alerts', null),
+  key: p => String(p || '').toUpperCase().replace(/[^0-9A-Zก-๙]/g, ''),
+  async refresh() {
+    if (!SEND_URL || navigator.onLine === false) return false;
+    try {
+      const r = await fetch(`${SEND_URL}?action=alerts&token=${encodeURIComponent(SEND_TOKEN)}&_=${Date.now()}`, { cache: 'no-store' });
+      const j = await r.json();
+      if (j && j.ok && j.plates) { this.data = { at: j.at || null, fetched: new Date().toISOString(), plates: j.plates }; Persist.set('alerts', this.data); return true; }
+    } catch (e) { /* offline or old script: keep the last copy */ }
+    return false;
+  },
+  lookup(store, plate, selfId) {
+    const k = this.key(plate); if (k.length < 3) return null;
+    const srv = this.data && this.data.plates ? this.data.plates[k] : null;
+    const since = Math.max(this.data && this.data.at ? Date.parse(this.data.at) : 0, Date.now() - 30 * 864e5);
+    const local = store.saved.filter(r => r.id !== selfId && r.overall === 'dirty' && this.key(r.plate) === k && Date.parse(r.savedAt) > since);
+    const n = (srv ? srv.n : 0) + local.length; if (!n) return null;
+    let last = srv ? srv.last : '', farm = srv ? srv.farm : '';
+    const pts = srv && srv.points ? srv.points.slice() : [];
+    local.forEach(r => {
+      if (!last || r.date >= last) { last = r.date; farm = r.farm; }
+      for (const sk in SECTIONS) SECTIONS[sk].items.forEach(([id, , th]) => { const it = (r.sections[sk] || { items: {} }).items[id]; if (it && it.status === 'dirty' && !pts.includes(th)) pts.unshift(th); });
+    });
+    return { n, last, farm, points: pts.slice(0, 3) };
+  },
+  text(a) { return `เคยไม่ผ่าน <b>${a.n} ครั้ง</b> ใน 30 วัน · ล่าสุด ${esc(fmtDate(a.last))}${a.farm ? ' · ' + esc(a.farm) : ''}${a.points.length ? '<br>จุดที่เคยพบสกปรก: ' + esc(a.points.join(', ')) : ''}`; },
+};
 
 const Mail = {
   DATA_START: '===TRUCKCHECK-DATA===',
@@ -2316,6 +2399,9 @@ class App {
       $('#bootstep').innerHTML = `<span class="boot-err">${esc(err.message || err)}</span>`; console.error(err); return;
     }
     this.setupUI(); this.setupInput();
+    $('#edit-cancel').addEventListener('click', () => this.cancelEdit());
+    const pullAlerts = () => Alerts.refresh().then(ok => { if (ok) { this.refreshHUD(); this.renderPlateAlert(); } });
+    pullAlerts(); setInterval(pullAlerts, 3600 * 1000); addEventListener('online', pullAlerts);
     this.store.restorePhotos().then(() => { this._sig = null; this.refreshHUD(true); this.flushQueue(); }).catch(() => {});
     if (SEND_URL) { addEventListener('online', () => this.flushQueue()); setInterval(() => this.flushQueue(), 120000); }
     this.clock = performance.now(); requestAnimationFrame(t => this.loop(t));
@@ -2389,7 +2475,11 @@ class App {
   refreshHUD(initial) {
     const s = this.store, v = s.vehicle;
     $$('#vstrip .cell').forEach(c => { const f = c.dataset.f, val = String(v[f] || '').trim(), b = c.querySelector('b'); c.classList.toggle('req', !val); b.textContent = val || 'ต้องกรอก'; b.dataset.ph = c.dataset.ph; });
-    $('#vno').textContent = pad2(s.saved.length + 1);
+    const editRec = s.editing ? s.saved.find(r => r.id === s.editingId) : null;
+    $('#vno').textContent = pad2(editRec ? editRec.vehicleNo : s.saved.length + 1);
+    const al = Alerts.lookup(s, v.plate, v.id), pc = $('#vstrip .cell[data-f="plate"]'); if (pc) pc.classList.toggle('alert', !!al);
+    const eb = $('#editbar'); eb.hidden = !editRec; $('#app').classList.toggle('editing', !!editRec); if (editRec) { $('#edit-no').textContent = pad2(editRec.vehicleNo); $('#edit-plate').textContent = v.plate || editRec.plate; }
+    $('#finish').textContent = editRec ? 'บันทึก ✓' : (this.awaitingNext ? 'คันถัดไป ▶' : 'จบคันนี้ ▶');
     $('#sopdots').innerHTML = Array.from({ length: SOP_MIN }, (_, i) => `<i class="${i < s.saved.length ? 'on' : ''}"></i>`).join('');
     $('#brand-sub').textContent = [s.batch.farm, s.batch.batchNo && ('รุ่น ' + s.batch.batchNo)].filter(Boolean).join(' · ') || 'ตรวจรถจับไก่';
     const h = s.house();
@@ -2406,7 +2496,7 @@ class App {
       const w = this.wm.wins.get('sec-' + k); if (w) { w.el.classList.toggle('complete', st.complete); w.el.classList.toggle('bad', st.dirty); }
       this.celebrateIf(k, st.complete, initial);
     }
-    const ready = s.missing().length === 0; $('#finish').classList.toggle('wait', !ready && !this.awaitingNext);
+    const ready = s.missing().length === 0; $('#finish').classList.toggle('wait', !ready && (!this.awaitingNext || !!editRec));
   }
   dock(key, frac, done, bad) {
     const b = $(`#dock [data-open="${key}"]`); if (!b) return;
@@ -2598,7 +2688,7 @@ class App {
             <div class="field span2"><label for="v-company">บริษัทขนส่ง</label>
               <div class="combo"><span data-dd="company"></span><button type="button" class="btn sq" data-add="carrier" aria-label="เพิ่มบริษัทขนส่ง">+</button></div>
               <div class="addrow" data-row="carrier" hidden><input id="f-carrier-new" placeholder="ชื่อบริษัทขนส่งใหม่" autocomplete="off"><button type="button" class="btn" data-ok="carrier">เพิ่ม</button></div></div>
-            <div class="field"><label for="v-time">เวลาตรวจ</label><input id="v-time" type="time" value="${esc(v.time)}"></div></div></fieldset>`;
+            <div class="field"><label for="v-time">เวลาตรวจ</label><input id="v-time" type="time" value="${esc(v.time)}"></div></div><p class="plate-alert" id="plate-alert" role="alert" hidden></p></fieldset>`;
         if (key === 'crates') html += `<div class="field"><span class="lbl">สีกล่อง</span><div class="swatches" id="sw">${Object.entries(CRATE_COLORS).map(([k, [hex, th]]) => `<button type="button" class="sw" data-c="${k}" aria-pressed="${v.crate === k}" aria-label="${th}" style="background:${hex || 'linear-gradient(135deg,#e0262e 0 25%,#ff8a1f 0 50%,#2a6fdb 0 75%,#2fa84f 0)'}">${th}</button>`).join('')}</div></div>`;
         html += `<div class="never"><span class="lbl">ไม่ควรพบ</span>${FINDINGS.map(f => `<span>${f[2]}</span>`).join('')}</div>
           <div class="chk-head"><span class="lbl">จุดตรวจ</span><button type="button" class="btn small" data-all>สะอาดทุกจุด</button></div>
@@ -2629,7 +2719,7 @@ class App {
         foot.querySelector('[data-done]').addEventListener('click', () => this.wm.close('sec-' + key));
         body.addEventListener('input', e => {
           const t = e.target;
-          if (t.id === 'v-plate') { const up = t.value.toUpperCase(); if (up !== t.value) t.value = up; s.setVehicle('plate', up); }
+          if (t.id === 'v-plate') { const up = t.value.toUpperCase(); if (up !== t.value) t.value = up; s.setVehicle('plate', up); this.renderPlateAlert(true); }
           if (t.id === 'v-province') s.setVehicle('province', t.value);
           if (t.id === 'v-time') s.setVehicle('time', t.value);
           if (t.id === 'note-' + key) s.setNote(key, t.value);
@@ -2645,7 +2735,16 @@ class App {
       },
     });
     this.renderSection(key);
+    if (key === 'body') this.renderPlateAlert();
     return w;
+  }
+  /* warn when this plate failed within the last 30 days */
+  renderPlateAlert(typing) {
+    const box = $('#plate-alert'); const v = this.store.vehicle;
+    const a = Alerts.lookup(this.store, v.plate, v.id);
+    if (box) { box.hidden = !a; if (a) box.innerHTML = `⚠ ทะเบียน <b>${esc(v.plate)}</b> ${Alerts.text(a)}`; }
+    const k = Alerts.key(v.plate);
+    if (a && typing && this._alertedFor !== v.id + k) { this._alertedFor = v.id + k; this.sfx.error(); Toast.show(`⚠ <b>${esc(v.plate)}</b> เคยไม่ผ่าน ${a.n} ครั้งใน 30 วัน · ตรวจจุดเดิมให้ละเอียด`, 'bad'); }
   }
   renderSection(key) {
     const w = this.wm.wins.get('sec-' + key); if (!w) return;
@@ -2676,6 +2775,7 @@ class App {
   /* ---------- finish + next vehicle ---------- */
   async finish() {
     if (this.busy) return;
+    if (this.store.editing) return this.saveEdit();
     if (this.awaitingNext) return this.nextVehicle();
     const miss = this.store.missing();
     if (miss.length) {
@@ -2696,6 +2796,33 @@ class App {
     $('#finish').textContent = 'คันถัดไป ▶'; $('#finish').classList.remove('wait');
     this.openSaved(rec);
     this.refreshHUD();
+  }
+  /* ---------- edit a saved truck before it is sent ---------- */
+  editRecord(id) {
+    if (this.busy) return;
+    const s = this.store, rec = s.saved.find(r => r.id === id); if (!rec) return;
+    if (rec.sentAt) { Toast.show('คันนี้ส่งแล้ว แก้ในแอปไม่ได้ ให้แก้ใน Microsoft List แทน', 'bad'); return; }
+    if (s.editing) { if (s.editingId !== id) Toast.show('กำลังแก้ไขอีกคันอยู่ บันทึกหรือยกเลิกก่อน', 'bad'); return; }
+    s.startEdit(id, this.awaitingNext); this.awaitingNext = false; this.prevDone = {}; this._sig = null;
+    this.wm.closeAll(); this.truck.root.position.x = 0; this.truck.lastX = 0; $('#callouts').classList.remove('hide');
+    this.syncScene(); this.refreshHUD(true); this.sfx.blip();
+    Toast.show(`แก้ไขคันที่ <b>${pad2(rec.vehicleNo)}</b> · ${esc(rec.plate)} · แก้เสร็จกด <b>บันทึก ✓</b>`);
+    setTimeout(() => this.open('body'), REDUCED ? 0 : 350);
+  }
+  saveEdit() {
+    const miss = this.store.missing();
+    if (miss.length) { this.sfx.error(); Toast.show(`ยังไม่ครบ: <b>${miss.join(' · ')}</b>`, 'bad'); return; }
+    const res = this.store.saveEdit(); if (!res) return;
+    this.awaitingNext = res.awaitingNext; this.prevDone = {}; this._sig = null;
+    this.wm.closeAll(); this.syncScene(); this.refreshHUD(true); this.sfx.check();
+    Toast.show(`บันทึกการแก้ไขคันที่ <b>${pad2(res.rec.vehicleNo)}</b> · ${esc(res.rec.plate)} แล้ว`, 'ok');
+    setTimeout(() => this.openLog(), REDUCED ? 0 : 300);
+  }
+  cancelEdit() {
+    const stash = this.store.cancelEdit(); if (!stash) return;
+    this.awaitingNext = !!stash.awaitingNext; this.prevDone = {}; this._sig = null;
+    this.wm.closeAll(); this.syncScene(); this.refreshHUD(true); this.sfx.close();
+    Toast.show('ยกเลิกการแก้ไขแล้ว ข้อมูลเดิมไม่เปลี่ยน');
   }
   async nextVehicle() {
     if (this.busy) return; this.busy = true; this.awaitingNext = false; $('#finish').textContent = 'จบคันนี้ ▶';
@@ -2719,7 +2846,9 @@ class App {
           <div class="res">${Object.keys(SECTIONS).map(res).join('')}</div>
           <div class="field"><span class="lbl">ความคืบหน้าตาม SOP<span class="th">อย่างน้อย ${SOP_MIN} คัน/รุ่น</span></span><div class="meter5">${Array.from({ length: SOP_MIN }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>
           <p class="note">${n >= SOP_MIN ? `ตรวจแล้ว ${n} คัน ครบขั้นต่ำตาม SOP` : `ตรวจแล้ว ${n} จาก ${SOP_MIN} คันของรุ่นนี้`}</p></div>
-          <div class="conn" data-sendstate="${esc(rec.id)}"></div>`;
+          <div class="conn" data-sendstate="${esc(rec.id)}"></div>
+          <button type="button" class="btn small saved-edit" data-edit-id="${esc(rec.id)}">✎ แก้ไขคันนี้</button>`;
+        body.addEventListener('click', e => { const ed = e.target.closest('[data-edit-id]'); if (ed) this.editRecord(ed.dataset.editId); });
         const foot = document.createElement('div'); foot.className = 'win-foot';
         foot.innerHTML = `<button type="button" class="btn" data-log>บันทึกรุ่นนี้</button><span class="grow"></span><button type="button" class="btn go" data-send-all>ส่งผลทั้งหมด ✉</button><button type="button" class="btn primary" data-next>คันถัดไป ▶</button>`; el.appendChild(foot);
         foot.querySelector('[data-next]').addEventListener('click', () => this.nextVehicle());
@@ -2750,7 +2879,7 @@ class App {
         foot.innerHTML = `<button type="button" class="btn ghost-danger" data-reset>ล้างบันทึก</button><span class="grow"></span><button type="button" class="btn" data-xlsx>ส่งออก Excel</button>${SEND_URL ? '<button type="button" class="btn go" data-send-all>ส่งผลทั้งหมด ✉</button>' : ''}`; el.appendChild(foot);
         foot.querySelector('[data-xlsx]').addEventListener('click', e => this.exportExcel(e.currentTarget));
         const sa = foot.querySelector('[data-send-all]'); if (sa) sa.addEventListener('click', e => this.sendAll(e.currentTarget));
-        body.addEventListener('click', e => { const b = e.target.closest('[data-send-id]'); if (b) this.sendRecord(b.dataset.sendId, b); });
+        body.addEventListener('click', e => { const ed = e.target.closest('[data-edit-id]'); if (ed) return this.editRecord(ed.dataset.editId); const b = e.target.closest('[data-send-id]'); if (b) this.sendRecord(b.dataset.sendId, b); });
         armConfirm(foot.querySelector('[data-reset]'), { armedText: 'แตะอีกครั้งเพื่อล้างรถทั้งหมด', sfx: this.sfx, onConfirm: () => {
           if (!this.store.saved.length) { Toast.show('ยังไม่มีรถในบันทึก'); return; }
           this.store.resetBatch(); this.renderLog(); this.sfx.close(); Toast.show('ล้างบันทึกรุ่นนี้แล้ว');
@@ -2766,7 +2895,7 @@ class App {
     w.body.innerHTML = `<div class="field"><span class="lbl">${esc(b.business)} · ${esc(b.farm)}${b.batchNo ? ' · รุ่น ' + esc(b.batchNo) : ''}</span>
         <div class="meter5">${Array.from({ length: SOP_MIN }, (_, i) => `<i class="${i < recs.length ? 'on' : ''}"></i>`).join('')}</div>
         <p class="note">บันทึกแล้ว ${recs.length} คัน · SOP ขั้นต่ำ ${SOP_MIN} คันต่อรุ่น</p></div>` +
-      (recs.length ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>ทะเบียน</th><th class="wide">จังหวัด</th><th>เวลา</th><th title="ตัวรถ · โมดูล · กล่อง">รถ·โม·กล่อง</th><th class="wide">รูป</th><th>ส่งผล</th><th><span class="sr-only">ลบ</span></th></tr></thead><tbody>${recs.map(r => `<tr data-id="${esc(r.id)}"><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="wide">${esc(r.province)}</td><td>${esc(r.time)}</td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${this.sendCell(r)}</td><td class="del"><button type="button" class="rowdel" aria-label="ลบรถ ${esc(r.plate)}">×</button></td></tr>`).join('')}</tbody></table></div>`
+      (recs.length ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>ทะเบียน</th><th class="wide">จังหวัด</th><th>เวลา</th><th title="ตัวรถ · โมดูล · กล่อง">รถ·โม·กล่อง</th><th class="wide">รูป</th><th>ส่งผล</th><th><span class="sr-only">แก้ไข</span></th><th><span class="sr-only">ลบ</span></th></tr></thead><tbody>${recs.map(r => `<tr data-id="${esc(r.id)}"><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="wide">${esc(r.province)}</td><td>${esc(r.time)}</td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${this.sendCell(r)}</td><td class="ed">${this.editCell(r)}</td><td class="del"><button type="button" class="rowdel" aria-label="ลบรถ ${esc(r.plate)}">×</button></td></tr>`).join('')}</tbody></table></div>`
         : `<div class="empty">ยังไม่มีรถที่บันทึก ตรวจรถที่จุดตรวจ แล้วกด <b>จบคันนี้</b></div>`) +
       `<p class="note">กด × สองครั้งเพื่อลบรถคันนั้น</p><p class="note">ไฟล์ Excel มี 2 ชีตสำหรับ Power BI: <b>Inspections</b> (หนึ่งแถวต่อหนึ่งคัน) และ <b>CheckPoints</b> (หนึ่งแถวต่อหนึ่งจุดตรวจ) เชื่อมกันด้วย InspectionID</p>`;
     this.wireLogDeletes(w);
@@ -2774,6 +2903,7 @@ class App {
   wireLogDeletes(w) {
     $$('.rowdel', w.body).forEach(btn => armConfirm(btn, { armedText: 'ลบ?', sfx: this.sfx, onConfirm: () => {
       const tr = btn.closest('tr'), id = tr.dataset.id, rec = this.store.saved.find(r => r.id === id);
+      if (id === this.store.editingId) { Toast.show('คันนี้กำลังแก้ไขอยู่ บันทึกหรือยกเลิกการแก้ไขก่อน', 'bad'); return; }
       tr.classList.add('going');
       setTimeout(() => { this.store.deleteSaved(id); this.renderLog(); this.sfx.close(); Toast.show(`ลบ <b>${esc(rec ? rec.plate : 'รถ')}</b> แล้ว`); }, REDUCED ? 0 : 240);
     } }));
@@ -2796,6 +2926,10 @@ class App {
     } finally { btn.disabled = false; btn.textContent = label; }
   }
   /* ---------- send results (email → Gmail inbox → Power Automate) ---------- */
+  editCell(r) {
+    if (r.sentAt) return '';
+    return this.store.editingId === r.id ? '<span class="pill q">กำลังแก้</span>' : `<button type="button" class="btn small" data-edit-id="${esc(r.id)}">✎ แก้ไข</button>`;
+  }
   sendCell(r) {
     return r.sentAt
       ? `<button type="button" class="btn small" data-send-id="${esc(r.id)}" title="ส่งแล้ว ${esc(fmtStamp(r.sentAt))} · กดเพื่อส่งซ้ำ">✓ ส่งซ้ำ</button>`
@@ -2819,6 +2953,7 @@ class App {
           e.target.classList.toggle('bad-input', !!this.mailCfg.to && !EMAIL_RE.test(this.mailCfg.to)); this.renderSendList();
         });
         body.addEventListener('click', async e => {
+          const ed = e.target.closest('[data-edit-id]'); if (ed) return this.editRecord(ed.dataset.editId);
           const sb = e.target.closest('[data-send-id]'); if (sb) return this.sendRecord(sb.dataset.sendId, sb);
           const sa = e.target.closest('[data-send-all]'); if (sa) return this.sendAll(sa);
           if (e.target.closest('[data-xlsx]')) return this.exportExcel(e.target.closest('[data-xlsx]'));
@@ -2849,7 +2984,7 @@ class App {
     this.renderSendConn();
     const recs = this.store.saved, dot = r => `<span class="dot ${r}" title="${r}"></span>`;
     $('#send-list', w.body).innerHTML = recs.length
-      ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>ทะเบียน</th><th title="ตัวรถ · โมดูล · กล่อง">รถ·โม·กล่อง</th><th>ผล</th><th class="wide">รูป</th><th>สถานะ</th><th></th></tr></thead><tbody>${recs.map(r => `<tr><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td>${Mail.res(r.overall)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${r.sentAt ? `<span class="pill ok">ส่งแล้ว ${esc(fmtStamp(r.sentAt))}</span>` : (r.queued ? '<span class="pill q">รอสัญญาณ</span>' : '<span class="pill q">ยังไม่ส่ง</span>')}</td><td>${this.sendCell(r)}</td></tr>`).join('')}</tbody></table></div>`
+      ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>ทะเบียน</th><th title="ตัวรถ · โมดูล · กล่อง">รถ·โม·กล่อง</th><th>ผล</th><th class="wide">รูป</th><th>สถานะ</th><th></th><th></th></tr></thead><tbody>${recs.map(r => `<tr><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td>${Mail.res(r.overall)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${r.sentAt ? `<span class="pill ok">ส่งแล้ว ${esc(fmtStamp(r.sentAt))}</span>` : (r.queued ? '<span class="pill q">รอสัญญาณ</span>' : '<span class="pill q">ยังไม่ส่ง</span>')}</td><td>${this.sendCell(r)}</td><td class="ed">${this.editCell(r)}</td></tr>`).join('')}</tbody></table></div>`
       : '<div class="empty">ยังไม่มีรถที่บันทึก ตรวจและกดจบคันนี้ก่อน แล้วค่อยส่งที่นี่</div>';
     const last = recs[recs.length - 1], pre = $('#send-prev', w.body);
     if (!last) { pre.textContent = '// จบรถอย่างน้อย 1 คันเพื่อดูตัวอย่างอีเมล'; return; }
@@ -2858,6 +2993,7 @@ class App {
   }
   async sendRecord(id, btn) {
     const rec = this.store.saved.find(r => r.id === id); if (!rec) return;
+    if (id === this.store.editingId) { Toast.show('บันทึกการแก้ไขก่อน แล้วค่อยส่ง', 'bad'); return; }
     if (SEND_URL) return this.sendDirect(rec, btn, false);
     const to = (this.mailCfg.to || '').trim();
     if (!EMAIL_RE.test(to)) {
@@ -2915,7 +3051,7 @@ class App {
   async sendAll(btn) {
     if (!SEND_URL) { const r = this.store.saved.find(x => !x.sentAt); if (r) this.sendRecord(r.id, btn); return; }
     if (this._sendingAll) return;
-    const todo = this.store.saved.filter(r => !r.sentAt);
+    const todo = this.store.saved.filter(r => !r.sentAt && r.id !== this.store.editingId);
     if (!todo.length) { Toast.show('ส่งครบทุกคันแล้ว', 'ok'); return; }
     if (navigator.onLine === false) { todo.forEach(r => this.store.markQueued(r.id)); this.renderSendList(); this.renderSavedState(); Toast.show(`ไม่มีสัญญาณ · เก็บไว้ ${todo.length} คัน จะส่งให้เองเมื่อมีเน็ต`, 'bad'); return; }
     this._sendingAll = true;
@@ -2937,7 +3073,7 @@ class App {
   }
   flushQueue() {
     if (!SEND_URL || navigator.onLine === false) return;
-    this.store.saved.filter(r => r.queued && !r.sentAt).forEach(r => this.sendDirect(r, null, true));
+    this.store.saved.filter(r => r.queued && !r.sentAt && r.id !== this.store.editingId).forEach(r => this.sendDirect(r, null, true));
   }
   openSendFallback(rec, pack, to) {
     const n = pack.files.length;
