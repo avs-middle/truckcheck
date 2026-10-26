@@ -2559,8 +2559,7 @@ class App {
             <span data-dd="inspector"></span></div>
           <div class="field"><span class="lbl"><span class="n">5</span>Inspection date<span class="th">วันที่ตรวจ</span></span>
             <button type="button" class="btn" id="f-date" style="justify-content:space-between;font-size:12px;padding:11px 12px" aria-expanded="false"><span id="f-date-t">${fmtDate(s.batch.date)}</span><span aria-hidden="true">▦</span></button>
-            <div id="f-cal" hidden></div></div>
-          <p class="sop"><b>SOP</b> · ตรวจรถจับไก่อย่างน้อย ${SOP_MIN} คัน/รุ่น ที่หน้าป้อมก่อนพ่นยาฆ่าเชื้อ · Check at least ${SOP_MIN} trucks per batch at the guard post, before the disinfection spray.</p>`;
+            <div id="f-cal" hidden></div></div>`;
         const listOpts = list => s.lists[list].map(o => ({ value: o, label: o }));
         const showAdd = list => { const row = $(`[data-row="${list}"]`, body); row.hidden = false; row.querySelector('input').focus(); };
         const mount = (key, ps) => { const slot = $(`[data-dd="${key}"]`, body); slot.replaceWith(ps.el); return ps; };
