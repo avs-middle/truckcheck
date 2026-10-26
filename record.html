@@ -586,8 +586,8 @@ a.btn{text-decoration:none;align-self:flex-start}
 <script>try{document.documentElement.dataset.ui=JSON.parse(localStorage.getItem('ptvi:ui'))||'real'}catch(e){document.documentElement.dataset.ui='real'}</script>
 
 <div id="app">
-  <canvas id="gl" tabindex="0" aria-label="3D farm road with a poultry transport truck and poultry house. Use the inspection buttons below to open each section."></canvas>
-  <div id="callouts" aria-label="Inspection areas"></div>
+  <canvas id="gl" tabindex="0" aria-label="ภาพ 3 มิติ ถนนในฟาร์ม รถจับไก่ และเล้าไก่ ใช้ปุ่มตรวจด้านล่างเพื่อเปิดแต่ละส่วน"></canvas>
+  <div id="callouts" aria-label="จุดตรวจ"></div>
 
   <header id="top">
     <a class="brand" href="./" aria-label="Truck Check · กลับหน้าแรก" title="กลับหน้าแรก" style="text-decoration:none;color:inherit">
@@ -597,36 +597,36 @@ a.btn{text-decoration:none;align-self:flex-start}
         <p id="brand-sub">ตรวจรถจับไก่ · ‹ หน้าแรก</p>
       </div>
     </a>
-    <button class="vstrip" id="vstrip" type="button" aria-label="Vehicle details, required for every truck">
-      <span class="cell" data-f="plate" data-ph="ทะเบียน ?"><small>Plate · ทะเบียน</small><b>—</b></span>
-      <span class="cell" data-f="province" data-ph="จังหวัด ?"><small>Province</small><b>—</b></span>
-      <span class="cell" data-f="company" data-ph="บริษัทขนส่ง ?"><small>Carrier · บริษัท</small><b>—</b></span>
-      <span class="cell" data-f="time" data-ph="เวลา ?"><small>Time</small><b>—</b></span>
+    <button class="vstrip" id="vstrip" type="button" aria-label="ข้อมูลรถ ต้องกรอกทุกคัน">
+      <span class="cell" data-f="plate" data-ph="ทะเบียน ?"><small>ทะเบียน</small><b>—</b></span>
+      <span class="cell" data-f="province" data-ph="จังหวัด ?"><small>จังหวัด</small><b>—</b></span>
+      <span class="cell" data-f="company" data-ph="บริษัทขนส่ง ?"><small>บริษัทขนส่ง</small><b>—</b></span>
+      <span class="cell" data-f="time" data-ph="เวลา ?"><small>เวลา</small><b>—</b></span>
     </button>
-    <div class="vcount" aria-live="polite"><small>Vehicle</small><b id="vno">01</b><span class="sop" id="sopdots" title="SOP: at least 5 trucks per batch"></span></div>
+    <div class="vcount" aria-live="polite"><small>คันที่</small><b id="vno">01</b><span class="sop" id="sopdots" title="SOP: ตรวจอย่างน้อย 5 คันต่อรุ่น"></span></div>
   </header>
 
-  <div id="hint">Drag to orbit · Wheel or pinch to zoom · Double-tap a part to inspect</div>
+  <div id="hint">ลากเพื่อหมุนมุมมอง · หมุนล้อเมาส์หรือถ่างนิ้วเพื่อซูม · แตะสองครั้งที่ชิ้นส่วนเพื่อตรวจ</div>
   <div id="desk"></div>
 
-  <nav id="dock" aria-label="Inspection">
-    <button class="btn dk" data-open="house" type="button"><span>Farm</span><span class="m"><b></b></span></button>
-    <button class="btn dk" data-open="body" type="button"><span>Body</span><span class="m"><b></b></span></button>
-    <button class="btn dk" data-open="module" type="button"><span>Module</span><span class="m"><b></b></span></button>
-    <button class="btn dk" data-open="crates" type="button"><span>Crates</span><span class="m"><b></b></span></button>
+  <nav id="dock" aria-label="เมนูตรวจ">
+    <button class="btn dk" data-open="house" type="button"><span>ฟาร์ม</span><span class="m"><b></b></span></button>
+    <button class="btn dk" data-open="body" type="button"><span>ตัวรถ</span><span class="m"><b></b></span></button>
+    <button class="btn dk" data-open="module" type="button"><span>โมดูล</span><span class="m"><b></b></span></button>
+    <button class="btn dk" data-open="crates" type="button"><span>กล่อง</span><span class="m"><b></b></span></button>
     <span class="sep" aria-hidden="true"></span>
-    <button class="btn primary wait" id="finish" type="button">Finish ▶</button>
+    <button class="btn primary wait" id="finish" type="button">จบคันนี้ ▶</button>
     <span class="sep" aria-hidden="true"></span>
-    <button class="btn" data-open="log" type="button">Log</button>
+    <button class="btn" data-open="log" type="button">บันทึก</button>
     <button class="btn" data-open="send" type="button">ส่งผล ✉</button>
-    <button class="btn" id="setbtn" data-open="settings" type="button"><span class="gear" aria-hidden="true"></span>Settings</button>
-    <button class="btn more" id="morebtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="moremenu">More</button>
+    <button class="btn" id="setbtn" data-open="settings" type="button"><span class="gear" aria-hidden="true"></span>ตั้งค่า</button>
+    <button class="btn more" id="morebtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="moremenu">เพิ่มเติม</button>
   </nav>
 
   <div id="moremenu" role="menu" hidden>
-    <button type="button" role="menuitem" data-open="log">Batch log</button>
+    <button type="button" role="menuitem" data-open="log">บันทึกรุ่นนี้</button>
     <button type="button" role="menuitem" data-open="send">ส่งผล · อีเมล / Excel</button>
-    <button type="button" role="menuitem" data-open="settings">Settings</button>
+    <button type="button" role="menuitem" data-open="settings">ตั้งค่า</button>
     <button type="button" role="menuitem" onclick="location.href='./'">‹ หน้าแรก</button>
   </div>
   <div id="toasts" role="status" aria-live="polite"></div>
@@ -636,9 +636,9 @@ a.btn{text-decoration:none;align-self:flex-start}
     <section class="win boot-win" aria-live="polite">
       <header class="win-bar" style="cursor:default"><h2>TRUCKCHECK.EXE</h2><span class="wbtn" aria-hidden="true">×</span></header>
       <div class="win-body">
-        <div class="boot-art"><span id="boot-mark"></span><div><h3>Poultry Transport<br>Vehicle Inspection</h3><p>ตรวจรถจับไก่ก่อนเข้าฟาร์ม</p></div></div>
+        <div class="boot-art"><span id="boot-mark"></span><div><h3>ระบบตรวจ<br>รถจับไก่</h3><p>ตรวจรถจับไก่ก่อนเข้าฟาร์ม</p></div></div>
         <div class="bar" id="bootbar"></div>
-        <div class="boot-step"><span id="bootstep">Starting<span class="blink">_</span></span><span id="bootpct">0%</span></div>
+        <div class="boot-step"><span id="bootstep">กำลังเริ่ม<span class="blink">_</span></span><span id="bootpct">0%</span></div>
       </div>
     </section>
   </div>
@@ -674,7 +674,8 @@ const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad2
 const nowHM = () => { const d = new Date(); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const fmtDate = iso => { if (!iso) return '—'; const [y, m, d] = iso.split('-').map(Number); return `${pad2(d)} ${MONTHS[m - 1]} ${y}`; };
+const TH_MONTHS_FULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const fmtDate = iso => { if (!iso) return '—'; const [y, m, d] = iso.split('-').map(Number); return `${d} ${TH_MONTHS[m - 1]} ${y + 543}`; };
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const Ease = {
   outCubic: t => 1 - Math.pow(1 - t, 3),
@@ -838,8 +839,8 @@ class Store extends EventTarget {
   vehicleInfoMissing() { return VEHICLE_FIELDS.filter(([f]) => !String(this.vehicle[f] || '').trim()); }
   missing() {
     const m = [];
-    if (!this.house().complete) m.push('Farm info');
-    for (const k in SECTIONS) { const st = this.section(k); if (!st.complete) m.push(st.onlyPhoto ? SECTIONS[k].tag + ' photo' : SECTIONS[k].tag); }
+    if (!this.house().complete) m.push('ข้อมูลฟาร์ม');
+    for (const k in SECTIONS) { const st = this.section(k); if (!st.complete) m.push(st.onlyPhoto ? 'รูป' + SECTIONS[k].th : SECTIONS[k].th); }
     return m;
   }
   /* commit + next */
@@ -1213,7 +1214,7 @@ class Stage {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(38, 1, .1, 420);
-    this.levels = [{ name: 'Real', px: 1, real: true }, { name: 'Pixel', px: 2.4 }, { name: '8-bit', px: 4 }];
+    this.levels = [{ name: 'สมจริง', px: 1, real: true }, { name: 'พิกเซล', px: 2.4 }, { name: '8 บิต', px: 4 }];
     this.level = clamp(Persist.get('render', 0), 0, 2);
     this.w = 1; this.h = 1;
   }
@@ -2039,7 +2040,7 @@ class Callouts {
   }
   add(key, label, th, getWorld) {
     const el = document.createElement('div'); el.className = 'co';
-    el.innerHTML = `<i class="co-dot"></i><i class="co-line"></i><button type="button" class="co-tag" data-key="${key}"><span>${label}</span><span class="co-th">${th}</span><span class="co-s"></span></button>`;
+    el.innerHTML = `<i class="co-dot"></i><i class="co-line"></i><button type="button" class="co-tag" data-key="${key}"><span>${th || label}</span><span class="co-s"></span></button>`;
     this.layer.appendChild(el); this.items.set(key, { el, getWorld, s: el.querySelector('.co-s') });
   }
   status(key, html, cls) { const it = this.items.get(key); if (!it) return; it.s.innerHTML = html; ['done', 'bad', 'need'].forEach(c => it.el.classList.toggle(c, cls.includes(c))); }
@@ -2073,7 +2074,7 @@ class WindowManager {
     if (this.wins.has(id)) { const w = this.wins.get(id); this.focus(id); w.el.classList.remove('min'); w.el.animate([{ transform: 'scale(1.03)' }, { transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.2,.9,.3,1.3)' }); return w; }
     const el = document.createElement('section'); el.className = 'win'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', title);
     if (wide) el.style.width = 'min(560px, calc(100vw - 24px))';
-    el.innerHTML = `<header class="win-bar"><h2>${esc(title)}${th ? `<small>${esc(th)}</small>` : ''}</h2><span class="stamp">${ICON_CHECK(2)}</span><button type="button" class="wbtn" data-act="min" aria-label="Minimize">_</button><button type="button" class="wbtn" data-act="close" aria-label="Close">×</button></header><div class="win-body"></div>`;
+    el.innerHTML = `<header class="win-bar"><h2>${esc(title)}${th ? `<small>${esc(th)}</small>` : ''}</h2><span class="stamp">${ICON_CHECK(2)}</span><button type="button" class="wbtn" data-act="min" aria-label="ย่อ">_</button><button type="button" class="wbtn" data-act="close" aria-label="ปิด">×</button></header><div class="win-body"></div>`;
     const mode = this.mode;
     if (mode !== 'float') { [...this.wins.keys()].forEach(k => this.close(k, true)); el.classList.add(mode); }
     this.layer.appendChild(el);
@@ -2226,7 +2227,7 @@ class PixelSelect {
   get isOpen() { return !this.list.hidden; }
   render() {
     const o = this.o, cur = o.options.find(x => x.value === o.value), v = this.btn.querySelector('.dd-v');
-    v.textContent = cur ? cur.label : (o.placeholder || 'Choose'); v.classList.toggle('dd-ph', !cur);
+    v.textContent = cur ? cur.label : (o.placeholder || 'เลือก'); v.classList.toggle('dd-ph', !cur);
     this.list.innerHTML = o.options.map(x => `<button type="button" class="dd-opt" role="option" data-v="${esc(x.value)}" aria-selected="${x.value === o.value}"><span>${esc(x.label)}</span>${ICON_CHECK(2)}</button>`).join('') +
       (o.addLabel ? `<button type="button" class="dd-opt dd-add">${esc(o.addLabel)}</button>` : '');
   }
@@ -2254,10 +2255,10 @@ class PixelCalendar {
   }
   render(dir) {
     const first = new Date(this.y, this.m, 1).getDay(), days = new Date(this.y, this.m + 1, 0).getDate(), today = todayISO();
-    let cells = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => `<span class="cal-dow">${d}</span>`).join('');
+    let cells = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'].map(d => `<span class="cal-dow">${d}</span>`).join('');
     for (let i = 0; i < first; i++) cells += '<span></span>';
     for (let d = 1; d <= days; d++) { const iso = `${this.y}-${pad2(this.m + 1)}-${pad2(d)}`; cells += `<button type="button" data-d="${iso}" class="${iso === today ? 'today' : ''} ${iso === this.value ? 'sel' : ''}" aria-label="${fmtDate(iso)}">${d}</button>`; }
-    this.root.innerHTML = `<div class="cal"><div class="cal-head"><button type="button" class="btn sq small" data-nav="-1" aria-label="Previous month">◀</button><div class="cal-t">${MONTHS[this.m]} ${this.y}<small>${TH_MONTHS[this.m]} ${this.y + 543}</small></div><button type="button" class="btn sq small" data-nav="1" aria-label="Next month">▶</button></div><div class="cal-grid ${dir > 0 ? 'slide-l' : dir < 0 ? 'slide-r' : ''}">${cells}</div></div>`;
+    this.root.innerHTML = `<div class="cal"><div class="cal-head"><button type="button" class="btn sq small" data-nav="-1" aria-label="เดือนก่อน">◀</button><div class="cal-t">${TH_MONTHS_FULL[this.m]} ${this.y + 543}</div><button type="button" class="btn sq small" data-nav="1" aria-label="เดือนถัดไป">▶</button></div><div class="cal-grid ${dir > 0 ? 'slide-l' : dir < 0 ? 'slide-r' : ''}">${cells}</div></div>`;
   }
 }
 
@@ -2294,23 +2295,23 @@ class App {
     this.wipe = new PixelWipe($('#wipe')); this.wipe.cover('#0d1b4c');
     try {
       if (!window.THREE) throw new Error('The 3D library did not load. Check your connection and reload the page.');
-      progress(.05, 'Loading pixel fonts');
+      progress(.05, 'กำลังโหลดฟอนต์');
       await Promise.race([Promise.all([
         document.fonts.load('700 30px "Chakra Petch"', 'ลพบุรี'), document.fonts.load('600 15px "Chakra Petch"', 'บริษัท'),
         document.fonts.load('700 26px "Silkscreen"'), document.fonts.load('400 15px "Pixelify Sans"')]), sleep(3000)]).catch(() => {});
-      progress(.18, 'Starting renderer'); await nextFrame();
+      progress(.18, 'กำลังเตรียมภาพ 3 มิติ'); await nextFrame();
       this.stage = new Stage($('#gl')); this.stage.resize(); this.rig = new Rig(this.stage.camera);
       this.world = new World(this.stage, this.hl);
-      progress(.3, 'Pouring the farm road'); await nextFrame(); this.world.buildEnvironment();
-      progress(.46, 'Raising poultry house 20'); await nextFrame(); this.world.buildHouse(); this.world.buildCheckpoint();
-      progress(.6, 'Welding the module frame'); await nextFrame();
+      progress(.3, 'กำลังสร้างถนนในฟาร์ม'); await nextFrame(); this.world.buildEnvironment();
+      progress(.46, 'กำลังสร้างเล้าไก่'); await nextFrame(); this.world.buildHouse(); this.world.buildCheckpoint();
+      progress(.6, 'กำลังประกอบโมดูลจับไก่'); await nextFrame();
       this.truck = new Truck(this.hl); this.truck.build(); this.stage.scene.add(this.truck.root);
-      progress(.72, 'Stacking 224 chicken crates'); await nextFrame(); this.truck.buildCrates(); this.truck.drawFront();
-      progress(.84, 'Painting plates and signs'); await nextFrame(); this.syncScene(); this.stage.applyMode();
-      progress(.93, 'Warming up shaders'); await nextFrame();
+      progress(.72, 'กำลังเรียงกล่องจับไก่'); await nextFrame(); this.truck.buildCrates(); this.truck.drawFront();
+      progress(.84, 'กำลังทำป้ายทะเบียนและป้ายต่าง ๆ'); await nextFrame(); this.syncScene(); this.stage.applyMode();
+      progress(.93, 'กำลังเตรียมแสงเงา'); await nextFrame();
       this.rig.set(POSES.intro, true); this.rig.apply(this.stage.w, this.stage.h);
       this.stage.renderer.compile(this.stage.scene, this.stage.camera); this.stage.render();
-      progress(1, 'Ready'); await sleep(260);
+      progress(1, 'พร้อมใช้งาน'); await sleep(260);
     } catch (err) {
       $('#bootstep').innerHTML = `<span class="boot-err">${esc(err.message || err)}</span>`; console.error(err); return;
     }
@@ -2323,7 +2324,7 @@ class App {
     await this.wipe.reveal('#0d1b4c', 1.05);
     setTimeout(() => { this.rig.omega = 3.6; }, REDUCED ? 0 : 2600);
     this.started = true;
-    if (!this.store.house().complete) setTimeout(() => Toast.show('Start with the poultry house: tap <b>FARM</b> to set the batch'), 900);
+    if (!this.store.house().complete) setTimeout(() => Toast.show('เริ่มที่ข้อมูลฟาร์ม: แตะ <b>ฟาร์ม</b> เพื่อกรอกข้อมูลรุ่น'), 900);
   }
   /* ---------- scene sync ---------- */
   syncScene() {
@@ -2339,10 +2340,10 @@ class App {
     this.renderCarriers();
     this.callouts = new Callouts($('#callouts'), (k, r) => this.open(k, r), k => this.setHover(k, true));
     const v = new THREE.Vector3(), tr = this.truck.root;
-    this.callouts.add('house', 'Farm info', 'ข้อมูลฟาร์ม', o => o.set(-8, 4.9, -9));
-    this.callouts.add('body', 'Body', 'ตัวรถ', o => tr.localToWorld(o.set(4.3, 3.2, 1.15)));
-    this.callouts.add('module', 'Module', 'โมดูล', o => tr.localToWorld(o.set(-2.2, 4.25, 1.22)));
-    this.callouts.add('crates', 'Crates', 'กล่อง', o => tr.localToWorld(o.set(-3.6, 1.75, 1.3)));
+    this.callouts.add('house', 'ข้อมูลฟาร์ม', 'ข้อมูลฟาร์ม', o => o.set(-8, 4.9, -9));
+    this.callouts.add('body', 'ตัวรถ', 'ตัวรถ', o => tr.localToWorld(o.set(4.3, 3.2, 1.15)));
+    this.callouts.add('module', 'โมดูล', 'โมดูล', o => tr.localToWorld(o.set(-2.2, 4.25, 1.22)));
+    this.callouts.add('crates', 'กล่อง', 'กล่อง', o => tr.localToWorld(o.set(-3.6, 1.75, 1.3)));
     void v;
     this.wm = new WindowManager($('#desk'), this.sfx);
     this.wm.onChange = () => this.onWindows();
@@ -2364,7 +2365,7 @@ class App {
       const vv = window.visualViewport, onvv = () => { const kb = Math.max(0, innerHeight - vv.height - vv.offsetTop); const on = kb > 80; document.documentElement.style.setProperty('--kb', on ? kb + 'px' : '0px'); document.body.classList.toggle('kb', on); };
       vv.addEventListener('resize', onvv); vv.addEventListener('scroll', onvv);
     }
-    if (COARSE) $('#hint').textContent = 'Drag to orbit · Pinch to zoom · Double-tap a part';
+    if (COARSE) $('#hint').textContent = 'ลากเพื่อหมุน · ถ่างนิ้วเพื่อซูม · แตะสองครั้งที่ชิ้นส่วนเพื่อตรวจ';
     this.paintBrand();
     this.store.addEventListener('change', e => this.onStore(e.detail.scope));
     this.refreshHUD(true);
@@ -2387,18 +2388,18 @@ class App {
   }
   refreshHUD(initial) {
     const s = this.store, v = s.vehicle;
-    $$('#vstrip .cell').forEach(c => { const f = c.dataset.f, val = String(v[f] || '').trim(), b = c.querySelector('b'); c.classList.toggle('req', !val); b.textContent = val || 'Required'; b.dataset.ph = c.dataset.ph; });
+    $$('#vstrip .cell').forEach(c => { const f = c.dataset.f, val = String(v[f] || '').trim(), b = c.querySelector('b'); c.classList.toggle('req', !val); b.textContent = val || 'ต้องกรอก'; b.dataset.ph = c.dataset.ph; });
     $('#vno').textContent = pad2(s.saved.length + 1);
     $('#sopdots').innerHTML = Array.from({ length: SOP_MIN }, (_, i) => `<i class="${i < s.saved.length ? 'on' : ''}"></i>`).join('');
-    $('#brand-sub').textContent = [s.batch.farm, s.batch.batchNo && ('Batch ' + s.batch.batchNo)].filter(Boolean).join(' · ') || 'ตรวจรถจับไก่';
+    $('#brand-sub').textContent = [s.batch.farm, s.batch.batchNo && ('รุ่น ' + s.batch.batchNo)].filter(Boolean).join(' · ') || 'ตรวจรถจับไก่';
     const h = s.house();
-    this.callouts.status('house', h.complete ? ICON_CHECK(1) + 'Set' : `${h.done}/5`, h.complete ? ['done'] : ['need']);
+    this.callouts.status('house', h.complete ? ICON_CHECK(1) + 'ครบ' : `${h.done}/5`, h.complete ? ['done'] : ['need']);
     this.dock('house', h.done / 5, h.complete, false);
     const winH = this.wm.wins.get('house'); if (winH) winH.el.classList.toggle('complete', h.complete);
     this.celebrateIf('house', h.complete, initial);
     for (const k in SECTIONS) {
       const st = s.section(k);
-      const html = st.complete ? (st.dirty ? ICON_BANG(1) + 'Dirty' : ICON_CHECK(1) + 'Clean') : `${st.done}/${st.total}`;
+      const html = st.complete ? (st.dirty ? ICON_BANG(1) + 'สกปรก' : ICON_CHECK(1) + 'สะอาด') : `${st.done}/${st.total}`;
       const cls = st.complete ? [st.dirty ? 'bad' : 'done'] : (k === 'body' && h.complete && s.vehicleInfoMissing().length ? ['need'] : []);
       this.callouts.status(k, html, cls);
       this.dock(k, st.done / st.total, st.complete && !st.dirty, st.complete && st.dirty);
@@ -2432,7 +2433,7 @@ class App {
   open(key, from) {
     if (this.busy) return;
     this.hideHint();
-    if (this.awaitingNext && (key === 'house' || SECTIONS[key])) { this.openSaved(this.store.saved[this.store.saved.length - 1]); Toast.show('This truck is saved. Press <b>Next vehicle</b> to start the next one.'); return; }
+    if (this.awaitingNext && (key === 'house' || SECTIONS[key])) { this.openSaved(this.store.saved[this.store.saved.length - 1]); Toast.show('บันทึกรถคันนี้แล้ว กด <b>คันถัดไป</b> เพื่อเริ่มคันใหม่'); return; }
     if (key === 'log') return this.openLog(from);
     if (key === 'send' || key === 'portal') return this.openSend(from);
     if (key === 'settings') return this.openSettings(from);
@@ -2450,27 +2451,27 @@ class App {
   /* ---------- settings ---------- */
   openSettings(from) {
     const st = this.stage;
-    const ART = [['Realistic', 'แสงเงาและวัสดุสมจริง'], ['Pixel', 'พิกเซลอาร์ตคมชัด'], ['8-bit', 'พิกเซลหยาบแบบเกมย้อนยุค']];
-    const UIS = [['pixel', 'Retro pixel', 'หน้าต่างพิกเซลสไตล์ Y2K', UI_PREV_PIXEL], ['real', 'Realistic', 'แผงกระจกโปร่ง มุมโค้ง อ่านง่าย', UI_PREV_REAL]];
+    const ART = [['สมจริง', 'แสงเงาและวัสดุสมจริง'], ['พิกเซล', 'พิกเซลอาร์ตคมชัด'], ['8 บิต', 'พิกเซลหยาบแบบเกมย้อนยุค']];
+    const UIS = [['pixel', 'พิกเซลย้อนยุค', 'หน้าต่างพิกเซลสไตล์ Y2K', UI_PREV_PIXEL], ['real', 'สมจริง', 'แผงกระจกโปร่ง มุมโค้ง อ่านง่าย', UI_PREV_REAL]];
     const w = this.wm.open('settings', {
-      title: 'Settings', th: 'ตั้งค่า', from,
+      title: 'ตั้งค่า', from,
       build: body => {
         body.innerHTML = `
-          <div class="set-group"><span class="lbl">Art style<span class="th">รูปแบบภาพ 3D</span></span>
-            <div class="opt-cards" role="radiogroup" aria-label="Art style">${ART.map(([n, d], i) => `<button type="button" class="opt-card" role="radio" data-art="${i}" aria-checked="${i === st.level}"><span class="opt-prev"><img alt="${n} preview" class="${i ? 'px' : ''}" data-prev="${i}"></span><b>${n}</b><small>${d}</small></button>`).join('')}</div></div>
-          <div class="set-group"><span class="lbl">Interface<span class="th">หน้าตา UI</span></span>
-            <div class="opt-cards two" role="radiogroup" aria-label="Interface style">${UIS.map(([k, n, d, svg]) => `<button type="button" class="opt-card" role="radio" data-uiopt="${k}" aria-checked="${this.ui === k}"><span class="opt-prev">${svg}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div></div>
-          <div class="sw-row"><span><b>Sound</b><small>เสียงประกอบ</small></span><button type="button" class="toggle" role="switch" id="set-sound" aria-checked="${!this.sfx.muted}" aria-label="Sound"></button></div>
-          <div class="set-group"><span class="lbl">Saved choices<span class="th">รายการที่บันทึกไว้ · กด × สองครั้งเพื่อลบ</span></span><div id="set-lists" class="set-group"></div></div>
-          <div class="set-group"><span class="lbl">Data<span class="th">ลบข้อมูล</span></span>
+          <div class="set-group"><span class="lbl">รูปแบบภาพ 3D</span>
+            <div class="opt-cards" role="radiogroup" aria-label="รูปแบบภาพ 3D">${ART.map(([n, d], i) => `<button type="button" class="opt-card" role="radio" data-art="${i}" aria-checked="${i === st.level}"><span class="opt-prev"><img alt="ตัวอย่าง ${n}" class="${i ? 'px' : ''}" data-prev="${i}"></span><b>${n}</b><small>${d}</small></button>`).join('')}</div></div>
+          <div class="set-group"><span class="lbl">หน้าตา UI</span>
+            <div class="opt-cards two" role="radiogroup" aria-label="หน้าตา UI">${UIS.map(([k, n, d, svg]) => `<button type="button" class="opt-card" role="radio" data-uiopt="${k}" aria-checked="${this.ui === k}"><span class="opt-prev">${svg}</span><b>${n}</b><small>${d}</small></button>`).join('')}</div></div>
+          <div class="sw-row"><span><b>เสียงประกอบ</b><small>เปิด/ปิดเสียงในแอป</small></span><button type="button" class="toggle" role="switch" id="set-sound" aria-checked="${!this.sfx.muted}" aria-label="เสียงประกอบ"></button></div>
+          <div class="set-group"><span class="lbl">รายการที่บันทึกไว้ · กด × สองครั้งเพื่อลบ</span><div id="set-lists" class="set-group"></div></div>
+          <div class="set-group"><span class="lbl">ลบข้อมูล</span>
             <div class="danger-zone">
-              <div class="dz-row"><span><b>Clear current vehicle</b><small>ล้างข้อมูลรถคันที่กำลังตรวจ และรูปของคันนี้</small></span><button type="button" class="btn ghost-danger" id="set-clear-vehicle">Clear vehicle</button></div>
-              <div class="dz-row"><span><b>Clear all data</b><small>ลบรถที่บันทึกทั้งหมด ข้อมูลฟาร์ม รายการตัวเลือก และฉบับร่าง (การตั้งค่าหน้าตายังอยู่)</small></span><button type="button" class="btn danger" id="set-clear-all">Clear all</button></div>
+              <div class="dz-row"><span><b>ล้างรถคันปัจจุบัน</b><small>ล้างข้อมูลรถคันที่กำลังตรวจ และรูปของคันนี้</small></span><button type="button" class="btn ghost-danger" id="set-clear-vehicle">ล้างคันนี้</button></div>
+              <div class="dz-row"><span><b>ลบข้อมูลทั้งหมด</b><small>ลบรถที่บันทึกทั้งหมด ข้อมูลฟาร์ม รายการตัวเลือก และฉบับร่าง (การตั้งค่าหน้าตายังอยู่)</small></span><button type="button" class="btn danger" id="set-clear-all">ลบทั้งหมด</button></div>
             </div></div>
-          <p class="note">Saved on this device · บันทึกไว้ในเครื่องนี้</p>`;
+          <p class="note">ข้อมูลบันทึกไว้ในเครื่องนี้</p>`;
         this.renderSettingsLists(body);
-        armConfirm($('#set-clear-vehicle', body), { armedText: 'Tap again to clear', sfx: this.sfx, onConfirm: () => this.clearVehicle() });
-        armConfirm($('#set-clear-all', body), { armedText: 'Tap again · ลบทั้งหมด', sfx: this.sfx, onConfirm: () => this.clearAllData() });
+        armConfirm($('#set-clear-vehicle', body), { armedText: 'แตะอีกครั้งเพื่อล้าง', sfx: this.sfx, onConfirm: () => this.clearVehicle() });
+        armConfirm($('#set-clear-all', body), { armedText: 'แตะอีกครั้งเพื่อลบทั้งหมด', sfx: this.sfx, onConfirm: () => this.clearAllData() });
         body.addEventListener('click', e => {
           const a = e.target.closest('[data-art]');
           if (a) { this.setArt(+a.dataset.art); $$('[data-art]', body).forEach(b => b.setAttribute('aria-checked', String(b === a))); return; }
@@ -2491,10 +2492,10 @@ class App {
   }
   renderSettingsLists(body) {
     const box = $('#set-lists', body); if (!box) return;
-    const s = this.store, groups = [['business', 'Businesses · กิจการ', s.batch.business], ['farm', 'Farms · ฟาร์ม', s.batch.farm], ['carrier', 'Carriers · บริษัทขนส่ง', s.vehicle.company]];
-    box.innerHTML = groups.map(([k, label, cur]) => `<div class="field"><span class="lbl">${label}</span><div class="list-chips">${s.lists[k].length ? s.lists[k].map(v => `<span class="lchip ${v === cur ? 'sel' : ''}" data-list="${k}" data-v="${esc(v)}"><span>${esc(v)}</span><button type="button" aria-label="Remove ${esc(v)}">×</button></span>`).join('') : '<span class="note">None saved</span>'}</div></div>`).join('');
-    $$('.lchip', box).forEach(ch => armConfirm(ch.querySelector('button'), { armedText: 'Remove', sfx: this.sfx, onArm: () => ch.classList.add('armed'), onDisarm: () => ch.classList.remove('armed'), onConfirm: () => {
-      s.removeListItem(ch.dataset.list, ch.dataset.v); this.renderSettingsLists(body); this.renderCarriers(); this.refreshDropdowns(); this.sfx.close(); Toast.show(`Removed <b>${esc(ch.dataset.v)}</b>`);
+    const s = this.store, groups = [['business', 'กิจการ', s.batch.business], ['farm', 'ฟาร์ม', s.batch.farm], ['carrier', 'บริษัทขนส่ง', s.vehicle.company]];
+    box.innerHTML = groups.map(([k, label, cur]) => `<div class="field"><span class="lbl">${label}</span><div class="list-chips">${s.lists[k].length ? s.lists[k].map(v => `<span class="lchip ${v === cur ? 'sel' : ''}" data-list="${k}" data-v="${esc(v)}"><span>${esc(v)}</span><button type="button" aria-label="ลบ ${esc(v)}">×</button></span>`).join('') : '<span class="note">ยังไม่มีรายการ</span>'}</div></div>`).join('');
+    $$('.lchip', box).forEach(ch => armConfirm(ch.querySelector('button'), { armedText: 'ลบ', sfx: this.sfx, onArm: () => ch.classList.add('armed'), onDisarm: () => ch.classList.remove('armed'), onConfirm: () => {
+      s.removeListItem(ch.dataset.list, ch.dataset.v); this.renderSettingsLists(body); this.renderCarriers(); this.refreshDropdowns(); this.sfx.close(); Toast.show(`ลบ <b>${esc(ch.dataset.v)}</b> แล้ว`);
     } }));
   }
   refreshDropdowns() {
@@ -2503,18 +2504,18 @@ class App {
     if (this.wm.has('sec-body')) { this.wm.close('sec-body', true); this.openSection('body'); }
   }
   resetTruckStage() {
-    this.awaitingNext = false; $('#finish').textContent = 'Finish ▶';
+    this.awaitingNext = false; $('#finish').textContent = 'จบคันนี้ ▶';
     this.truck.root.position.x = 0; this.truck.lastX = 0; $('#callouts').classList.remove('hide');
   }
   clearVehicle() {
     this.store.clearVehicle(); this.prevDone = {}; this._sig = null; this.resetTruckStage();
     this.wm.closeAll('settings'); this.syncScene(); this.refreshHUD(true);
-    this.sfx.close(); Toast.show('Current vehicle cleared');
+    this.sfx.close(); Toast.show('ล้างรถคันปัจจุบันแล้ว');
   }
   clearAllData() {
     this.store.clearAll(); this.prevDone = {}; this._sig = null; this.resetTruckStage();
     this.wm.closeAll(); this.syncScene(); this.refreshHUD(true);
-    this.sfx.close(); Toast.show('All data cleared · ลบข้อมูลทั้งหมดแล้ว', 'ok');
+    this.sfx.close(); Toast.show('ลบข้อมูลทั้งหมดแล้ว', 'ok');
   }
   snapArt() {
     const st = this.stage, r = st.renderer, cam = st.camera, cur = st.level, asp = cam.aspect, out = [], W = 320, H = 200;
@@ -2531,7 +2532,7 @@ class App {
     const st = this.stage; if (i === st.level) return;
     if (!REDUCED) st.canvas.animate([{ filter: 'blur(10px) saturate(1.4)', opacity: .55 }, { filter: 'none', opacity: 1 }], { duration: 560, easing: 'cubic-bezier(.16,1,.3,1)' });
     st.level = i; Persist.set('render', i); st.applyMode(); st.resize();
-    this.sfx.toggle(true); Toast.show(`Art style: <b>${st.pixelName}</b>`);
+    this.sfx.toggle(true); Toast.show(`รูปแบบภาพ: <b>${st.pixelName}</b>`);
   }
   setUI(k) {
     if (k === this.ui) return;
@@ -2545,28 +2546,28 @@ class App {
   openHouse(from) {
     const s = this.store;
     this.wm.open('house', {
-      title: 'Farm info', th: 'ข้อมูลการตรวจ', from: from || this.callouts.rectOf('house'),
+      title: 'ข้อมูลฟาร์ม', from: from || this.callouts.rectOf('house'),
       build: (body) => {
         body.innerHTML = `
-          <div class="field"><label for="f-business"><span class="n">1</span>Business<span class="th">กิจการ</span></label>
-            <div class="combo"><span data-dd="business"></span><button type="button" class="btn sq" data-add="business" aria-label="Add a business">+</button></div>
-            <div class="addrow" data-row="business" hidden><input id="f-business-new" placeholder="New business name" autocomplete="off"><button type="button" class="btn" data-ok="business">Add</button></div></div>
-          <div class="field"><label for="f-farm"><span class="n">2</span>Farm<span class="th">ฟาร์ม</span></label>
-            <div class="combo"><span data-dd="farm"></span><button type="button" class="btn sq" data-add="farm" aria-label="Add a farm">+</button></div>
-            <div class="addrow" data-row="farm" hidden><input id="f-farm-new" placeholder="New farm name" autocomplete="off"><button type="button" class="btn" data-ok="farm">Add</button></div></div>
-          <div class="field"><label for="f-batch"><span class="n">3</span>Rearing batch<span class="th">รุ่นการเลี้ยง</span></label><input id="f-batch" value="${esc(s.batch.batchNo)}" placeholder="e.g. 5/2569" autocomplete="off"></div>
-          <div class="field"><label for="f-inspector"><span class="n">4</span>Inspector<span class="th">ผู้ตรวจ</span></label>
+          <div class="field"><label for="f-business"><span class="n">1</span>กิจการ</label>
+            <div class="combo"><span data-dd="business"></span><button type="button" class="btn sq" data-add="business" aria-label="เพิ่มกิจการ">+</button></div>
+            <div class="addrow" data-row="business" hidden><input id="f-business-new" placeholder="ชื่อกิจการใหม่" autocomplete="off"><button type="button" class="btn" data-ok="business">เพิ่ม</button></div></div>
+          <div class="field"><label for="f-farm"><span class="n">2</span>ฟาร์ม</label>
+            <div class="combo"><span data-dd="farm"></span><button type="button" class="btn sq" data-add="farm" aria-label="เพิ่มฟาร์ม">+</button></div>
+            <div class="addrow" data-row="farm" hidden><input id="f-farm-new" placeholder="ชื่อฟาร์มใหม่" autocomplete="off"><button type="button" class="btn" data-ok="farm">เพิ่ม</button></div></div>
+          <div class="field"><label for="f-batch"><span class="n">3</span>รุ่นการเลี้ยง</label><input id="f-batch" value="${esc(s.batch.batchNo)}" placeholder="เช่น 5/2569" autocomplete="off"></div>
+          <div class="field"><label for="f-inspector"><span class="n">4</span>ผู้ตรวจ</label>
             <span data-dd="inspector"></span></div>
-          <div class="field"><span class="lbl"><span class="n">5</span>Inspection date<span class="th">วันที่ตรวจ</span></span>
+          <div class="field"><span class="lbl"><span class="n">5</span>วันที่ตรวจ</span>
             <button type="button" class="btn" id="f-date" style="justify-content:space-between;font-size:12px;padding:11px 12px" aria-expanded="false"><span id="f-date-t">${fmtDate(s.batch.date)}</span><span aria-hidden="true">▦</span></button>
             <div id="f-cal" hidden></div></div>`;
         const listOpts = list => s.lists[list].map(o => ({ value: o, label: o }));
         const showAdd = list => { const row = $(`[data-row="${list}"]`, body); row.hidden = false; row.querySelector('input').focus(); };
         const mount = (key, ps) => { const slot = $(`[data-dd="${key}"]`, body); slot.replaceWith(ps.el); return ps; };
         this.houseSel = {
-          business: mount('business', new PixelSelect({ id: 'f-business', options: listOpts('business'), value: s.batch.business, placeholder: 'Choose a business', addLabel: '+ Add a business', onAdd: () => showAdd('business'), onChange: v => s.setBatch('business', v), sfx: this.sfx })),
-          farm: mount('farm', new PixelSelect({ id: 'f-farm', options: listOpts('farm'), value: s.batch.farm, placeholder: 'Choose a farm', addLabel: '+ Add a farm', onAdd: () => showAdd('farm'), onChange: v => s.setBatch('farm', v), sfx: this.sfx })),
-          inspector: mount('inspector', new PixelSelect({ id: 'f-inspector', options: Object.entries(INSPECTORS).map(([k, [en, th]]) => ({ value: k, label: `${en} · ${th}` })), value: s.batch.inspector, placeholder: 'Choose who is inspecting', onChange: v => s.setBatch('inspector', v), sfx: this.sfx })),
+          business: mount('business', new PixelSelect({ id: 'f-business', options: listOpts('business'), value: s.batch.business, placeholder: 'เลือกกิจการ', addLabel: '+ เพิ่มกิจการ', onAdd: () => showAdd('business'), onChange: v => s.setBatch('business', v), sfx: this.sfx })),
+          farm: mount('farm', new PixelSelect({ id: 'f-farm', options: listOpts('farm'), value: s.batch.farm, placeholder: 'เลือกฟาร์ม', addLabel: '+ เพิ่มฟาร์ม', onAdd: () => showAdd('farm'), onChange: v => s.setBatch('farm', v), sfx: this.sfx })),
+          inspector: mount('inspector', new PixelSelect({ id: 'f-inspector', options: Object.entries(INSPECTORS).map(([k, [en, th]]) => ({ value: k, label: th })), value: s.batch.inspector, placeholder: 'เลือกผู้ตรวจ', onChange: v => s.setBatch('inspector', v), sfx: this.sfx })),
         };
         body.addEventListener('input', e => { if (e.target.id === 'f-batch') s.setBatch('batchNo', e.target.value); });
         body.addEventListener('click', e => {
@@ -2587,40 +2588,40 @@ class App {
     const inp = $(`#f-${list}-new`, body), v = inp.value.trim(); if (!v) { inp.focus(); return; }
     this.store.addList(list, v); this.store.setBatch(list, v);
     const ps = this.houseSel && this.houseSel[list]; if (ps) ps.setOptions(this.store.lists[list].map(o => ({ value: o, label: o })), v);
-    inp.value = ''; $(`[data-row="${list}"]`, body).hidden = true; this.sfx.check(); Toast.show(`Added <b>${esc(v)}</b>`, 'ok');
+    inp.value = ''; $(`[data-row="${list}"]`, body).hidden = true; this.sfx.check(); Toast.show(`เพิ่ม <b>${esc(v)}</b> แล้ว`, 'ok');
   }
   openSection(key, from) {
     const s = this.store, def = SECTIONS[key];
     const w = this.wm.open('sec-' + key, {
-      title: def.en, th: def.th, from: from || this.callouts.rectOf(key),
+      title: def.th, from: from || this.callouts.rectOf(key),
       build: (body, el) => {
         const v = s.vehicle;
         let html = '';
-        if (key === 'body') html += `<fieldset><legend>Vehicle details · required</legend><div class="grid2">
-            <div class="field"><label for="v-plate">Plate<span class="th">ทะเบียน</span></label><input id="v-plate" value="${esc(v.plate)}" placeholder="70-3451" autocomplete="off" maxlength="12"></div>
-            <div class="field"><label for="v-province">Province<span class="th">จังหวัด</span></label><input id="v-province" list="dl-province" value="${esc(v.province)}" placeholder="ลพบุรี" autocomplete="off"></div>
-            <div class="field span2"><label for="v-company">Carrier<span class="th">บริษัทขนส่ง</span></label>
-              <div class="combo"><span data-dd="company"></span><button type="button" class="btn sq" data-add="carrier" aria-label="Add a carrier">+</button></div>
-              <div class="addrow" data-row="carrier" hidden><input id="f-carrier-new" placeholder="New carrier name" autocomplete="off"><button type="button" class="btn" data-ok="carrier">Add</button></div></div>
-            <div class="field"><label for="v-time">Check time<span class="th">เวลาตรวจ</span></label><input id="v-time" type="time" value="${esc(v.time)}"></div></div></fieldset>`;
-        if (key === 'crates') html += `<div class="field"><span class="lbl">Crate colour<span class="th">สีกล่อง</span></span><div class="swatches" id="sw">${Object.entries(CRATE_COLORS).map(([k, [hex, th]]) => `<button type="button" class="sw" data-c="${k}" aria-pressed="${v.crate === k}" aria-label="${th}" style="background:${hex || 'linear-gradient(135deg,#e0262e 0 25%,#ff8a1f 0 50%,#2a6fdb 0 75%,#2fa84f 0)'}">${th}</button>`).join('')}</div></div>`;
-        html += `<div class="never"><span class="lbl">Must not find<span class="th">ไม่ควรพบ</span></span>${FINDINGS.map(f => `<span>${f[2]} · ${f[1]}</span>`).join('')}</div>
-          <div class="chk-head"><span class="lbl">Checkpoints<span class="th">จุดตรวจ</span></span><button type="button" class="btn small" data-all>All clean</button></div>
+        if (key === 'body') html += `<fieldset><legend>ข้อมูลรถ · ต้องกรอก</legend><div class="grid2">
+            <div class="field"><label for="v-plate">ทะเบียน</label><input id="v-plate" value="${esc(v.plate)}" placeholder="70-3451" autocomplete="off" maxlength="12"></div>
+            <div class="field"><label for="v-province">จังหวัด</label><input id="v-province" list="dl-province" value="${esc(v.province)}" placeholder="ลพบุรี" autocomplete="off"></div>
+            <div class="field span2"><label for="v-company">บริษัทขนส่ง</label>
+              <div class="combo"><span data-dd="company"></span><button type="button" class="btn sq" data-add="carrier" aria-label="เพิ่มบริษัทขนส่ง">+</button></div>
+              <div class="addrow" data-row="carrier" hidden><input id="f-carrier-new" placeholder="ชื่อบริษัทขนส่งใหม่" autocomplete="off"><button type="button" class="btn" data-ok="carrier">เพิ่ม</button></div></div>
+            <div class="field"><label for="v-time">เวลาตรวจ</label><input id="v-time" type="time" value="${esc(v.time)}"></div></div></fieldset>`;
+        if (key === 'crates') html += `<div class="field"><span class="lbl">สีกล่อง</span><div class="swatches" id="sw">${Object.entries(CRATE_COLORS).map(([k, [hex, th]]) => `<button type="button" class="sw" data-c="${k}" aria-pressed="${v.crate === k}" aria-label="${th}" style="background:${hex || 'linear-gradient(135deg,#e0262e 0 25%,#ff8a1f 0 50%,#2a6fdb 0 75%,#2fa84f 0)'}">${th}</button>`).join('')}</div></div>`;
+        html += `<div class="never"><span class="lbl">ไม่ควรพบ</span>${FINDINGS.map(f => `<span>${f[2]}</span>`).join('')}</div>
+          <div class="chk-head"><span class="lbl">จุดตรวจ</span><button type="button" class="btn small" data-all>สะอาดทุกจุด</button></div>
           <div class="chk" id="chk-${key}"></div>
-          <div class="field"><span class="lbl">Photos<span class="req-star">*</span><span class="th">ต้องแนบรูปอย่างน้อย 1 รูป</span></span><div class="photos" id="ph-${key}"></div><p class="warn" id="warn-${key}" hidden>${ICON_BANG(2)}<span></span></p></div>
-          <div class="field"><label for="note-${key}">Note<span class="th">หมายเหตุ</span></label><textarea id="note-${key}" placeholder="Anything the vet should know">${esc(v.sections[key].note)}</textarea></div>`;
+          <div class="field"><span class="lbl">รูปถ่าย<span class="req-star">*</span><span class="th">อย่างน้อย 1 รูป</span></span><div class="photos" id="ph-${key}"></div><p class="warn" id="warn-${key}" hidden>${ICON_BANG(2)}<span></span></p></div>
+          <div class="field"><label for="note-${key}">หมายเหตุ</label><textarea id="note-${key}" placeholder="สิ่งที่อยากแจ้งสัตวแพทย์">${esc(v.sections[key].note)}</textarea></div>`;
         body.innerHTML = html;
         if (key === 'body') {
           if (v.company && !s.lists.carrier.includes(v.company)) s.addList('carrier', v.company);
           const carrierOpts = () => s.lists.carrier.map(c => ({ value: c, label: c }));
           const row = $('[data-row="carrier"]', body), inp = $('#f-carrier-new', body);
-          const ps = new PixelSelect({ id: 'v-company', options: carrierOpts(), value: v.company, placeholder: 'Choose a transport company', addLabel: '+ Add a carrier',
+          const ps = new PixelSelect({ id: 'v-company', options: carrierOpts(), value: v.company, placeholder: 'เลือกบริษัทขนส่ง', addLabel: '+ เพิ่มบริษัทขนส่ง',
             onAdd: () => { row.hidden = false; inp.focus(); }, onChange: val => s.setVehicle('company', val), sfx: this.sfx });
           $('[data-dd="company"]', body).replaceWith(ps.el);
           const addCarrier = () => {
             const val = inp.value.trim(); if (!val) { inp.focus(); return; }
             s.addList('carrier', val); s.setVehicle('company', val); ps.setOptions(carrierOpts(), val); this.renderCarriers();
-            inp.value = ''; row.hidden = true; this.sfx.check(); Toast.show(`Added <b>${esc(val)}</b>`, 'ok');
+            inp.value = ''; row.hidden = true; this.sfx.check(); Toast.show(`เพิ่ม <b>${esc(val)}</b> แล้ว`, 'ok');
           };
           body.addEventListener('click', e => {
             if (e.target.closest('[data-add="carrier"]')) { row.hidden = !row.hidden; if (!row.hidden) inp.focus(); this.sfx.blip(); }
@@ -2629,7 +2630,7 @@ class App {
           inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addCarrier(); } });
         }
         const foot = document.createElement('div'); foot.className = 'win-foot';
-        foot.innerHTML = `<span class="grow progress-txt" id="prog-${key}"></span><button type="button" class="btn go" data-done>Done</button>`; el.appendChild(foot);
+        foot.innerHTML = `<span class="grow progress-txt" id="prog-${key}"></span><button type="button" class="btn go" data-done>เสร็จ</button>`; el.appendChild(foot);
         foot.querySelector('[data-done]').addEventListener('click', () => this.wm.close('sec-' + key));
         body.addEventListener('input', e => {
           const t = e.target;
@@ -2657,24 +2658,24 @@ class App {
     const chk = $('#chk-' + key, w.el);
     chk.innerHTML = SECTIONS[key].items.map(([id, en, th]) => {
       const it = sec.items[id] || {}, stt = it.status || '';
-      return `<div class="row ${stt}" data-item="${id}"><div style="min-width:0"><b>${en}</b><span class="th">${th}</span></div>
-        <div class="seg" role="group" aria-label="${en}"><button type="button" data-v="clean" aria-pressed="${stt === 'clean'}">Clean</button><button type="button" data-v="dirty" aria-pressed="${stt === 'dirty'}">Dirty</button></div>
-        ${stt === 'dirty' ? `<div class="finds"><span class="lbl">Found</span>${FINDINGS.map(([f, fen, fth]) => `<button type="button" class="chip" data-f="${f}" aria-pressed="${(it.findings || []).includes(f)}">${fth} · ${fen}</button>`).join('')}</div>` : ''}</div>`;
+      return `<div class="row ${stt}" data-item="${id}"><div style="min-width:0"><b>${th}</b></div>
+        <div class="seg" role="group" aria-label="${th}"><button type="button" data-v="clean" aria-pressed="${stt === 'clean'}">สะอาด</button><button type="button" data-v="dirty" aria-pressed="${stt === 'dirty'}">สกปรก</button></div>
+        ${stt === 'dirty' ? `<div class="finds"><span class="lbl">สิ่งที่พบ</span>${FINDINGS.map(([f, fen, fth]) => `<button type="button" class="chip" data-f="${f}" aria-pressed="${(it.findings || []).includes(f)}">${fth}</button>`).join('')}</div>` : ''}</div>`;
     }).join('');
     const photos = s.photosOf(key);
-    $('#ph-' + key, w.el).innerHTML = photos.map((p, i) => `<figure class="ph"><img src="${p}" alt="Inspection photo ${i + 1}"><button type="button" data-rm="${i}" aria-label="Remove photo ${i + 1}">×</button></figure>`).join('') +
-      `<label class="ph-add" for="file-${key}"><big>+</big>Add photo</label><input type="file" id="file-${key}" accept="image/*" multiple hidden>`;
+    $('#ph-' + key, w.el).innerHTML = photos.map((p, i) => `<figure class="ph"><img src="${p}" alt="รูปตรวจ ${i + 1}"><button type="button" data-rm="${i}" aria-label="ลบรูป ${i + 1}">×</button></figure>`).join('') +
+      `<label class="ph-add" for="file-${key}"><big>+</big>เพิ่มรูป</label><input type="file" id="file-${key}" accept="image/*" multiple hidden>`;
     const warn = $('#warn-' + key, w.el), need = photos.length === 0;
     $('#ph-' + key, w.el).classList.toggle('need', need);
     warn.hidden = !need; warn.classList.toggle('need', need && !st.dirty);
-    warn.querySelector('span').textContent = st.dirty ? 'Dirty point found. Take a photo and notify the farm vet · ถ่ายรูปและแจ้งสัตวแพทย์คุมฟาร์ม' : 'A photo is required for this section · ต้องแนบรูปอย่างน้อย 1 รูปก่อนจบส่วนนี้';
-    $('#prog-' + key, w.el).textContent = st.complete ? (st.dirty ? 'Complete · dirty points recorded' : 'Complete · all clean') : st.onlyPhoto ? 'Add a photo to finish this section' : `${st.done} of ${st.total} done`;
+    warn.querySelector('span').textContent = st.dirty ? 'พบจุดสกปรก ถ่ายรูปและแจ้งสัตวแพทย์คุมฟาร์ม' : 'ต้องแนบรูปอย่างน้อย 1 รูปก่อนจบส่วนนี้';
+    $('#prog-' + key, w.el).textContent = st.complete ? (st.dirty ? 'ครบแล้ว · บันทึกจุดสกปรกแล้ว' : 'ครบแล้ว · สะอาดทุกจุด') : st.onlyPhoto ? 'เพิ่มรูปเพื่อจบส่วนนี้' : `ทำแล้ว ${st.done} จาก ${st.total}`;
   }
   async addPhotos(key, files) {
     for (const f of Array.from(files || [])) {
       if (!f.type.startsWith('image/')) continue;
       try { this.store.addPhoto(key, await shrinkImage(f, 1280, .82)); this.sfx.blip(); }
-      catch (e) { Toast.show('That photo could not be read. Try a JPG or PNG.', 'bad'); }
+      catch (e) { Toast.show('อ่านรูปนี้ไม่ได้ ลองใช้ไฟล์ JPG หรือ PNG', 'bad'); }
     }
   }
   /* ---------- finish + next vehicle ---------- */
@@ -2684,8 +2685,8 @@ class App {
     const miss = this.store.missing();
     if (miss.length) {
       this.sfx.error(); const b = $('#finish'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
-      if (miss.includes('Body') && this.store.vehicleInfoMissing().length) { const vs = $('#vstrip'); vs.classList.remove('flash'); void vs.offsetWidth; vs.classList.add('flash'); }
-      Toast.show(`Still to do: <b>${miss.join(' · ')}</b>`, 'bad'); return;
+      if (miss.includes(SECTIONS.body.th) && this.store.vehicleInfoMissing().length) { const vs = $('#vstrip'); vs.classList.remove('flash'); void vs.offsetWidth; vs.classList.add('flash'); }
+      Toast.show(`ยังไม่ครบ: <b>${miss.join(' · ')}</b>`, 'bad'); return;
     }
     this.busy = true; this.panelFocus = false;
     const rec = this.store.commit();
@@ -2697,12 +2698,12 @@ class App {
     await this.tweens.to({ dur: REDUCED ? .5 : 4.6, ease: Ease.inCubic, update: e => { this.truck.root.position.x = e * 70; } });
     this.following = false;
     this.busy = false; this.awaitingNext = true;
-    $('#finish').textContent = 'Next ▶'; $('#finish').classList.remove('wait');
+    $('#finish').textContent = 'คันถัดไป ▶'; $('#finish').classList.remove('wait');
     this.openSaved(rec);
     this.refreshHUD();
   }
   async nextVehicle() {
-    if (this.busy) return; this.busy = true; this.awaitingNext = false; $('#finish').textContent = 'Finish ▶';
+    if (this.busy) return; this.busy = true; this.awaitingNext = false; $('#finish').textContent = 'จบคันนี้ ▶';
     this.wm.closeAll(); this.store.startNext(); this.prevDone = {}; this.refreshHUD(true);
     this.truck.root.position.x = -60; this.truck.lastX = -60; this.syncScene();
     this.rig.set(Object.assign({}, POSES.home, { tx: -6, th: .4 }));
@@ -2710,22 +2711,22 @@ class App {
     await this.tweens.to({ dur: REDUCED ? .5 : 3.9, ease: Ease.outQuint, update: e => { this.truck.root.position.x = -60 + e * 60; } });
     this.following = false; this.truck.cabSpring.kick(3.2); this.truck.cargoSpring.kick(1.4);
     this.rig.set(POSES.home); $('#callouts').classList.remove('hide'); this.busy = false;
-    Toast.show(`Vehicle <b>${pad2(this.store.saved.length + 1)}</b> at the checkpoint. Enter its plate.`);
+    Toast.show(`รถคันที่ <b>${pad2(this.store.saved.length + 1)}</b> มาถึงจุดตรวจแล้ว กรอกทะเบียนได้เลย`);
     setTimeout(() => this.open('body'), REDUCED ? 0 : 700);
   }
   openSaved(rec) {
     const n = this.store.saved.length;
     this.wm.open('saved', {
-      title: 'Vehicle saved', th: 'บันทึกแล้ว',
+      title: 'บันทึกรถคันนี้แล้ว',
       build: (body, el) => {
-        const res = k => { const r = rec.sections[k].result; return `<div class="${r}"><small>${SECTIONS[k].tag}</small><b>${r === 'dirty' ? 'Dirty' : 'Clean'}</b></div>`; };
-        body.innerHTML = `<div class="saved-hero"><span class="big ${rec.overall === 'dirty' ? 'bad' : ''}">${rec.overall === 'dirty' ? ICON_BANG(4) : ICON_CHECK(4)}</span><div><h3>${esc(rec.plate)} ${esc(rec.province)}</h3><p>${esc(rec.company)} · ${esc(rec.time)} · passed the disinfection spray</p></div></div>
+        const res = k => { const r = rec.sections[k].result; return `<div class="${r}"><small>${SECTIONS[k].th}</small><b>${r === 'dirty' ? 'ไม่ผ่าน' : 'ผ่าน'}</b></div>`; };
+        body.innerHTML = `<div class="saved-hero"><span class="big ${rec.overall === 'dirty' ? 'bad' : ''}">${rec.overall === 'dirty' ? ICON_BANG(4) : ICON_CHECK(4)}</span><div><h3>${esc(rec.plate)} ${esc(rec.province)}</h3><p>${esc(rec.company)} · ${esc(rec.time)} · ผ่านซุ้มพ่นยาฆ่าเชื้อแล้ว</p></div></div>
           <div class="res">${Object.keys(SECTIONS).map(res).join('')}</div>
-          <div class="field"><span class="lbl">SOP progress<span class="th">อย่างน้อย ${SOP_MIN} คัน/รุ่น</span></span><div class="meter5">${Array.from({ length: SOP_MIN }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>
-          <p class="note">${n >= SOP_MIN ? `${n} trucks checked. The batch meets the SOP minimum.` : `${n} of ${SOP_MIN} trucks checked for this batch.`}</p></div>
+          <div class="field"><span class="lbl">ความคืบหน้าตาม SOP<span class="th">อย่างน้อย ${SOP_MIN} คัน/รุ่น</span></span><div class="meter5">${Array.from({ length: SOP_MIN }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>
+          <p class="note">${n >= SOP_MIN ? `ตรวจแล้ว ${n} คัน ครบขั้นต่ำตาม SOP` : `ตรวจแล้ว ${n} จาก ${SOP_MIN} คันของรุ่นนี้`}</p></div>
           <div class="conn" data-sendstate="${esc(rec.id)}"></div>`;
         const foot = document.createElement('div'); foot.className = 'win-foot';
-        foot.innerHTML = `<button type="button" class="btn" data-log>Batch log</button><span class="grow"></span><button type="button" class="btn go" data-send-all>ส่งผลทั้งหมด ✉</button><button type="button" class="btn primary" data-next>Next vehicle ▶</button>`; el.appendChild(foot);
+        foot.innerHTML = `<button type="button" class="btn" data-log>บันทึกรุ่นนี้</button><span class="grow"></span><button type="button" class="btn go" data-send-all>ส่งผลทั้งหมด ✉</button><button type="button" class="btn primary" data-next>คันถัดไป ▶</button>`; el.appendChild(foot);
         foot.querySelector('[data-next]').addEventListener('click', () => this.nextVehicle());
         foot.querySelector('[data-send-all]').addEventListener('click', e => this.sendAll(e.currentTarget));
         foot.querySelector('[data-log]').addEventListener('click', e => this.openLog(e.target.getBoundingClientRect()));
@@ -2738,26 +2739,26 @@ class App {
     const box = $('[data-sendstate]', w.el); if (!box) return;
     const rec = this.store.saved.find(r => r.id === box.dataset.sendstate); if (!rec) return;
     box.innerHTML = rec.sentAt
-      ? `<span class="led on"></span><div><b>Sent to mail app</b><small>${SEND_URL ? 'ส่งเข้า Gmail กลางแล้ว' : 'ส่งต่อให้แอปอีเมลแล้ว'} ${esc(fmtStamp(rec.sentAt))}</small></div><span class="pill ok">ส่งแล้ว</span>`
+      ? `<span class="led on"></span><div><b>ส่งแล้ว</b><small>${SEND_URL ? 'ส่งเข้า Gmail กลางแล้ว' : 'ส่งต่อให้แอปอีเมลแล้ว'} ${esc(fmtStamp(rec.sentAt))}</small></div><span class="pill ok">ส่งแล้ว</span>`
       : rec.queued
-        ? `<span class="led q"></span><div><b>Waiting for signal</b><small>เก็บไว้ในเครื่องแล้ว จะส่งให้เองเมื่อมีเน็ต</small></div><span class="pill q">รอส่ง</span>`
-        : `<span class="led q"></span><div><b>Not sent yet</b><small>${SEND_URL ? 'กด <b>ส่งผลทั้งหมด ✉</b> ครั้งเดียว รถทุกคันที่ยังไม่ส่งในรุ่นนี้ ส่งเข้า Gmail กลางพร้อมรูป' : 'กด <b>ส่งผล ✉</b> แล้วเลือก Gmail ข้อมูลและรูปทุกส่วนจะอยู่ในอีเมล'}</small></div><span class="pill q">ยังไม่ส่ง</span>`;
+        ? `<span class="led q"></span><div><b>รอสัญญาณ</b><small>เก็บไว้ในเครื่องแล้ว จะส่งให้เองเมื่อมีเน็ต</small></div><span class="pill q">รอส่ง</span>`
+        : `<span class="led q"></span><div><b>ยังไม่ส่ง</b><small>${SEND_URL ? 'กด <b>ส่งผลทั้งหมด ✉</b> ครั้งเดียว รถทุกคันที่ยังไม่ส่งในรุ่นนี้ ส่งเข้า Gmail กลางพร้อมรูป' : 'กด <b>ส่งผล ✉</b> แล้วเลือก Gmail ข้อมูลและรูปทุกส่วนจะอยู่ในอีเมล'}</small></div><span class="pill q">ยังไม่ส่ง</span>`;
     const all = $('[data-send-all]', w.el), n = this.store.saved.filter(r => !r.sentAt).length;
     if (all && !this._sendingAll) { all.textContent = n ? `ส่งผลทั้งหมด (${n}) ✉` : '✓ ส่งครบแล้ว'; all.classList.toggle('go', !!n); }
   }
   /* ---------- log + export ---------- */
   openLog(from) {
     this.wm.open('log', {
-      title: 'Batch log', th: 'บันทึกรุ่นนี้', from, wide: true,
+      title: 'บันทึกรุ่นนี้', from, wide: true,
       build: (body, el) => {
         const foot = document.createElement('div'); foot.className = 'win-foot';
-        foot.innerHTML = `<button type="button" class="btn ghost-danger" data-reset>Clear log</button><span class="grow"></span><button type="button" class="btn" data-xlsx>Export Excel</button>${SEND_URL ? '<button type="button" class="btn go" data-send-all>ส่งผลทั้งหมด ✉</button>' : ''}`; el.appendChild(foot);
+        foot.innerHTML = `<button type="button" class="btn ghost-danger" data-reset>ล้างบันทึก</button><span class="grow"></span><button type="button" class="btn" data-xlsx>ส่งออก Excel</button>${SEND_URL ? '<button type="button" class="btn go" data-send-all>ส่งผลทั้งหมด ✉</button>' : ''}`; el.appendChild(foot);
         foot.querySelector('[data-xlsx]').addEventListener('click', e => this.exportExcel(e.currentTarget));
         const sa = foot.querySelector('[data-send-all]'); if (sa) sa.addEventListener('click', e => this.sendAll(e.currentTarget));
         body.addEventListener('click', e => { const b = e.target.closest('[data-send-id]'); if (b) this.sendRecord(b.dataset.sendId, b); });
-        armConfirm(foot.querySelector('[data-reset]'), { armedText: 'Tap again to clear all trucks', sfx: this.sfx, onConfirm: () => {
-          if (!this.store.saved.length) { Toast.show('The log is already empty'); return; }
-          this.store.resetBatch(); this.renderLog(); this.sfx.close(); Toast.show('Batch log cleared');
+        armConfirm(foot.querySelector('[data-reset]'), { armedText: 'แตะอีกครั้งเพื่อล้างรถทั้งหมด', sfx: this.sfx, onConfirm: () => {
+          if (!this.store.saved.length) { Toast.show('ยังไม่มีรถในบันทึก'); return; }
+          this.store.resetBatch(); this.renderLog(); this.sfx.close(); Toast.show('ล้างบันทึกรุ่นนี้แล้ว');
         } });
       },
     });
@@ -2767,36 +2768,36 @@ class App {
     const w = this.wm.wins.get('log'); if (!w) return;
     setTimeout(() => this.renderSendAllButtons(), 0);
     const s = this.store, recs = s.saved, b = s.batch, dot = r => `<span class="dot ${r}" title="${r}"></span>`;
-    w.body.innerHTML = `<div class="field"><span class="lbl">${esc(b.business)} · ${esc(b.farm)}${b.batchNo ? ' · Batch ' + esc(b.batchNo) : ''}</span>
+    w.body.innerHTML = `<div class="field"><span class="lbl">${esc(b.business)} · ${esc(b.farm)}${b.batchNo ? ' · รุ่น ' + esc(b.batchNo) : ''}</span>
         <div class="meter5">${Array.from({ length: SOP_MIN }, (_, i) => `<i class="${i < recs.length ? 'on' : ''}"></i>`).join('')}</div>
-        <p class="note">${recs.length} truck${recs.length === 1 ? '' : 's'} saved · SOP minimum ${SOP_MIN} per batch</p></div>` +
-      (recs.length ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Plate</th><th class="wide">Province</th><th>Time</th><th title="Body · Module · Crates">B · M · C</th><th class="wide">Photos</th><th>Send · ส่ง</th><th><span class="sr-only">Delete</span></th></tr></thead><tbody>${recs.map(r => `<tr data-id="${esc(r.id)}"><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="wide">${esc(r.province)}</td><td>${esc(r.time)}</td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${this.sendCell(r)}</td><td class="del"><button type="button" class="rowdel" aria-label="Delete truck ${esc(r.plate)}">×</button></td></tr>`).join('')}</tbody></table></div>`
-        : `<div class="empty">No trucks saved yet. Inspect the truck at the checkpoint, then press <b>Finish</b>.</div>`) +
-      `<p class="note">Tap × twice to delete one truck · กด × สองครั้งเพื่อลบรถคันนั้น</p><p class="note">Excel export has two sheets for Power BI: <b>Inspections</b> (one row per truck) and <b>CheckPoints</b> (one row per check point). Join them on InspectionID.</p>`;
+        <p class="note">บันทึกแล้ว ${recs.length} คัน · SOP ขั้นต่ำ ${SOP_MIN} คันต่อรุ่น</p></div>` +
+      (recs.length ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>ทะเบียน</th><th class="wide">จังหวัด</th><th>เวลา</th><th title="ตัวรถ · โมดูล · กล่อง">รถ·โม·กล่อง</th><th class="wide">รูป</th><th>ส่งผล</th><th><span class="sr-only">ลบ</span></th></tr></thead><tbody>${recs.map(r => `<tr data-id="${esc(r.id)}"><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="wide">${esc(r.province)}</td><td>${esc(r.time)}</td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${this.sendCell(r)}</td><td class="del"><button type="button" class="rowdel" aria-label="ลบรถ ${esc(r.plate)}">×</button></td></tr>`).join('')}</tbody></table></div>`
+        : `<div class="empty">ยังไม่มีรถที่บันทึก ตรวจรถที่จุดตรวจ แล้วกด <b>จบคันนี้</b></div>`) +
+      `<p class="note">กด × สองครั้งเพื่อลบรถคันนั้น</p><p class="note">ไฟล์ Excel มี 2 ชีตสำหรับ Power BI: <b>Inspections</b> (หนึ่งแถวต่อหนึ่งคัน) และ <b>CheckPoints</b> (หนึ่งแถวต่อหนึ่งจุดตรวจ) เชื่อมกันด้วย InspectionID</p>`;
     this.wireLogDeletes(w);
   }
   wireLogDeletes(w) {
-    $$('.rowdel', w.body).forEach(btn => armConfirm(btn, { armedText: 'Delete?', sfx: this.sfx, onConfirm: () => {
+    $$('.rowdel', w.body).forEach(btn => armConfirm(btn, { armedText: 'ลบ?', sfx: this.sfx, onConfirm: () => {
       const tr = btn.closest('tr'), id = tr.dataset.id, rec = this.store.saved.find(r => r.id === id);
       tr.classList.add('going');
-      setTimeout(() => { this.store.deleteSaved(id); this.renderLog(); this.sfx.close(); Toast.show(`Deleted <b>${esc(rec ? rec.plate : 'truck')}</b>`); }, REDUCED ? 0 : 240);
+      setTimeout(() => { this.store.deleteSaved(id); this.renderLog(); this.sfx.close(); Toast.show(`ลบ <b>${esc(rec ? rec.plate : 'รถ')}</b> แล้ว`); }, REDUCED ? 0 : 240);
     } }));
   }
   async exportExcel(btn) {
     const recs = this.store.saved;
-    if (!recs.length) { this.sfx.error(); Toast.show('Save at least one truck before exporting.', 'bad'); return; }
-    if (!window.XLSX) { Toast.show('The Excel library did not load. Reload and try again.', 'bad'); return; }
+    if (!recs.length) { this.sfx.error(); Toast.show('บันทึกรถอย่างน้อย 1 คันก่อนส่งออก', 'bad'); return; }
+    if (!window.XLSX) { Toast.show('โหลดตัวสร้าง Excel ไม่สำเร็จ ลองเปิดหน้าใหม่', 'bad'); return; }
     const downloads = await FileSaver.get();
-    btn.disabled = true; const label = btn.textContent; btn.textContent = 'Building…';
+    btn.disabled = true; const label = btn.textContent; btn.textContent = 'กำลังสร้าง…';
     try {
       const buf = Excel.build(recs);
       await downloads.save({ filename: Excel.filename(this.store.batch), data: new Uint8Array(buf) });
-      this.sfx.check(); Toast.show(`Excel saved · ${recs.length} truck${recs.length === 1 ? '' : 's'}`, 'ok');
+      this.sfx.check(); Toast.show(`บันทึก Excel แล้ว · ${recs.length} คัน`, 'ok');
     } catch (e) {
       const code = e && e.code;
-      if (code === 'declined') Toast.show('Export cancelled');
-      else if (code === 'rate_limited') Toast.show('A save prompt is already open. Finish that one first.', 'bad');
-      else Toast.show('The file could not be saved here.', 'bad');
+      if (code === 'declined') Toast.show('ยกเลิกการส่งออก');
+      else if (code === 'rate_limited') Toast.show('มีหน้าต่างบันทึกไฟล์เปิดอยู่ ปิดอันนั้นก่อน', 'bad');
+      else Toast.show('บันทึกไฟล์ในหน้านี้ไม่ได้', 'bad');
     } finally { btn.disabled = false; btn.textContent = label; }
   }
   /* ---------- send results (email → Gmail inbox → Power Automate) ---------- */
@@ -2807,16 +2808,16 @@ class App {
   }
   openSend(from) {
     this.wm.open('send', {
-      title: 'Send results', th: 'ส่งผลทางอีเมล', from, wide: true,
+      title: 'ส่งผล', from, wide: true,
       build: (body) => {
         body.innerHTML = `
           <div class="conn" id="send-conn"></div>
-          ${SEND_URL ? '<button type="button" class="btn go" data-send-all style="width:100%;padding:14px;font-size:14px">ส่งผลทั้งหมด ✉</button><p class="note">กดปุ่มเดียว รถทุกคันในรุ่นนี้ที่ยังไม่ส่ง ส่งเข้า Gmail กลางของ AVS พร้อมรูป (หนึ่งอีเมลต่อหนึ่งคัน) ถ้าไม่มีสัญญาณ แอปจะเก็บไว้แล้วส่งให้เองเมื่อมีเน็ต · ปุ่ม <b>ส่ง ✉</b> ในตารางใช้ส่งทีละคัน</p>' : `<div class="field"><label for="m-to">Recipient<span class="th">Gmail กลางที่ Power Automate อ่าน</span></label>
+          ${SEND_URL ? '<button type="button" class="btn go" data-send-all style="width:100%;padding:14px;font-size:14px">ส่งผลทั้งหมด ✉</button><p class="note">กดปุ่มเดียว รถทุกคันในรุ่นนี้ที่ยังไม่ส่ง ส่งเข้า Gmail กลางของ AVS พร้อมรูป (หนึ่งอีเมลต่อหนึ่งคัน) ถ้าไม่มีสัญญาณ แอปจะเก็บไว้แล้วส่งให้เองเมื่อมีเน็ต · ปุ่ม <b>ส่ง ✉</b> ในตารางใช้ส่งทีละคัน</p>' : `<div class="field"><label for="m-to">อีเมลผู้รับ<span class="th">Gmail กลางที่ Power Automate อ่าน</span></label>
             <input id="m-to" type="email" inputmode="email" value="${esc(this.mailCfg.to)}" placeholder="truckcheck.farm@gmail.com" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
           <p class="note">กด <b>ส่ง ✉</b> แล้วเลือกแอป <b>Gmail</b> (หรือแอปอีเมลที่ใช้) ในเมนูแชร์ ระบบคัดลอกอีเมลผู้รับไว้ให้แล้ว ให้วางในช่อง To แล้วกดส่งในแอปอีเมลอีกครั้ง</p>`}
-          <div class="field"><span class="lbl">Trucks in this batch<span class="th">รถในรุ่นนี้</span></span><div id="send-list"></div></div>
-          <div class="field"><span class="lbl">Email preview<span class="th">ตัวอย่างอีเมลของคันล่าสุด</span></span><pre id="send-prev"></pre></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" data-copy-prev>Copy preview</button><button type="button" class="btn" data-copy>Copy batch JSON</button><button type="button" class="btn go" data-xlsx>Export Excel</button></div>`;
+          <div class="field"><span class="lbl">รถในรุ่นนี้</span><div id="send-list"></div></div>
+          <div class="field"><span class="lbl">ตัวอย่างอีเมลของคันล่าสุด</span><pre id="send-prev"></pre></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" data-copy-prev>คัดลอกตัวอย่าง</button><button type="button" class="btn" data-copy>คัดลอกข้อมูล JSON</button><button type="button" class="btn go" data-xlsx>ส่งออก Excel</button></div>`;
         body.addEventListener('input', e => {
           if (e.target.id !== 'm-to') return;
           this.mailCfg.to = e.target.value.trim(); Persist.set('mailcfg', this.mailCfg);
@@ -2828,8 +2829,8 @@ class App {
           if (e.target.closest('[data-xlsx]')) return this.exportExcel(e.target.closest('[data-xlsx]'));
           const cp = e.target.closest('[data-copy],[data-copy-prev]'); if (!cp) return;
           const txt = cp.hasAttribute('data-copy') ? JSON.stringify({ batch: this.store.batch, vehicles: this.store.saved }, null, 2) : $('#send-prev', body).textContent;
-          if (await copyText(txt)) { Toast.show('Copied · คัดลอกแล้ว', 'ok'); this.sfx.blip(); }
-          else { const pre = $('#send-prev', body); pre.textContent = txt; const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); Toast.show('Selected. Press Ctrl+C or Copy to finish.'); }
+          if (await copyText(txt)) { Toast.show('คัดลอกแล้ว', 'ok'); this.sfx.blip(); }
+          else { const pre = $('#send-prev', body); pre.textContent = txt; const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); Toast.show('เลือกข้อความแล้ว กด Ctrl+C หรือ คัดลอก'); }
         });
       },
     });
@@ -2839,7 +2840,7 @@ class App {
     const w = this.wm.wins.get('send'); if (!w) return;
     const box = $('#send-conn', w.body), ok = EMAIL_RE.test(this.mailCfg.to || ''), pending = this.store.saved.filter(r => !r.sentAt).length;
     if (SEND_URL) { box.innerHTML = `<span class="led ${navigator.onLine === false ? 'q' : 'on'}"></span><div><b>AVS · Gmail กลาง</b><small>ส่งตรงด้วยปุ่มเดียว · รูปทุกส่วนแนบไปด้วย</small></div><span class="pill ${pending ? 'q' : 'ok'}">${pending ? `รอส่ง ${pending}` : 'ส่งครบ'}</span>`; return; }
-    box.innerHTML = `<span class="led ${ok ? 'on' : 'q'}"></span><div><b>Email · Gmail</b><small>${ok ? `ส่งถึง ${esc(this.mailCfg.to)}` : 'ใส่อีเมลผู้รับก่อนส่ง'} · รูปทุกส่วนแนบไปกับอีเมล</small></div><span class="pill ${pending ? 'q' : 'ok'}">${pending ? `รอส่ง ${pending}` : 'ส่งครบ'}</span>`;
+    box.innerHTML = `<span class="led ${ok ? 'on' : 'q'}"></span><div><b>อีเมล · Gmail</b><small>${ok ? `ส่งถึง ${esc(this.mailCfg.to)}` : 'ใส่อีเมลผู้รับก่อนส่ง'} · รูปทุกส่วนแนบไปกับอีเมล</small></div><span class="pill ${pending ? 'q' : 'ok'}">${pending ? `รอส่ง ${pending}` : 'ส่งครบ'}</span>`;
   }
   /* label every "send all" button with how many trucks are still unsent */
   renderSendAllButtons() {
@@ -2853,10 +2854,10 @@ class App {
     this.renderSendConn();
     const recs = this.store.saved, dot = r => `<span class="dot ${r}" title="${r}"></span>`;
     $('#send-list', w.body).innerHTML = recs.length
-      ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Plate</th><th title="Body · Module · Crates">B · M · C</th><th>Result</th><th class="wide">Photos</th><th>Status</th><th></th></tr></thead><tbody>${recs.map(r => `<tr><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td>${Mail.res(r.overall)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${r.sentAt ? `<span class="pill ok">ส่งแล้ว ${esc(fmtStamp(r.sentAt))}</span>` : (r.queued ? '<span class="pill q">รอสัญญาณ</span>' : '<span class="pill q">ยังไม่ส่ง</span>')}</td><td>${this.sendCell(r)}</td></tr>`).join('')}</tbody></table></div>`
-      : '<div class="empty">No trucks saved yet. Finish a truck first, then send it here.</div>';
+      ? `<div class="tbl-wrap"><table><thead><tr><th>#</th><th>ทะเบียน</th><th title="ตัวรถ · โมดูล · กล่อง">รถ·โม·กล่อง</th><th>ผล</th><th class="wide">รูป</th><th>สถานะ</th><th></th></tr></thead><tbody>${recs.map(r => `<tr><td>${pad2(r.vehicleNo)}</td><td><b>${esc(r.plate)}</b></td><td class="bmc">${dot(r.sections.body.result)}${dot(r.sections.module.result)}${dot(r.sections.crates.result)}</td><td>${Mail.res(r.overall)}</td><td class="wide">${Object.values(r.sections).reduce((a, x) => a + (x.photoCount || 0), 0)}</td><td>${r.sentAt ? `<span class="pill ok">ส่งแล้ว ${esc(fmtStamp(r.sentAt))}</span>` : (r.queued ? '<span class="pill q">รอสัญญาณ</span>' : '<span class="pill q">ยังไม่ส่ง</span>')}</td><td>${this.sendCell(r)}</td></tr>`).join('')}</tbody></table></div>`
+      : '<div class="empty">ยังไม่มีรถที่บันทึก ตรวจและกดจบคันนี้ก่อน แล้วค่อยส่งที่นี่</div>';
     const last = recs[recs.length - 1], pre = $('#send-prev', w.body);
-    if (!last) { pre.textContent = '// Finish a truck to preview its email'; return; }
+    if (!last) { pre.textContent = '// จบรถอย่างน้อย 1 คันเพื่อดูตัวอย่างอีเมล'; return; }
     const p = this.store.recPhotos[last.id] || {}, names = Mail.names(p);
     pre.textContent = `To: ${SEND_URL ? 'Gmail กลาง AVS (กำหนดในระบบ)' : (this.mailCfg.to || '(ยังไม่ได้ใส่)')}\nSubject: ${Mail.subject(last)}\nAttachments: ${Object.values(names).flat().join(', ') || '-'}\n\n${Mail.text(last, names, false)}`;
   }
@@ -2865,7 +2866,7 @@ class App {
     if (SEND_URL) return this.sendDirect(rec, btn, false);
     const to = (this.mailCfg.to || '').trim();
     if (!EMAIL_RE.test(to)) {
-      this.sfx.error(); Toast.show('ใส่อีเมลผู้รับก่อนส่ง · Add the recipient first', 'bad');
+      this.sfx.error(); Toast.show('ใส่อีเมลผู้รับก่อนส่ง', 'bad');
       if (!this.wm.has('send')) this.openSend(btn && btn.getBoundingClientRect());
       setTimeout(() => { const i = $('#m-to'); if (i) i.focus(); }, 320); return;
     }
@@ -2881,7 +2882,7 @@ class App {
         Toast.show(`ส่งต่อให้แอปอีเมลแล้ว · วาง <b>${esc(to)}</b> ในช่อง To แล้วกดส่ง`, 'ok');
         return;
       } catch (e) {
-        if (e && e.name === 'AbortError') { Toast.show('ยกเลิกการส่ง · Send cancelled'); return; }
+        if (e && e.name === 'AbortError') { Toast.show('ยกเลิกการส่ง'); return; }
         /* share refused here (e.g. embedded view): fall through to the manual route */
       }
     }
@@ -2920,7 +2921,7 @@ class App {
     if (!SEND_URL) { const r = this.store.saved.find(x => !x.sentAt); if (r) this.sendRecord(r.id, btn); return; }
     if (this._sendingAll) return;
     const todo = this.store.saved.filter(r => !r.sentAt);
-    if (!todo.length) { Toast.show('ส่งครบทุกคันแล้ว · All trucks are sent', 'ok'); return; }
+    if (!todo.length) { Toast.show('ส่งครบทุกคันแล้ว', 'ok'); return; }
     if (navigator.onLine === false) { todo.forEach(r => this.store.markQueued(r.id)); this.renderSendList(); this.renderSavedState(); Toast.show(`ไม่มีสัญญาณ · เก็บไว้ ${todo.length} คัน จะส่งให้เองเมื่อมีเน็ต`, 'bad'); return; }
     this._sendingAll = true;
     const btns = () => ['send', 'log', 'saved'].map(k => { const w = this.wm.wins.get(k); return w && $('[data-send-all]', w.el); }).filter(Boolean);
@@ -2947,15 +2948,15 @@ class App {
     const n = pack.files.length;
     this.wm.close('sendfb', true);
     this.wm.open('sendfb', {
-      title: 'Send by email', th: 'ส่งผลแบบเปิดอีเมลเอง',
+      title: 'ส่งผลแบบเปิดอีเมลเอง',
       build: (body, el) => {
         body.innerHTML = `
           <p class="note">หน้านี้เปิดเมนูแชร์พร้อมรูปไม่ได้ ใช้ 3 ขั้นนี้แทน · ${esc(rec.plate)} ${esc(rec.province)} คันที่ ${pad2(rec.vehicleNo)}</p>
-          <div class="field"><span class="lbl"><span class="n">1</span>Open email<span class="th">เปิดอีเมลใหม่ที่ใส่ผู้รับ หัวเรื่อง และข้อความไว้ให้แล้ว</span></span>
+          <div class="field"><span class="lbl"><span class="n">1</span>เปิดอีเมล<span class="th">เปิดอีเมลใหม่ที่ใส่ผู้รับ หัวเรื่อง และข้อความไว้ให้แล้ว</span></span>
             <a class="btn primary" href="${esc(Mail.mailto(to, pack))}" target="_blank" rel="noopener" data-mailto>เปิดแอปอีเมล ✉</a></div>
-          <div class="field"><span class="lbl"><span class="n">2</span>If it did not open<span class="th">คัดลอกข้อความไปวางในอีเมลใหม่เอง</span></span>
+          <div class="field"><span class="lbl"><span class="n">2</span>ถ้าอีเมลไม่เปิด<span class="th">คัดลอกข้อความไปวางในอีเมลใหม่เอง</span></span>
             <button type="button" class="btn" data-copy-all>คัดลอกหัวเรื่อง + ข้อความ</button></div>
-          <div class="field"><span class="lbl"><span class="n">3</span>Attach photos<span class="th">${n ? `บันทึกรูป ${n} รูปลงเครื่อง แล้วแนบในอีเมล` : 'ไม่มีรูปที่บันทึกไว้สำหรับคันนี้'}</span></span>
+          <div class="field"><span class="lbl"><span class="n">3</span>แนบรูป<span class="th">${n ? `บันทึกรูป ${n} รูปลงเครื่อง แล้วแนบในอีเมล` : 'ไม่มีรูปที่บันทึกไว้สำหรับคันนี้'}</span></span>
             ${n ? `<button type="button" class="btn" data-save-photos>บันทึกรูป ${n} รูป</button><p class="note">${esc(Object.values(pack.names).flat().join(', '))}</p>` : ''}</div>`;
         const foot = document.createElement('div'); foot.className = 'win-foot';
         foot.innerHTML = `<span class="grow note">กดส่งในแอปอีเมลแล้วค่อยกดปุ่มนี้</span><button type="button" class="btn go" data-mark>ส่งแล้ว ✓</button>`; el.appendChild(foot);
@@ -2963,7 +2964,7 @@ class App {
         body.addEventListener('click', async e => {
           if (e.target.closest('[data-copy-all]')) {
             if (await copyText(`${pack.subject}\n\n${pack.text}`)) { Toast.show('คัดลอกแล้ว · ส่งถึง ' + esc(to), 'ok'); this.sfx.blip(); }
-            else Toast.show('คัดลอกไม่ได้ในหน้านี้ ใช้ Copy preview ในหน้าส่งผล', 'bad');
+            else Toast.show('คัดลอกไม่ได้ในหน้านี้ ใช้ปุ่มคัดลอกตัวอย่างในหน้าส่งผล', 'bad');
           }
           const sp = e.target.closest('[data-save-photos]'); if (sp) this.savePhotoFiles(pack.files, sp);
         });
