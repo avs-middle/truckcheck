@@ -2807,7 +2807,7 @@ class App {
       build: (body) => {
         body.innerHTML = `
           <div class="conn" id="send-conn"></div>
-          ${SEND_URL ? '<button type="button" class="btn go" data-send-all style="width:100%;padding:14px;font-size:14px">ส่งผลทั้งหมด ✉</button><p class="note">กดปุ่มเดียว รถทุกคันในรุ่นนี้ที่ยังไม่ส่ง ส่งเข้า Gmail กลางของ AVS พร้อมรูป (หนึ่งอีเมลต่อหนึ่งคัน) ถ้าไม่มีสัญญาณ แอปจะเก็บไว้แล้วส่งให้เองเมื่อมีเน็ต · ปุ่ม <b>ส่ง ✉</b> ในตารางใช้ส่งทีละคัน</p>' : `<div class="field"><label for="m-to">อีเมลผู้รับ<span class="th">Gmail กลางที่ Power Automate อ่าน</span></label>
+          ${SEND_URL ? '<button type="button" class="btn go" data-send-all style="width:100%;padding:14px;font-size:14px">ส่งผลทั้งหมด ✉</button>' : `<div class="field"><label for="m-to">อีเมลผู้รับ<span class="th">Gmail กลางที่ Power Automate อ่าน</span></label>
             <input id="m-to" type="email" inputmode="email" value="${esc(this.mailCfg.to)}" placeholder="truckcheck.farm@gmail.com" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
           <p class="note">กด <b>ส่ง ✉</b> แล้วเลือกแอป <b>Gmail</b> (หรือแอปอีเมลที่ใช้) ในเมนูแชร์ ระบบคัดลอกอีเมลผู้รับไว้ให้แล้ว ให้วางในช่อง To แล้วกดส่งในแอปอีเมลอีกครั้ง</p>`}
           <div class="field"><span class="lbl">รถในรุ่นนี้</span><div id="send-list"></div></div>
