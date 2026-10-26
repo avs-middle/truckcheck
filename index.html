@@ -327,10 +327,44 @@ button{font:inherit;color:inherit}
 .bh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap}
 .bh h2{margin:0;font:600 17px/24px var(--f-num);color:var(--d-tx)}
 .bh span{font-size:11px;color:var(--d-mute)}
-.truckmap{display:block;width:100%;max-width:560px;height:auto;margin:0 auto}
+.truckmap{display:block;width:100%;max-width:620px;height:auto;margin:0 auto}
 .truckmap text{font-family:var(--f-ui)}
+.t3d-host{width:100%;max-width:640px;margin:0 auto}
+.t3d{width:100%}
+.t3d-stage{position:relative;width:100%;aspect-ratio:16/10;max-height:380px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse 80% 70% at 50% 38%,#FFFFFF 0%,#F1F5F9 62%,#E2E8F0 100%);touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.t3d-stage.drag{cursor:grabbing}
+.t3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
+.t3d .ml{position:absolute;inset:0;pointer-events:none}
+.t3d-load{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:12px;color:var(--d-mute)}
+.t3d.loading .t3d-load{display:flex}
+.t3d.loading .t3d-views,.t3d.loading .t3d-hint{visibility:hidden}
+.m3{position:absolute;left:0;top:0;width:24px;height:24px;margin:-12px 0 0 -12px;padding:0;border-radius:50%;border:2px solid #fff;background:var(--c);color:#fff;font:800 11px/20px var(--f-ui);text-align:center;box-shadow:0 2px 6px rgba(15,23,42,.38);pointer-events:auto;cursor:pointer;transition:opacity .2s,filter .2s}
+.m3::before{content:"";position:absolute;inset:-7px;border-radius:50%}
+.m3.clean{width:14px;height:14px;margin:-7px 0 0 -7px;border-width:2px}
+.m3.lt{color:#78350F}
+.m3.far{opacity:.3;filter:saturate(.5);z-index:0}
+.m3.sel{width:28px;height:28px;margin:-14px 0 0 -14px;line-height:24px;font-size:12px;opacity:1;filter:none;z-index:2;box-shadow:0 0 0 2px #111827,0 3px 8px rgba(15,23,42,.4)}
+.m3.clean.sel{width:18px;height:18px;margin:-9px 0 0 -9px}
+.m3.sel::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--c);animation:m3p 1.8s ease-out infinite}
+@keyframes m3p{0%{transform:scale(.85);opacity:.9}100%{transform:scale(1.7);opacity:0}}
+@media (prefers-reduced-motion:reduce){.m3.sel::after{animation:none;opacity:.5}}
+@media (max-width:400px){.m3{width:21px;height:21px;margin:-10.5px 0 0 -10.5px;font-size:10px;line-height:17px}.m3.clean{width:12px;height:12px;margin:-6px 0 0 -6px}.m3.sel{width:25px;height:25px;margin:-12.5px 0 0 -12.5px;line-height:21px;font-size:11px}.t3d-stage{aspect-ratio:4/3}}
+.m3:focus-visible{outline:2px solid #4338CA;outline-offset:2px}
+.t3d-hint{position:absolute;left:10px;top:9px;font-size:11px;color:#475569;background:rgba(255,255,255,.8);padding:2px 8px;border-radius:99px;pointer-events:none;transition:opacity .4s}
+.t3d-stage.used .t3d-hint{opacity:0}
+.t3d-views{display:flex;justify-content:center;gap:4px;margin:8px auto 0;width:max-content;max-width:100%;background:var(--d-bg);padding:3px;border-radius:99px}
+.t3d-views button{border:0;background:transparent;font:600 12px/1 var(--f-ui);color:#334155;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:30px}
+.t3d-views button:hover,.t3d-views button.on{background:#fff;color:#4338CA;box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.bh.tmh{flex-wrap:wrap;row-gap:4px}
+.bh.tmh span{flex-basis:100%;order:3}
+.tmsw{display:inline-flex;background:var(--d-bg);border-radius:99px;padding:2px;margin-left:auto}
+.tmsw button{border:0;background:transparent;font:700 11px/1 var(--f-ui);color:var(--d-mute);padding:6px 11px;border-radius:99px;cursor:pointer}
+.tmsw button.on{background:#fff;color:#4338CA;box-shadow:0 1px 3px rgba(15,23,42,.15)}
 .hot{cursor:pointer}
-.hot:hover circle.halo,.hot.sel circle.halo{stroke:#111827;stroke-width:2}
+.hot .dot{filter:drop-shadow(0 1.5px 2px rgba(15,23,42,.35));transition:r .15s}.hot:hover .dot,.hot:focus-visible .dot{stroke:#111827}.hot:focus{outline:none}
+.hot .pulse{transform-box:fill-box;transform-origin:center;animation:tmPulse 1.8s ease-out infinite}
+@keyframes tmPulse{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+@media (prefers-reduced-motion:reduce){.hot .pulse{animation:none;opacity:.5}}
 .hotinfo{max-width:560px;margin-left:auto!important;margin-right:auto!important;display:flex;gap:10px;align-items:center;background:var(--d-bg);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--d-tx-3);margin-top:8px}
 .hotinfo b{color:var(--d-tx);font-size:13px}
 .scale{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--d-mute);margin-top:8px}
@@ -721,7 +755,7 @@ const optList = (opts, cur) => opts.map(([v, label, count]) => `<button type="bu
 
 /* ===== Dashboard ===== */
 const Dash = {
-  all: null, src: null, f: { weeks: 6, farm: '', batch: '', carrier: '' }, showAllCp: false, showAllFails: false, loading: false, tab: 'over', vq: '', vf: 'all', selWeek: -1, hotKey: '', showAllB: false,
+  all: null, src: null, f: { weeks: 6, farm: '', batch: '', carrier: '' }, showAllCp: false, showAllFails: false, loading: false, tab: 'over', tm: (() => { try { return localStorage.getItem('tc:tm') || '3d'; } catch (e) { return '3d'; } })(), vq: '', vf: 'all', selWeek: -1, hotKey: '', showAllB: false,
   reset() { this.all = null; this.src = null; this.f = { weeks: 6, farm: '', batch: '', carrier: '' }; },
   open() { if (!this.all && !this.loading) this.load(false); else this.render(); },
   async load(force) {
@@ -1015,24 +1049,66 @@ const Dash = {
   truckMapB(L, S) {
     const by = {}; S.cps.forEach(c => { by[c.key] = c; });
     const col = p => p >= 8 ? '#EF4444' : p >= 4 ? '#F59E0B' : p > 0 ? '#FCD34D' : '#10B981';
-    // side view of a catching truck: crates on the module, cab on the right
-    const HS = [['Module_edges', 60, 22], ['Module_around', 236, 60], ['Crates_out_l', 52, 96], ['Crates_in_l', 100, 96], ['Crates_out_r', 152, 96], ['Crates_in_r', 200, 96],
-      ['Module_under_frame', 150, 128], ['Body_rope_hooks', 214, 120], ['Body_side_lights', 112, 138], ['Body_mudguards', 72, 150], ['Body_tail_rear', 14, 128], ['Body_tail_front', 330, 132]];
+    // side view of a chicken-catching truck: crate module on a steel frame, cab on the right
+    const HS = [['Module_edges', 34, 26], ['Module_around', 262, 52], ['Crates_out_l', 58, 106], ['Crates_in_l', 108, 106], ['Crates_out_r', 168, 106], ['Crates_in_r', 218, 106],
+      ['Module_under_frame', 192, 146], ['Body_rope_hooks', 244, 134], ['Body_side_lights', 154, 152], ['Body_mudguards', 100, 142], ['Body_tail_rear', 16, 144], ['Body_tail_front', 372, 140]];
     const sel = this.hotKey && by[this.hotKey] ? this.hotKey : (S.cps[0] && S.cps[0].dirty ? S.cps[0].key : HS[0][0]);
     let crates = '';
-    for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) crates += `<rect x="${30 + c * 23}" y="${30 + r * 19}" width="20" height="16" rx="2" fill="${r >= 2 ? 'rgba(99,102,241,.16)' : 'rgba(99,102,241,.07)'}" stroke="rgba(99,102,241,.30)"/>`;
-    const truck = `<g>
-      <rect x="22" y="22" width="222" height="96" rx="4" fill="none" stroke="#94A3B8" stroke-width="2"/>${crates}
-      <rect x="16" y="118" width="300" height="10" rx="2" fill="#CBD5E1"/>
-      <path d="M252 62h50l22 30v36h-72z" fill="#EEF2FF" stroke="#94A3B8" stroke-width="2"/><path d="M262 70h36l14 20h-50z" fill="#C7D2FE"/>
-      ${[72, 112, 282].map(x => `<circle cx="${x}" cy="136" r="14" fill="#fff" stroke="#64748B" stroke-width="3"/><circle cx="${x}" cy="136" r="5" fill="#94A3B8"/>`).join('')}
-    </g>`;
-    const hs = HS.map(([k, x, y]) => { const c = by[k] || { p: 0, dirty: 0 }, r = 6 + Math.min(10, c.p * .9);
-      return `<g class="hot${k === sel ? ' sel' : ''}" data-hot="${k}"><circle cx="${x}" cy="${y}" r="${r + 7}" fill="${col(c.p)}" opacity=".18"/><circle class="halo" cx="${x}" cy="${y}" r="${r}" fill="${col(c.p)}"/><text x="${x}" y="${y + 3.5}" text-anchor="middle" font-size="9" font-weight="700" fill="#111827">${c.dirty || ''}</text></g>`; }).join('');
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 8; c++) {
+      const x = 31 + c * 28.5, y = 31 + r * 25.5, low = r >= 2;
+      crates += `<g><rect x="${x}" y="${y}" width="26" height="23" rx="2.5" fill="url(#tm-crate${low ? 'L' : ''})" stroke="${low ? '#7C93C9' : '#9DB0DA'}" stroke-width=".8"/>`
+        + `<rect x="${x + 3}" y="${y + 3}" width="20" height="3" rx="1.5" fill="${low ? '#5B74AE' : '#7F95C8'}" opacity=".55"/>`
+        + [0, 1, 2].map(i => `<rect x="${x + 4 + i * 6.6}" y="${y + 9}" width="4.4" height="10" rx="1.6" fill="${low ? '#5B74AE' : '#7F95C8'}" opacity=".35"/>`).join('') + '</g>';
+    }
+    const wheel = x => `<g><circle cx="${x}" cy="162" r="17" fill="#1F2937"/><circle cx="${x}" cy="162" r="13.5" fill="#374151"/><circle cx="${x}" cy="162" r="9" fill="url(#tm-rim)" stroke="#94A3B8" stroke-width=".8"/>${[0, 72, 144, 216, 288].map(d => `<circle cx="${(x + 5.4 * Math.cos(d * Math.PI / 180)).toFixed(1)}" cy="${(162 + 5.4 * Math.sin(d * Math.PI / 180)).toFixed(1)}" r="1.1" fill="#64748B"/>`).join('')}<circle cx="${x}" cy="162" r="2.6" fill="#475569"/></g>`;
+    const truck = `<defs>
+        <linearGradient id="tm-crate" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E4EBFA"/><stop offset="1" stop-color="#C9D5F0"/></linearGradient>
+        <linearGradient id="tm-crateL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9D5F0"/><stop offset="1" stop-color="#AFC0E6"/></linearGradient>
+        <linearGradient id="tm-cab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E2E8F0"/></linearGradient>
+        <linearGradient id="tm-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#BFDBFE"/><stop offset=".55" stop-color="#93C5FD"/><stop offset="1" stop-color="#60A5FA"/></linearGradient>
+        <radialGradient id="tm-rim" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#F8FAFC"/><stop offset="1" stop-color="#CBD5E1"/></radialGradient>
+        <radialGradient id="tm-shadow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#0F172A" stop-opacity=".22"/><stop offset="1" stop-color="#0F172A" stop-opacity="0"/></radialGradient>
+      </defs>
+      <ellipse cx="196" cy="180" rx="190" ry="9" fill="url(#tm-shadow)"/>
+      <line x1="4" y1="179" x2="392" y2="179" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>
+      <rect x="14" y="138" width="346" height="9" rx="2" fill="#334155"/>
+      <rect x="22" y="147" width="250" height="4" rx="1" fill="#475569"/>
+      <rect x="26" y="26" width="238" height="110" rx="3" fill="#F1F5F9" stroke="#64748B" stroke-width="2.4"/>
+      ${crates}
+      <rect x="24" y="24" width="242" height="5" rx="2" fill="#64748B"/>
+      ${[[24, 5], [85.5, 3.5], [142.5, 3.5], [199.5, 3.5], [261, 5]].map(([x, w]) => `<rect x="${x}" y="24" width="${w}" height="114" rx="1.5" fill="#64748B"/>`).join('')}
+      <rect x="24" y="79.6" width="242" height="2.4" fill="#94A3B8"/>
+      <rect x="22" y="134" width="246" height="5" rx="1.5" fill="#475569"/>
+      ${[48, 108, 168, 228].map(x => `<path d="M${x} 139v4a2.5 2.5 0 0 0 5 0" fill="none" stroke="#94A3B8" stroke-width="1.6" stroke-linecap="round"/>`).join('')}
+      ${[132, 160, 188].map(x => `<rect x="${x}" y="149" width="7" height="3.5" rx="1" fill="#F59E0B"/>`).join('')}
+      <rect x="15" y="135" width="7" height="10" rx="1.5" fill="#DC2626"/><rect x="16.5" y="136.5" width="4" height="3" rx=".8" fill="#FCA5A5"/>
+      <path d="M274 147V66q0-8 8-8h46q7 0 10 6l22 40q4 7 4 15v28z" fill="url(#tm-cab)" stroke="#64748B" stroke-width="2"/>
+      <path d="M332 66l20 36h-30q-4 0-4-4V70q0-4 4-4z" fill="url(#tm-glass)" stroke="#64748B" stroke-width="1.2"/>
+      <path d="M282 70q0-4 4-4h24q4 0 4 4v26q0 4-4 4h-24q-4 0-4-4z" fill="url(#tm-glass)" stroke="#64748B" stroke-width="1.2"/>
+      <path d="M287 70l10 0l-8 22h-2z" fill="#fff" opacity=".35"/><path d="M336 70l5 0l-10 26h-4z" fill="#fff" opacity=".35"/>
+      <path d="M316 66v78" stroke="#94A3B8" stroke-width="1.2"/>
+      <rect x="298" y="110" width="10" height="3" rx="1.5" fill="#64748B"/>
+      <rect x="274" y="118" width="90" height="7" fill="#6366F1"/><rect x="274" y="125" width="90" height="2" fill="#A5B4FC"/>
+      <rect x="352" y="104" width="10" height="9" rx="2" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
+      <rect x="358" y="129" width="12" height="18" rx="3" fill="#334155"/>
+      <rect x="366" y="132" width="6" height="7" rx="1.5" fill="#F97316"/>
+      <rect x="270" y="72" width="3" height="18" rx="1.5" fill="#334155"/><rect x="266" y="76" width="6" height="12" rx="2" fill="#475569"/>
+      ${[80, 118, 314].map(x => `<path d="M${x - 22} 163a22 22 0 0 1 44 0" fill="none" stroke="#1E293B" stroke-width="4.5" stroke-linecap="round"/>`).join('')}
+      ${[80, 118, 314].map(wheel).join('')}`;
+    const hs = HS.map(([k, x, y]) => { const c = by[k] || { p: 0, dirty: 0 }, clr = col(c.p), on = k === sel, txt = c.p > 0 && c.p < 4 ? '#78350F' : '#fff';
+      return `<g class="hot${on ? ' sel' : ''}" data-hot="${k}" tabindex="0" role="button" aria-label="${esc((by[k] || {}).th || k)} ${c.dirty || 0} คัน">`
+        + (on ? `<circle class="pulse" cx="${x}" cy="${y}" r="12" fill="none" stroke="${clr}" stroke-width="2"/>` : '')
+        + `<circle cx="${x}" cy="${y}" r="16" fill="transparent"/>`
+        + (c.dirty ? `<circle class="dot" cx="${x}" cy="${y}" r="${on ? 11.5 : 10}" fill="${clr}" stroke="#fff" stroke-width="2.2"/><text x="${x}" y="${y + 3.6}" text-anchor="middle" font-size="10.5" font-weight="800" fill="${txt}">${c.dirty}</text>`
+          : `<circle class="dot" cx="${x}" cy="${y}" r="${on ? 7.5 : 6}" fill="${clr}" stroke="#fff" stroke-width="2"/>`) + '</g>'; }).join('');
     const c = by[sel] || {};
     const info = `<div class="hotinfo"><span style="width:12px;height:12px;border-radius:50%;background:${col(c.p || 0)};flex:none"></span><div style="min-width:0"><b>${esc(c.secTh || '')} · ${esc(c.th || '')}</b><br>พบสกปรก ${c.dirty || 0} คัน (${fmtPct(c.p || 0)} ของรถที่ตรวจ)${c.finds && c.finds.length ? ' · ' + esc(c.finds.slice(0, 2).join(', ')) : ''}</div></div>`;
-    return `<section class="card" style="padding:14px"><div class="bh"><h2>แผนที่จุดเสี่ยงบนตัวรถ</h2><span>แตะจุดเพื่อดูรายละเอียด · ตัวเลข = จำนวนคัน</span></div>
-      <svg class="truckmap" viewBox="0 0 344 168" role="img" aria-label="แผนภาพรถจับไก่ แสดงจุดตรวจ 12 จุด">${truck}${hs}</svg>${info}
+    const can3d = !T3D.failed && T3D.supported(), use3d = can3d && this.tm !== '2d';
+    this._t3d = use3d ? { by, sel } : null;
+    const sw = can3d ? `<div class="tmsw" role="group" aria-label="รูปแบบแผนที่"><button type="button" data-tm="3d" class="${use3d ? 'on' : ''}" aria-pressed="${use3d}">3D</button><button type="button" data-tm="2d" class="${use3d ? '' : 'on'}" aria-pressed="${!use3d}">2D</button></div>` : '';
+    const map = use3d ? '<div class="t3d-host" id="t3d-host"></div>' : `<svg class="truckmap" viewBox="0 0 396 190" role="img" aria-label="แผนภาพรถจับไก่ แสดงจุดตรวจ 12 จุด">${truck}${hs}</svg>`;
+    return `<section class="card" style="padding:14px"><div class="bh tmh"><h2>แผนที่จุดเสี่ยงบนตัวรถ</h2>${sw}<span>${use3d ? 'ลากเพื่อหมุนรถ · ' : ''}แตะจุดเพื่อดูรายละเอียด · ตัวเลข = จำนวนคัน</span></div>
+      ${map}${info}
       <div class="scale"><i style="background:#10B981"></i>สะอาด<i style="background:#FCD34D;margin-left:6px"></i>&lt;4%<i style="background:#F59E0B;margin-left:6px"></i>4–8%<i style="background:#EF4444;margin-left:6px"></i>≥8%</div></section>`;
   },
   heatB() {
@@ -1065,7 +1141,10 @@ const Dash = {
     body.querySelectorAll('[data-carrier]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.carrier; this.f.carrier = this.f.carrier === v ? '' : v; this.render(); }));
     body.querySelectorAll('[data-rec]').forEach(b => b.addEventListener('click', () => this.detail(b.dataset.rec)));
     body.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => { this.tab = b.dataset.goto; if (b.dataset.vf) this.vf = b.dataset.vf; this.render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
-    body.querySelectorAll('[data-hot]').forEach(g => g.addEventListener('click', () => { this.hotKey = g.dataset.hot; this.render(); }));
+    body.querySelectorAll('[data-tm]').forEach(b => b.addEventListener('click', () => { this.tm = b.dataset.tm; try { localStorage.setItem('tc:tm', this.tm); } catch (e) { /* private mode */ } this.render(); }));
+    const t3h = $('#t3d-host');
+    if (t3h && this._t3d) queueMicrotask(() => T3D.mount(t3h, this._t3d.by, this._t3d.sel, k => { if (k) this.hotKey = k; this.render(); }));
+    body.querySelectorAll('[data-hot]').forEach(g => { const go = () => { this.hotKey = g.dataset.hot; this.render(); }; g.addEventListener('click', go); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
     const bm = $('#b-more'); bm && bm.addEventListener('click', () => { this.showAllB = !this.showAllB; this.render(); });
     body.querySelectorAll('.wkb').forEach(g => g.addEventListener('click', () => { this.selWeek = +g.dataset.wk; this.render(); }));
     body.querySelectorAll('.seg2 [data-vf]').forEach(b => b.addEventListener('click', () => { this.vf = b.dataset.vf; this.render(); }));
@@ -1178,7 +1257,256 @@ function save(blob, name) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
   toast('บันทึกไฟล์ ' + name);
 }
-window.__TC_DASH = Dash; window.__TC_SAMPLE = sampleRecords; // for tests
+/* ---------- 3D truck hotspot map (three.js r128, loaded only when the จุดตรวจ tab opens) ---------- */
+const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+function loadThree() {
+  if (window.THREE && THREE.WebGLRenderer && THREE.REVISION) return Promise.resolve(THREE);
+  if (loadThree.p) return loadThree.p;
+  return (loadThree.p = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = THREE_URL;
+    s.onload = () => (window.THREE && THREE.WebGLRenderer && THREE.REVISION ? res(THREE) : rej(new Error('three')));
+    s.onerror = () => { loadThree.p = null; rej(new Error('three')); };
+    document.head.appendChild(s);
+  }));
+}
+// Same coordinates as the recording app's truck: +x towards the cab, z < 0 = left side of the truck.
+// side: 'both' = point exists on both sides (marker follows the side you are looking at), 'L'/'R' fixed side, 'rear', 'top'
+const T3D_PTS = {
+  Body_tail_front: { p: [2.92, .74, 1.2], side: 'both' },
+  Body_tail_rear: { p: [-4.76, .8, .92], side: 'rear' },
+  Body_side_lights: { p: [-1.0, .98, 1.3], side: 'both' },
+  Body_mudguards: { p: [-2.55, 1.1, 1.26], side: 'both' },
+  Body_rope_hooks: { p: [.4, .98, 1.32], side: 'both' },
+  Module_under_frame: { p: [1.7, 1.15, 1.28], side: 'both' },
+  Module_edges: { p: [-2.45, 4.2, 1.22], side: 'top' },
+  Module_around: { p: [2.72, 2.75, 1.24], side: 'both' },
+  Crates_out_l: { p: [-3.65, 1.95, -1.3], side: 'L' },
+  Crates_in_l: { p: [-.3, 1.95, -1.3], side: 'L' },
+  Crates_out_r: { p: [-3.65, 1.95, 1.3], side: 'R' },
+  Crates_in_r: { p: [-.3, 1.95, 1.3], side: 'R' },
+};
+const T3D_VIEWS = [['ด้านซ้าย', Math.PI - .32], ['ด้านหลัง', -2.25], ['ด้านขวา', .32]];
+const T3D = {
+  failed: false, wrap: null, az: Math.PI - .32, el: .3, vel: 0, goal: null, raf: 0, by: {}, sel: '', onPick: null,
+  supported() {
+    if (this._sup != null) return this._sup;
+    try { const c = document.createElement('canvas'); this._sup = !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); } catch (e) { this._sup = false; }
+    return this._sup;
+  },
+  // Put the (persistent) 3D view into a freshly rendered host element and refresh hotspots.
+  mount(host, by, sel, onPick) {
+    this.by = by; this.sel = sel; this.onPick = onPick;
+    if (!this.wrap) this.makeWrap();
+    host.appendChild(this.wrap);
+    if (this.ready) { this.applyData(); this.resize(); return; }
+    if (this.loading) return;
+    this.loading = true;
+    loadThree().then(() => { this.build(); this.ready = true; this.wrap.classList.remove('loading'); this.applyData(); this.resize(); })
+      .catch(() => { this.failed = true; this.onPick && this.onPick(null); })
+      .finally(() => { this.loading = false; });
+  },
+  makeWrap() {
+    const w = this.wrap = document.createElement('div'); w.className = 't3d loading';
+    w.innerHTML = `<div class="t3d-stage"><div class="t3d-load">กำลังโหลดรถ 3D…</div><div class="ml" aria-label="จุดตรวจบนรถ"></div><div class="t3d-hint" aria-hidden="true">↔ ลากเพื่อหมุนรถ</div></div>
+      <div class="t3d-views" role="group" aria-label="มุมมอง">${T3D_VIEWS.map(([t, a]) => `<button type="button" data-az="${a}">${t}</button>`).join('')}</div>`;
+    this.ml = w.querySelector('.ml'); this.stage = w.querySelector('.t3d-stage');
+    this.ml.addEventListener('click', e => { const b = e.target.closest('[data-hot]'); if (b && this.onPick) { e.stopPropagation(); this.onPick(b.dataset.hot); } });
+    w.querySelector('.t3d-views').addEventListener('click', e => { const b = e.target.closest('[data-az]'); if (!b) return; this.turnTo(+b.dataset.az); });
+    // drag to orbit; on touch only sideways so the page still scrolls up/down
+    let drag = null; const st = this.stage;
+    st.addEventListener('pointerdown', e => {
+      if (e.target.closest('button') || !this.ready) return;
+      drag = { x: e.clientX, y: e.clientY, id: e.pointerId, t: performance.now(), mouse: e.pointerType === 'mouse' }; this.vel = 0; this.goal = null;
+      try { st.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      st.classList.add('drag');
+    });
+    st.addEventListener('pointermove', e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y, now = performance.now(), dt = Math.max(1, now - drag.t);
+      drag.x = e.clientX; drag.y = e.clientY; drag.t = now;
+      this.az -= dx * .0085; this.vel = -dx * .0085 / dt * 16;
+      if (drag.mouse) this.el = Math.min(.95, Math.max(.06, this.el + dy * .006));
+      if (!this.dragged) { this.dragged = true; st.classList.add('used'); }
+      this.req();
+    });
+    const end = e => { if (!drag || (e && e.pointerId !== drag.id)) return; drag = null; st.classList.remove('drag'); this.req(); };
+    st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end); st.addEventListener('lostpointercapture', end);
+    if (window.ResizeObserver) new ResizeObserver(() => this.resize()).observe(st);
+  },
+  turnTo(a) {
+    this.wrap.querySelectorAll('[data-az]').forEach(b => b.classList.toggle('on', +b.dataset.az === a));
+    let d = a - this.az; d = Math.atan2(Math.sin(d), Math.cos(d));
+    this.vel = 0;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { this.az += d; this.goal = null; } else this.goal = this.az + d;
+    this.req();
+  },
+  build() {
+    const T = THREE, C = h => new T.Color(h).convertSRGBToLinear();
+    const std = (h, o = {}) => new T.MeshStandardMaterial(Object.assign({ color: C(h), roughness: .55, metalness: .1 }, o));
+    const r = this.renderer = new T.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
+    r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    r.outputEncoding = T.sRGBEncoding; r.toneMapping = T.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
+    r.domElement.setAttribute('aria-hidden', 'true');
+    r.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); this.failed = true; this.onPick && this.onPick(null); });
+    this.stage.insertBefore(r.domElement, this.stage.firstChild);
+    const sc = this.scene = new T.Scene();
+    this.cam = new T.PerspectiveCamera(28, 1.6, .1, 100);
+    this.target = new T.Vector3(-.45, 1.95, 0);
+    sc.add(new T.HemisphereLight(C('#ffffff'), C('#9aa6b4'), 1.0));
+    const key = new T.DirectionalLight(C('#ffffff'), 1.7); key.position.set(3, 9, 5); sc.add(key);
+    const fill = new T.DirectionalLight(C('#dbe7ff'), .7); fill.position.set(-6, 4, -6); sc.add(fill);
+    this.amb = new T.AmbientLight(C('#ffffff'), .18); sc.add(this.amb);
+    // soft contact shadow on the ground
+    const sh = document.createElement('canvas'); sh.width = 256; sh.height = 64; const sg = sh.getContext('2d');
+    const gr = sg.createRadialGradient(128, 32, 4, 128, 32, 128); gr.addColorStop(0, 'rgba(15,23,42,.42)'); gr.addColorStop(.55, 'rgba(15,23,42,.16)'); gr.addColorStop(1, 'rgba(15,23,42,0)');
+    sg.fillStyle = gr; sg.fillRect(0, 0, 256, 64);
+    const shadow = new T.Mesh(new T.PlaneGeometry(12, 4.2), new T.MeshBasicMaterial({ map: new T.CanvasTexture(sh), transparent: true, depthWrite: false }));
+    shadow.rotation.x = -Math.PI / 2; shadow.position.set(-.3, .005, 0); sc.add(shadow);
+    const g = this.truck = new T.Group(); sc.add(g);
+    const add = (geo, mat, x, y, z, f) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); if (f) f(m); g.add(m); return m; };
+    const M = {
+      white: std('#eef0ee', { roughness: .38 }), steel: std('#4e535a', { roughness: .6, metalness: .3 }), dark: std('#1f2328', { roughness: .85 }),
+      tire: std('#191b1e', { roughness: .95 }), rim: std('#c7cdd3', { roughness: .32, metalness: .55 }), chrome: std('#e3e7ec', { roughness: .22, metalness: .6 }),
+      blue: std('#3d93e6', { roughness: .45 }), navy: std('#1f4fae', { roughness: .45 }), glass: std('#22344a', { roughness: .12, metalness: .35 }),
+      lamp: std('#f6f8ff', { emissive: C('#fff6dd'), emissiveIntensity: .25 }), amber: std('#ffae2e', { emissive: C('#ff8a00'), emissiveIntensity: .45 }),
+      red: std('#e3313a', { emissive: C('#c4161f'), emissiveIntensity: .4 }), galv: std('#b9c1c8', { roughness: .45, metalness: .25 }), deck: std('#7d563c', { roughness: .7, metalness: .2 }),
+      battery: std('#f2f2ee', { roughness: .6 }),
+    };
+    // cab (cab-over, rounded front corners)
+    add(new T.BoxGeometry(1.63, 2.15, 2.3), M.white, 3.79, 2.075, 0);
+    add(new T.BoxGeometry(.12, 2.03, 2.06), M.white, 4.665, 2.015, 0);
+    [-1, 1].forEach(s => { add(new T.CylinderGeometry(.12, .12, 2.03, 16), M.white, 4.605, 2.015, s * 1.03); add(new T.SphereGeometry(.12, 16, 8), M.white, 4.605, 3.03, s * 1.03); });
+    add(new T.CylinderGeometry(.12, .12, 2.06, 16), M.white, 4.605, 3.03, 0, m => { m.rotation.x = Math.PI / 2; });
+    add(new T.BoxGeometry(.03, .86, 1.96), M.glass, 4.74, 2.58, 0);
+    add(new T.BoxGeometry(.03, .1, 2.06), M.blue, 4.74, 1.92, 0); add(new T.BoxGeometry(.03, .1, 2.06), M.navy, 4.74, 1.8, 0);
+    add(new T.BoxGeometry(.03, .42, 1.2), M.dark, 4.74, 1.45, 0);
+    [-1, 1].forEach(s => {
+      add(new T.BoxGeometry(1.15, .78, .03), M.glass, 3.95, 2.6, s * 1.16);
+      add(new T.BoxGeometry(1.63, .1, .03), M.blue, 3.79, 1.92, s * 1.16); add(new T.BoxGeometry(1.63, .1, .03), M.navy, 3.79, 1.8, s * 1.16);
+      add(new T.BoxGeometry(.03, 1.5, .02), M.steel, 3.32, 1.9, s * 1.162);
+      add(new T.BoxGeometry(.22, .05, .03), M.dark, 3.5, 2.05, s * 1.17);
+      add(new T.BoxGeometry(.05, .17, .36), M.lamp, 4.74, 1.18, s * .76); add(new T.BoxGeometry(.05, .14, .1), M.amber, 4.74, 1.18, s * .99);
+      add(new T.BoxGeometry(.04, .04, .45), M.chrome, 4.66, 2.85, s * 1.32); add(new T.BoxGeometry(.08, .42, .2), M.dark, 4.62, 2.62, s * 1.55);
+      add(new T.BoxGeometry(.42, .06, .36), M.steel, 4.32, .64, s * 1.1);
+    });
+    add(new T.BoxGeometry(.28, .36, 2.42), M.steel, 4.78, .86, 0);
+    // chassis, wheels, guards, lights
+    add(new T.BoxGeometry(8.6, .28, .95), M.steel, -.35, .78, 0);
+    const tireG = new T.CylinderGeometry(.52, .52, .32, 24); tireG.rotateX(Math.PI / 2);
+    const rimG = new T.CylinderGeometry(.3, .3, .34, 16); rimG.rotateX(Math.PI / 2);
+    const hubG = new T.CylinderGeometry(.1, .1, .37, 10); hubG.rotateX(Math.PI / 2);
+    const wheel = (x, z, dual) => { const k = dual ? 1.7 : 1; [[tireG, M.tire], [rimG, M.rim], [hubG, M.steel]].forEach(([geo, mat]) => add(geo, mat, x, .52, z, m => { m.scale.z = k; })); };
+    [-1, 1].forEach(s => { wheel(3.65, s * 1.0, false); wheel(-1.9, s * .93, true); wheel(-3.15, s * .93, true); });
+    [-1, 1].forEach(s => {
+      add(new T.TorusGeometry(.64, .07, 6, 18, Math.PI), M.dark, 3.65, .55, s * 1.17);
+      add(new T.BoxGeometry(2.6, .05, .62), M.steel, -2.52, 1.08, s * .93);
+      add(new T.BoxGeometry(.04, .62, .6), M.dark, -3.8, .5, s * .93);
+      [.5, .82].forEach(y => add(new T.CylinderGeometry(.035, .035, 4.1, 8), M.chrome, .7, y, s * 1.2, m => { m.rotation.z = Math.PI / 2; }));
+      [2.2, .6, -1.0, -2.6, -4.1].forEach(x => add(new T.BoxGeometry(.14, .07, .03), M.amber, x, .98, s * 1.265));
+      [1.6, .0, -1.6, -3.3, -4.45].forEach(x => add(new T.BoxGeometry(.09, .13, .05), M.dark, x, .98, s * 1.285));
+      add(new T.BoxGeometry(.42, .2, .06), M.steel, 2.88, .74, s * 1.13);
+      [[2.78, M.amber], [2.98, M.red]].forEach(([x, mat]) => add(new T.CylinderGeometry(.075, .075, .05, 12), mat, x, .74, s * 1.165, m => { m.rotation.x = Math.PI / 2; }));
+      add(new T.BoxGeometry(.07, .24, .52), M.steel, -4.66, .78, s * .86);
+      [[.72, M.amber], [1.0, M.red]].forEach(([z, mat]) => add(new T.CylinderGeometry(.085, .085, .05, 12), mat, -4.71, .78, s * z, m => { m.rotation.z = Math.PI / 2; }));
+    });
+    add(new T.BoxGeometry(.12, .12, 2.3), M.steel, -4.62, .55, 0);
+    add(new T.BoxGeometry(.5, .36, .42), M.battery, 2.35, .62, -1.0);
+    add(new T.CylinderGeometry(.3, .3, 1.0, 16), M.chrome, 1.1, .68, -.98, m => { m.rotation.z = Math.PI / 2; });
+    // crate module: deck, galvanised frame
+    const x0 = -4.5, L = 7.2, xc = x0 + L / 2, y0 = 1.46, rows = 8, rh = .34, top = y0 + rows * rh, zS = 1.22, pitch = L / 7;
+    add(new T.BoxGeometry(L + .3, .14, 2.5), M.deck, xc, 1.13, 0);
+    add(new T.BoxGeometry(L + .12, .26, 2 * zS + .06), M.galv, xc, y0 - .13, 0);
+    const bars = [], bar = (x, y, z, sx, sy, sz, rx = 0, rz = 0) => bars.push([x, y, z, sx, sy, sz, rx, rz]);
+    for (let i = 0; i <= 7; i++) { const x = x0 + i * pitch; [-1, 1].forEach(s => bar(x, (y0 + top) / 2, s * zS, .07, top - y0 + .06, .07)); bar(x, top, 0, .06, .06, 2 * zS); }
+    for (let j = 0; j <= rows; j++) { const y = y0 + j * rh; [-1, 1].forEach(s => bar(xc, y, s * zS, L + .07, .05, .06)); [x0, x0 + L].forEach(x => bar(x, y, 0, .05, .04, 2 * zS)); }
+    const dl = Math.hypot(2 * zS, top - y0), da = Math.atan2(2 * zS, top - y0);
+    [x0, x0 + L].forEach(x => { bar(x, (y0 + top) / 2, 0, .045, dl, .045, da, 0); bar(x, (y0 + top) / 2, 0, .045, dl, .045, -da, 0); });
+    const d = new T.Object3D(), frame = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), M.galv, bars.length);
+    bars.forEach((b, i) => { d.position.set(b[0], b[1], b[2]); d.rotation.set(b[6], 0, b[7]); d.scale.set(b[3], b[4], b[5]); d.updateMatrix(); frame.setMatrixAt(i, d.matrix); });
+    g.add(frame);
+    // plastic crates: 7 columns x 8 tiers x 4 deep (k 0-1 = left half, 2-3 = right half)
+    const cv = document.createElement('canvas'); cv.width = 64; cv.height = 24; const cg = cv.getContext('2d');
+    cv.width = 128; cv.height = 48;
+    cg.fillStyle = '#ffffff'; cg.fillRect(0, 0, 128, 48);
+    cg.fillStyle = '#c5ccd6'; for (let x = 12; x < 116; x += 13) { cg.fillRect(x, 10, 7, 13); cg.fillRect(x, 27, 7, 13); }
+    cg.fillStyle = '#e3e7ed'; cg.fillRect(0, 0, 128, 5); cg.fillRect(0, 44, 128, 4);
+    cg.fillStyle = '#aeb6c2'; cg.fillRect(0, 0, 3, 48); cg.fillRect(125, 0, 3, 48); cg.fillRect(0, 46, 128, 2);
+    const ct = new T.CanvasTexture(cv); ct.encoding = T.sRGBEncoding; ct.anisotropy = 4;
+    const cm = new T.MeshStandardMaterial({ map: ct, roughness: .55 });
+    const crates = this.crates = new T.InstancedMesh(new T.BoxGeometry(.95, .29, .57), cm, 7 * rows * 4); this.crateInfo = [];
+    let i = 0;
+    for (let c = 0; c < 7; c++) for (let j = 0; j < rows; j++) for (let k = 0; k < 4; k++) {
+      d.position.set(x0 + (c + .5) * pitch, y0 + j * rh + .17, (k - 1.5) * .6); d.rotation.set(0, 0, 0); d.scale.set(1, 1, 1); d.updateMatrix();
+      crates.setMatrixAt(i, d.matrix); crates.setColorAt(i, C('#9fb6dc')); this.crateInfo.push({ j, k }); i++;
+    }
+    g.add(crates);
+    this.C = C;
+    this.v = new T.Vector3(); this.n = new T.Vector3();
+  },
+  sev(p) { return p >= 8 ? '#EF4444' : p >= 4 ? '#F59E0B' : p > 0 ? '#FCD34D' : '#10B981'; },
+  applyData() {
+    if (!this.ready) return;
+    const by = this.by, base = new THREE.Color('#9fb6dc'), tmp = new THREE.Color();
+    // tint the bottom two tiers of each side by how often they were dirty
+    const worst = (a, b) => { const x = by[a] || { p: 0, dirty: 0 }, y = by[b] || { p: 0, dirty: 0 }; return x.p >= y.p ? x : y; };
+    const side = { L: worst('Crates_out_l', 'Crates_in_l'), R: worst('Crates_out_r', 'Crates_in_r') };
+    this.crateInfo.forEach((ci, i) => {
+      const c = ci.j < 2 ? side[ci.k < 2 ? 'L' : 'R'] : null;
+      tmp.copy(base);
+      if (c && c.dirty) tmp.lerp(new THREE.Color(this.sev(c.p)), .78);
+      tmp.offsetHSL(0, 0, ((i * 37) % 7 - 3) * .006);
+      this.crates.setColorAt(i, tmp.convertSRGBToLinear());
+    });
+    this.crates.instanceColor.needsUpdate = true;
+    this.ml.innerHTML = Object.keys(T3D_PTS).map(k => {
+      const c = by[k] || { p: 0, dirty: 0 }, clr = this.sev(c.p), lt = c.p > 0 && c.p < 4;
+      return `<button type="button" class="hot m3${c.dirty ? '' : ' clean'}${lt ? ' lt' : ''}${k === this.sel ? ' sel' : ''}" data-hot="${k}" style="--c:${clr}" aria-label="${esc((c.th || k) + ' ' + (c.dirty || 0) + ' คัน')}">${c.dirty || ''}</button>`;
+    }).join('');
+    this.marks = [...this.ml.children];
+    this.req();
+  },
+  resize() {
+    if (!this.ready || !this.wrap.isConnected) return;
+    const w = this.stage.clientWidth, h = this.stage.clientHeight; if (!w || !h) return;
+    this.renderer.setSize(w, h, false); this.cam.aspect = w / h; this.cam.updateProjectionMatrix();
+    const vf = this.cam.fov * Math.PI / 360, hf = Math.atan(Math.tan(vf) * this.cam.aspect);
+    this.R = Math.max(5.1 / Math.tan(hf), 2.7 / Math.tan(vf)) + 1.4;
+    this.req();
+  },
+  req() { if (!this.raf && this.ready) this.raf = requestAnimationFrame(() => this.frame()); },
+  frame() {
+    this.raf = 0;
+    if (!this.wrap.isConnected) return;
+    let more = false;
+    if (this.goal != null) { const dd = this.goal - this.az; this.az += dd * .16; if (Math.abs(dd) < .002) { this.az = this.goal; this.goal = null; } else more = true; }
+    else if (!this.stage.classList.contains('drag') && Math.abs(this.vel) > .0004) { this.az += this.vel; this.vel *= .92; more = true; }
+    const ce = Math.cos(this.el);
+    this.cam.position.set(this.target.x + this.R * ce * Math.sin(this.az), this.target.y + this.R * Math.sin(this.el), this.target.z + this.R * ce * Math.cos(this.az));
+    this.cam.lookAt(this.target);
+    this.renderer.render(this.scene, this.cam);
+    this.placeMarks();
+    if (more) this.req();
+  },
+  placeMarks() {
+    const W = this.stage.clientWidth, H = this.stage.clientHeight, cp = this.cam.position, v = this.v, n = this.n;
+    const camSide = cp.z >= 0 ? 1 : -1;
+    (this.marks || []).forEach(b => {
+      const P = T3D_PTS[b.dataset.hot]; if (!P) return;
+      const [x, y, z] = P.p;
+      if (P.side === 'L') { v.set(x, y, -Math.abs(z)); n.set(0, 0, -1); }
+      else if (P.side === 'R') { v.set(x, y, Math.abs(z)); n.set(0, 0, 1); }
+      else if (P.side === 'rear') { v.set(x, y, camSide * Math.abs(z)); n.set(-1, 0, 0); }
+      else if (P.side === 'top') { v.set(x, y, camSide * Math.abs(z)); n.set(0, 1, 0); }
+      else { v.set(x, y, camSide * Math.abs(z)); n.set(0, 0, camSide); }
+      const facing = n.dot(this.n2 = (this.n2 || new THREE.Vector3()).copy(cp).sub(v).normalize()) > .08;
+      v.project(this.cam);
+      b.style.transform = `translate(${((v.x + 1) / 2 * W).toFixed(1)}px,${((1 - v.y) / 2 * H).toFixed(1)}px)`;
+      b.classList.toggle('far', !facing);
+    });
+  },
+};
+
+window.__TC_DASH = Dash; window.__TC_T3D = T3D; window.__TC_SAMPLE = sampleRecords; // for tests
 
 $('#d-refresh').addEventListener('click', () => { if (!Dash.loading) { if (Dash.src && Dash.src.kind === 'sample') Dash.all = null; Dash.load(true); } });
 $('#d-export').addEventListener('click', () => Dash.exportSheet());
