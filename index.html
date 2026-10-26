@@ -229,6 +229,131 @@ button{font:inherit;color:inherit}
 .d-foot{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--d-mute)}
 .d-foot button{border:0;background:none;color:var(--d-mute);font-size:12px;text-decoration:underline;cursor:pointer;min-height:32px}
 
+
+/* ---------------- Dashboard v3: sticky header, tabs, hero ---------------- */
+.d-head{position:sticky;top:0;z-index:20;margin:calc(-1 * (env(safe-area-inset-top,0px) + 16px)) -12px 0;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px 0;background:rgba(243,244,246,.92);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border-bottom:1px solid var(--d-line)}
+.tabs{display:flex;gap:4px;margin:0 -12px;padding:0 12px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;position:relative;min-height:44px;padding:0 12px;border:0;background:none;font:600 14px/1 var(--f-ui);color:var(--d-mute);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tab .cnt{font:600 11px/18px var(--f-num);padding:0 6px;border-radius:999px;background:var(--d-line);color:var(--d-tx-3)}
+.tab.on{color:var(--ind-d)}
+.tab.on::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--ind)}
+.tab.on .cnt{background:var(--ind-xl);color:var(--ind-dd)}
+.dhero{position:relative;overflow:hidden;border-radius:16px;padding:18px;color:#fff;background:radial-gradient(circle at calc(100% + 0px) 0,rgba(255,255,255,.09) 0 120px,transparent 121px),linear-gradient(135deg,#4338CA 0%,#6366F1 55%,#818CF8 100%);box-shadow:0 10px 30px rgba(67,56,202,.28);display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+.dhero.warn{background:radial-gradient(circle at calc(100% + 0px) 0,rgba(255,255,255,.09) 0 120px,transparent 121px),linear-gradient(135deg,#92400E 0%,#D97706 55%,#F59E0B 100%);box-shadow:0 10px 30px rgba(180,83,9,.28)}
+
+.ring{position:relative;width:112px;height:112px;flex:none}
+.ring svg{display:block;transform:rotate(-90deg)}
+.ring .rv{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.ring .rv b{font:700 28px/1 var(--f-num);font-variant-numeric:tabular-nums}
+.ring .rv small{font-size:11px;opacity:.85;margin-top:4px}
+.hero-t{min-width:0;display:flex;flex-direction:column;gap:6px;position:relative;z-index:1}
+.hero-k{font-size:11px;letter-spacing:.06em;opacity:.85;font-weight:600}
+.hero-h{font:700 20px/26px var(--f-num)}
+.hero-s{font-size:13px;line-height:19px;opacity:.92}
+.hero-badges{display:flex;gap:6px;flex-wrap:wrap}
+.hb{font-size:11px;font-weight:600;line-height:20px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.18)}
+.kpi3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kc{display:flex;flex-direction:column;gap:2px;padding:12px}
+.kc .ki{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;margin-bottom:4px}
+.kc .v{font:700 22px/28px var(--f-num);font-variant-numeric:tabular-nums}
+.kc .l{font-size:11px;line-height:15px;color:var(--d-tx-3);font-weight:500}
+.kc .d{font-size:11px;line-height:15px;color:var(--d-mute)}
+.secs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sc{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;text-align:center}
+.sc .mini{position:relative;width:64px;height:64px}
+.sc .mini svg{transform:rotate(-90deg)}
+.sc .mini b{position:absolute;inset:0;display:grid;place-items:center;font:700 14px/1 var(--f-num)}
+.sc .n{font-size:12px;font-weight:600}
+.sc .s{font-size:11px;color:var(--d-mute)}
+.chart{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:var(--f-ui);font-size:10px;fill:var(--d-mute)}
+.chart .wkb{cursor:pointer}
+.chart .wkb:hover rect.hit,.chart .wkb.sel rect.hit{fill:rgba(99,102,241,.08)}
+.readout{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--d-tx-3);background:var(--d-bg);border-radius:8px;padding:8px 10px}
+.readout b{color:var(--d-tx)}
+.seeall{display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;border:1px dashed var(--d-line-2);border-radius:8px;background:none;color:var(--ind-d);font:600 13px/1 var(--f-ui);cursor:pointer;width:100%}
+.fcard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;width:100%;font:inherit;cursor:pointer}
+.fcard .mini{position:relative;width:52px;height:52px}
+.fcard .mini svg{transform:rotate(-90deg)}
+.fcard .mini b{position:absolute;inset:0;display:grid;place-items:center;font:700 12px/1 var(--f-num)}
+.fcard .nm{font:600 15px/20px var(--f-num)}
+.fcard .meta{font-size:12px;color:var(--d-mute);line-height:17px}
+.fcard .bt{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.bchip{font-size:10px;line-height:16px;font-weight:600;padding:0 6px;border-radius:999px;background:var(--grn-xl);color:var(--grn)}
+.bchip.short{background:var(--amb-xl);color:var(--amb-dd)}
+.fcard.on{border-color:var(--ind);box-shadow:0 0 0 1px var(--ind)}
+.fcard .fgo{color:var(--d-mute);font-size:18px}
+.cgroup h3{margin:0 0 8px;font:600 13px/18px var(--f-num);display:flex;justify-content:space-between;color:var(--d-tx-2)}
+.cgroup h3 span{font-weight:500;color:var(--d-mute)}
+.search{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--d-line-2);border-radius:10px;background:#fff}
+.search input{flex:1 1 auto;min-width:0;border:0;outline:0;font:500 15px/1 var(--f-ui);background:none;color:var(--d-tx)}
+.seg2{display:inline-flex;background:var(--d-line);border-radius:10px;padding:3px;gap:2px}
+.seg2 button{min-height:34px;border:0;border-radius:8px;background:none;padding:0 12px;font:600 12px/1 var(--f-ui);color:var(--d-tx-3);cursor:pointer}
+.seg2 button.on{background:#fff;color:var(--d-tx);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.vrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;min-height:60px;padding:8px 0;border:0;border-top:1px solid var(--d-bg);background:none;text-align:left;cursor:pointer;color:var(--d-tx);font:inherit}
+.vrow:hover{background:#FAFAFB}
+.vrow .st{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font:700 11px/1 var(--f-num)}
+.vrow .st.ok{background:var(--grn-xl);color:var(--grn)}
+.vrow .st.bad{background:var(--amb-xl);color:var(--amb-dd)}
+.vrow .a{font:600 14px/20px var(--f-num)}
+.vrow .a span{font-weight:400;color:var(--d-mute);font-size:12px}
+.vrow .b{font-size:11px;line-height:16px;color:var(--d-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vrow .r{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:11px;color:var(--d-mute)}
+.daygrp{font:600 11px/16px var(--f-ui);color:var(--d-mute);letter-spacing:.04em;padding:12px 0 4px}
+.stack{display:flex;flex-direction:column;gap:16px}
+@media (min-width:760px){
+  .d-head{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}
+  .tabs{margin:0;padding:0}
+  .dhero{padding:24px}
+  .ring{width:132px;height:132px}
+  .kpi3{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .farmgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .cpgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+}
+@media (min-width:1080px){.farmgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:420px){.tab{padding:0 8px;font-size:13px;gap:4px}.tab .cnt{padding:0 5px}}
+@media (max-width:359px){.ring{width:96px;height:96px}.ring .rv b{font-size:24px}.dhero{padding:14px;gap:12px}.kc{padding:10px 8px}.kc .v{font-size:19px}}
+
+
+/* ---------------- Dashboard style B: dark control room ---------------- */
+.bk4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bk{padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.bk .l{font-size:11px;letter-spacing:.04em;color:var(--d-mute);font-weight:600}
+.bk .v{font:700 30px/34px var(--f-num);font-variant-numeric:tabular-nums;color:#fff}
+.bk .v small{font-size:15px;color:var(--d-mute);font-weight:600}
+.bk .s{font-size:11px;color:var(--d-mute);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.spark{display:block;width:100%;height:28px;margin-top:4px}
+.bh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.bh h2{margin:0;font:600 17px/24px var(--f-num);color:var(--d-tx)}
+.bh span{font-size:11px;color:var(--d-mute)}
+.truckmap{display:block;width:100%;max-width:560px;height:auto;margin:0 auto}
+.truckmap text{font-family:var(--f-ui)}
+.hot{cursor:pointer}
+.hot:hover circle.halo,.hot.sel circle.halo{stroke:#111827;stroke-width:2}
+.hotinfo{max-width:560px;margin-left:auto!important;margin-right:auto!important;display:flex;gap:10px;align-items:center;background:var(--d-bg);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--d-tx-3);margin-top:8px}
+.hotinfo b{color:var(--d-tx);font-size:13px}
+.scale{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--d-mute);margin-top:8px}
+.scale i{display:inline-block;width:10px;height:10px;border-radius:50%}
+.heat-wrap{overflow-x:auto;margin:0 -14px;padding:0 14px;scrollbar-width:thin}
+.heat{border-collapse:separate;border-spacing:4px}
+.heat th{font:500 10px/1 var(--f-ui);color:var(--d-mute);padding:2px 0 4px;text-align:center;white-space:nowrap}
+.heat th.fn{text-align:left;padding-right:6px}
+.heat td.fn{font:600 12px/1.2 var(--f-ui);color:var(--d-tx-2);white-space:nowrap;padding-right:6px;max-width:96px;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.heat td.c{width:40px;min-width:34px;height:34px;border-radius:7px;text-align:center;font:600 11px/1 var(--f-num);color:#0B1430}
+.heat td.c.none{background:var(--d-bg);color:#9CA3AF}
+.heat tr.on td.fn{color:var(--ind-d)}
+.lead{display:flex;flex-direction:column;gap:10px}
+.ld{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit;width:100%}
+.ld .rk{font:700 13px/1 var(--f-num);color:var(--d-mute);text-align:center}
+.ld .nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ld .br{height:6px;border-radius:3px;background:rgba(255,255,255,.07);margin-top:5px;overflow:hidden}
+.ld .br i{display:block;height:100%;border-radius:3px}
+.ld .pc{font:700 15px/1 var(--f-num)}
+.ld.on .nm{color:#FF9A4D}
+.bgrid{display:flex;flex-direction:column;gap:12px}
+@media (min-width:760px){.bk4{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.bgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}}
+
 /* ---------------- Bottom sheet ---------------- */
 .sheet-bg{position:fixed;inset:0;background:rgba(17,24,39,.42);z-index:40;opacity:0;transition:opacity .2s}
 .sheet-bg.open{opacity:1}
@@ -347,6 +472,7 @@ button{font:inherit;color:inherit}
       </div>
       <div class="chips" id="d-chips" role="toolbar" aria-label="ตัวกรอง"></div>
       <div class="d-src" id="d-src" aria-live="polite"></div>
+      <nav class="tabs" id="d-tabs" role="tablist" aria-label="มุมมอง"></nav>
     </header>
     <div id="d-banner"></div>
     <div id="d-body"></div>
@@ -595,7 +721,7 @@ const optList = (opts, cur) => opts.map(([v, label, count]) => `<button type="bu
 
 /* ===== Dashboard ===== */
 const Dash = {
-  all: null, src: null, f: { weeks: 6, farm: '', batch: '', carrier: '' }, showAllCp: false, showAllFails: false, loading: false,
+  all: null, src: null, f: { weeks: 6, farm: '', batch: '', carrier: '' }, showAllCp: false, showAllFails: false, loading: false, tab: 'over', vq: '', vf: 'all', selWeek: -1, hotKey: '', showAllB: false,
   reset() { this.all = null; this.src = null; this.f = { weeks: 6, farm: '', batch: '', carrier: '' }; },
   open() { if (!this.all && !this.loading) this.load(false); else this.render(); },
   async load(force) {
@@ -668,6 +794,7 @@ const Dash = {
     this.bindBody();
   },
   renderEmpty(title, msg, offerSample, offerClear) {
+    $('#d-tabs').innerHTML = '';
     $('#d-body').innerHTML = `<div class="card emptycard"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>
       <h2>${esc(title)}</h2><p>${esc(msg)}</p><div class="btns">
       ${offerClear ? '<button class="pbtn" type="button" id="e-clear">ดูทั้งหมด</button>' : ''}
@@ -694,7 +821,7 @@ const Dash = {
   chip(k) {
     const f = this.f;
     if (k === 'clear') { f.farm = f.batch = f.carrier = ''; return this.render(); }
-    if (k === 'weeks') return openSheet('ช่วงเวลา', optList(PERIODS.map(([v, l]) => [String(v), l]), String(f.weeks)), b => b.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => { f.weeks = +o.dataset.v; closeSheet(); this.render(); })));
+    if (k === 'weeks') return openSheet('ช่วงเวลา', optList(PERIODS.map(([v, l]) => [String(v), l]), String(f.weeks)), b => b.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => { f.weeks = +o.dataset.v; this.selWeek = -1; closeSheet(); this.render(); })));
     const base = this.all.filter(r => this.inPeriod(r, f.weeks, 0) && this.matchDims(r, f, k));
     const cnt = {}; base.forEach(r => { const v = r[k]; cnt[v] = (cnt[v] || 0) + 1; });
     let keys = Object.keys(cnt);
@@ -718,87 +845,231 @@ const Dash = {
     }).sort((a, b) => b.p - a.p || b.dirty - a.dirty);
     return { n, pass, fail, rate: pct(pass, pass + fail), secFail, batches, farms: new Set(L.map(r => r.farm)).size, cps };
   },
+  /* ---------- small drawing helpers ---------- */
+  ring(p, size, stroke, color, track) {
+    const r = (size - stroke) / 2, c = 2 * Math.PI * r, v = Math.max(0, Math.min(100, p || 0));
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${track}" stroke-width="${stroke}"/><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${(c * v / 100).toFixed(1)} ${c.toFixed(1)}"/></svg>`;
+  },
+  deltaBadge(cur, prev, unit, goodUp) {
+    if (prev == null) return '';
+    const d = Math.round((cur - prev) * 10) / 10;
+    if (!d) return `<span class="delta eq">± 0${unit}</span>`;
+    const good = goodUp ? d > 0 : d < 0;
+    return `<span class="delta ${good ? 'up' : 'dn'}">${d > 0 ? '▲' : '▼'} ${Math.abs(d)}${unit}</span>`;
+  },
+  weeks() {
+    const f = this.f, nW = f.weeks || 12, cur = weekStart(new Date());
+    const base = this.all.filter(r => this.matchDims(r) && r.date);
+    return Array.from({ length: nW }, (_, i) => {
+      const ws = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() - (nW - 1 - i) * 7), we = ws.getTime() + 7 * DAY;
+      const rs = base.filter(r => r.date >= ws && r.date.getTime() < we && r.overall);
+      const p = rs.filter(r => r.overall === 'pass').length;
+      return { label: 'ส.' + isoWeek(ws), from: ws, to: new Date(we - DAY), n: rs.length, p, f: rs.length - p, rate: rs.length ? pct(p, rs.length) : null };
+    });
+  },
+  chartSVG(W) {
+    const wk = this.weeks(), n = wk.length, w = 320, h = 168, pl = 26, pr = 30, pt = 14, pb = 26, cw = w - pl - pr, ch = h - pt - pb;
+    const maxN = Math.max(4, ...wk.map(x => x.n)), step = cw / n, bw = Math.min(28, step * .58);
+    const yN = v => pt + ch - v / maxN * ch, yR = v => pt + ch - v / 100 * ch;
+    const sel = this.selWeek >= 0 && this.selWeek < n ? this.selWeek : n - 1;
+    let g = `<line x1="${pl}" x2="${w - pr}" y1="${pt + ch}" y2="${pt + ch}" stroke="#E5E7EB"/>`;
+    [0, .5, 1].forEach(t => { const v = Math.round(maxN * t); g += `<text x="${pl - 6}" y="${yN(v) + 3}" text-anchor="end">${v}</text>`; });
+    g += `<line x1="${pl}" x2="${w - pr}" y1="${yR(TARGET)}" y2="${yR(TARGET)}" stroke="#10B981" stroke-dasharray="4 3" stroke-width="1"/><text x="${w - pr + 4}" y="${yR(TARGET) + 3}" style="fill:#047857">${TARGET}%</text>`;
+    const pts = [];
+    wk.forEach((x, i) => {
+      const cx = pl + step * i + step / 2, hp = x.p / maxN * ch, hf = x.f / maxN * ch;
+      g += `<g class="wkb${i === sel ? ' sel' : ''}" data-wk="${i}"><rect class="hit" x="${cx - step / 2}" y="${pt}" width="${step}" height="${ch}" fill="transparent" rx="4"/>`;
+      if (x.n) {
+        g += `<rect x="${cx - bw / 2}" y="${pt + ch - hp}" width="${bw}" height="${Math.max(0, hp)}" fill="${i === sel ? '#6366F1' : '#A5B4FC'}" rx="3"/>`;
+        if (x.f) g += `<rect x="${cx - bw / 2}" y="${pt + ch - hp - hf}" width="${bw}" height="${hf}" fill="${i === sel ? '#F59E0B' : '#FCD34D'}" rx="3"/>`;
+        pts.push([cx, yR(x.rate)]);
+      }
+      if (n <= 8 || i % 2 === (n - 1) % 2) g += `<text x="${cx}" y="${h - 8}" text-anchor="middle" style="${i === sel ? 'fill:#111827;font-weight:600' : ''}">${x.label}</text>`;
+      g += '</g>';
+    });
+    if (pts.length > 1) g += `<polyline points="${pts.map(p => p.map(v => v.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="#111827" stroke-width="1.6" stroke-linejoin="round"/>`;
+    pts.forEach(([x, y]) => { g += `<circle cx="${x}" cy="${y}" r="3" fill="#fff" stroke="#111827" stroke-width="1.6"/>`; });
+    g += `<text x="${w - pr + 4}" y="${pt + 3}">100%</text>`;
+    const s = wk[sel];
+    const read = `<div class="readout"><span><b>${s.label}</b> · ${fmtD(s.from)}–${fmtD(s.to)}</span><span>${s.n ? `<b>${s.n}</b> คัน · ผ่าน <b>${fmtPct(s.rate)}</b> · ไม่ผ่าน <b>${s.f}</b>` : 'ไม่มีการตรวจ'}</span></div>`;
+    return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(wk.map(x => `${x.label} ${x.n} คัน ${x.rate == null ? '' : 'ผ่าน ' + fmtPct(x.rate)}`).join(', '))}">${g}</svg>${read}`;
+  },
+  tabsHTML(L) {
+    const T = [['over', 'ภาพรวม'], ['farms', 'ฟาร์ม & ขนส่ง'], ['points', 'จุดตรวจ'], ['trucks', 'รายการรถ', String(L.length)]];
+    $('#d-tabs').innerHTML = T.map(([k, l, c]) => `<button type="button" class="tab${this.tab === k ? ' on' : ''}" role="tab" aria-selected="${this.tab === k}" data-tab="${k}">${l}${c ? `<span class="cnt">${c}</span>` : ''}</button>`).join('');
+    $('#d-tabs').querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { this.tab = b.dataset.tab; this.render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
+  },
   html(L) {
-    const S = this.stats(L), f = this.f;
-    const prev = f.weeks ? this.list(1) : [];
-    const pr = prev.filter(r => r.overall).length ? pct(prev.filter(r => r.overall === 'pass').length, prev.filter(r => r.overall).length) : null;
-    const dlt = pr == null ? '' : (() => { const d = Math.round(S.rate - pr); return `<span class="delta ${d > 0 ? 'up' : d < 0 ? 'dn' : 'eq'}" title="เทียบกับ ${f.weeks} สัปดาห์ก่อนหน้า (${fmtPct(pr)})">${d > 0 ? '▲ ' + d : d < 0 ? '▼ ' + -d : '± 0'}</span>`; })();
-    const okB = S.batches.filter(x => x >= SOP_MIN).length;
-    const dots = S.batches.length <= 24 ? `<div class="sop" aria-hidden="true">${S.batches.slice().sort((a, b) => b - a).map(x => `<span class="${x >= SOP_MIN ? 'ok' : ''}"></span>`).join('')}</div>` : `<div class="meter"><i style="width:${pct(okB, S.batches.length)}%;background:var(--teal)"></i></div>`;
-    const kpis = `<section class="kpis" aria-label="ตัวเลขสรุป">
-      <div class="card kpi"><div class="v">${S.n}</div><div class="l">รถที่ตรวจ (คัน)</div><div class="s">${S.batches.length} รุ่น · ${S.farms} ฟาร์ม</div></div>
-      <div class="card kpi"><div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap"><div class="v" style="color:${S.rate >= TARGET ? 'var(--ind-d)' : 'var(--amb-d)'}">${fmtPct(S.rate)}</div>${dlt}</div><div class="l">อัตราผ่านทั้งคัน</div>
-        <div class="meter" role="img" aria-label="อัตราผ่าน ${fmtPct(S.rate)} เป้า ${TARGET}%"><i style="width:${Math.min(100, S.rate)}%"></i><b style="left:${TARGET}%"></b></div><div class="s">เป้า ≥ ${TARGET}%</div></div>
-      <div class="card kpi"><div class="v" style="color:${S.fail ? 'var(--amb-d)' : 'var(--grn)'}">${S.fail}</div><div class="l">ไม่ผ่าน (คัน)</div>
-        <div class="tags">${S.fail ? SECTIONS.slice().sort((a, b) => S.secFail[b.tag] - S.secFail[a.tag]).filter(s => S.secFail[s.tag]).map(s => `<span class="tag">${s.short} ${S.secFail[s.tag]}</span>`).join('') : '<span class="tag ok">ผ่านทุกคัน</span>'}</div></div>
-      <div class="card kpi"><div class="v">${okB}<small>/${S.batches.length}</small></div><div class="l">รุ่นที่ตรวจครบ SOP</div>${dots}<div class="s">≥ ${SOP_MIN} คันต่อรุ่น</div></div>
+    this.tabsHTML(L);
+    const S = this.stats(L);
+    if (this.tab === 'farms') return this.farmsHTML(L);
+    if (this.tab === 'points') return this.pointsHTML(L, S);
+    if (this.tab === 'trucks') return this.trucksHTML(L);
+    return this.overHTML(L, S);
+  },
+  overHTML(L, S) {
+    const f = this.f, prev = f.weeks ? this.list(1) : null;
+    const PS = prev ? this.stats(prev) : null, pr = PS && PS.pass + PS.fail ? PS.rate : null;
+    const okB = S.batches.filter(x => x >= SOP_MIN).length, good = S.rate >= TARGET;
+    const per = PERIODS.find(p => p[0] === f.weeks)[1];
+    const scope = [f.farm, f.batch && 'รุ่น ' + f.batch, f.carrier].filter(Boolean).join(' · ') || 'ทุกฟาร์ม';
+    const hero = `<section class="dhero${good ? '' : ' warn'}">
+      <div class="ring">${this.ring(S.rate, 112, 12, '#fff', 'rgba(255,255,255,.22)')}<div class="rv"><b>${Math.round(S.rate)}%</b><small>ผ่านทั้งคัน</small></div></div>
+      <div class="hero-t"><div class="hero-k">${esc(per)} · ${esc(scope)}</div>
+        <div class="hero-h">${good ? 'อยู่ในเกณฑ์เป้าหมาย' : `ต่ำกว่าเป้า ${TARGET}%`}</div>
+        <div class="hero-s">ผ่าน ${S.pass} · ไม่ผ่าน ${S.fail} จาก ${S.n} คัน</div>
+        <div class="hero-badges">${pr != null ? `<span class="hb">${S.rate - pr >= 0 ? '▲' : '▼'} ${Math.abs(Math.round(S.rate - pr))} จุด จากช่วงก่อน</span>` : ''}<span class="hb">เป้า ≥ ${TARGET}%</span></div></div>
     </section>`;
-
+    const ic = (bg, fg, path) => `<span class="ki" style="background:${bg};color:${fg}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg></span>`;
+    const kpi = `<section class="kpi3" aria-label="ตัวเลขสรุป">
+      <div class="card kc">${ic('#EEF2FF', '#4F46E5', '<rect x="1" y="7" width="13" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="5.5" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/>')}<span class="v">${S.n}</span><span class="l">รถที่ตรวจ</span><span class="d">${this.deltaBadge(S.n, PS ? PS.n : null, '', true) || `${S.farms} ฟาร์ม`}</span></div>
+      <div class="card kc">${ic('#FEF3C7', '#B45309', '<path d="M12 8v5"/><path d="M12 16.5h.01"/><circle cx="12" cy="12" r="9"/>')}<span class="v" style="color:${S.fail ? 'var(--amb-d)' : 'var(--grn)'}">${S.fail}</span><span class="l">ไม่ผ่าน</span><span class="d">${this.deltaBadge(S.fail, PS ? PS.fail : null, '', false) || 'คัน'}</span></div>
+      <div class="card kc">${ic('#CCFBF1', '#0F766E', '<path d="M4 12.5l5 5L20 6.5"/>')}<span class="v">${okB}<small style="font-size:14px;color:var(--d-mute)">/${S.batches.length}</small></span><span class="l">รุ่นครบ SOP</span><span class="d">≥ ${SOP_MIN} คัน/รุ่น</span></div>
+    </section>`;
     const top = S.cps[0];
     const risk = top && top.dirty ? `<section class="risk"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 7v6"/><path d="M12 17h.01"/></svg></span>
-        <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><div class="k">จุดเสี่ยงอันดับ 1</div><div class="t">${esc(top.short)}</div>
-        <div class="d">พบสกปรก ${top.dirty} คัน (${fmtPct(top.p)})${top.finds.length ? ' · ส่วนใหญ่เป็น' + esc(top.finds.slice(0, 2).join('และ')) : ''}</div></div></section>`
-      : `<section class="risk good"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-        <div style="display:flex;flex-direction:column;gap:2px"><div class="k">จุดเสี่ยง</div><div class="t">ไม่พบจุดสกปรกในช่วงนี้</div></div></section>`;
-
-    /* weekly pass rate */
-    const nW = f.weeks || 12, cur = weekStart(new Date());
-    const wkBase = this.all.filter(r => this.matchDims(r) && r.date);
-    const weeks = Array.from({ length: nW }, (_, i) => {
-      const ws = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() - (nW - 1 - i) * 7), we = ws.getTime() + 7 * DAY;
-      const rs = wkBase.filter(r => r.date >= ws && r.date.getTime() < we && r.overall);
-      return { label: 'ส.' + isoWeek(ws), from: ws, n: rs.length, rate: rs.length ? pct(rs.filter(r => r.overall === 'pass').length, rs.length) : null, cur: i === nW - 1 };
-    });
-    const dense = nW > 8;
-    const wk = `<section class="card sec"><div class="sec-h"><h2>อัตราผ่านรายสัปดาห์</h2><span class="m">${nW} สัปดาห์${f.weeks ? '' : 'ล่าสุด'}</span></div>
-      <div class="wk${dense ? ' dense' : ''}" role="img" aria-label="${esc(weeks.map(w => `${w.label} ${w.rate == null ? 'ไม่มีข้อมูล' : fmtPct(w.rate)}`).join(', '))}">
-        <div class="goal" style="bottom:calc(${TARGET}% * 0.82)"><span>เป้า ${TARGET}%</span></div>
-        ${weeks.map(w => `<div class="col" title="${esc(`${w.label} (${fmtD(w.from)}) · ${w.n} คัน${w.rate == null ? '' : ' · ผ่าน ' + fmtPct(w.rate)}`)}"><span class="r">${w.rate == null ? '–' : Math.round(w.rate) + (dense ? '' : '%')}</span><div class="bar${w.cur ? ' cur' : ''}${w.rate == null ? ' none' : ''}" style="height:calc(${w.rate == null ? 0 : Math.max(2, w.rate)}% * 0.82)"></div></div>`).join('')}
-      </div>
-      <div class="wkl${dense ? ' dense' : ''}" aria-hidden="true">${weeks.map(w => `<span>${w.label}</span>`).join('')}</div></section>`;
-
-    /* farms */
-    const fg = {}; this.list(0, 'farm').forEach(r => { const g = fg[r.farm] || (fg[r.farm] = { n: 0, p: 0, fl: 0 }); g.n++; if (r.overall === 'pass') g.p++; else if (r.overall === 'fail') g.fl++; });
-    const farmRows = Object.entries(fg).sort((a, b) => b[1].n - a[1].n).slice(0, 8);
-    const maxN = Math.max(1, ...farmRows.map(x => x[1].n));
-    const farms = `<section class="card sec"><div class="sec-h"><h2>ฟาร์ม</h2><div class="legend"><span><span class="dot" style="background:var(--ind)"></span>ผ่าน</span><span><span class="dot" style="background:var(--amb)"></span>ไม่ผ่าน</span></div></div>
-      ${farmRows.map(([name, g]) => `<button type="button" class="frow${f.farm === name ? ' on' : ''}" data-farm="${esc(name)}" aria-pressed="${f.farm === name}" aria-label="${esc(`${name} ผ่าน ${fmtPct(pct(g.p, g.p + g.fl))} จาก ${g.n} คัน แตะเพื่อกรอง`)}">
-        <span class="ft"><span class="fname">${esc(name)}</span><span class="fs"><span class="mono">${fmtPct(pct(g.p, g.p + g.fl))}</span> · ${g.n} คัน</span></span>
-        <span class="fbar"><i style="width:${g.p / maxN * 100}%"></i><b style="width:${g.fl / maxN * 100}%"></b></span></button>`).join('')}
-      ${Object.keys(fg).length > 8 ? `<div class="empty-row">แสดง 8 จาก ${Object.keys(fg).length} ฟาร์ม · เลือกฟาร์มอื่นจากตัวกรองด้านบน</div>` : ''}</section>`;
-
-    /* checkpoints */
-    const maxP = Math.max(1, ...S.cps.map(c => c.p));
-    const shown = this.showAllCp ? S.cps : S.cps.slice(0, 6);
-    const cp = `<section class="card sec" style="gap:8px"><div class="sec-h"><h2>จุดตรวจที่พบสกปรก</h2><span class="m">% ของรถ</span></div>
-      ${shown.map(c => `<div class="cp" title="${esc(c.th)} · สกปรก ${c.dirty} คัน${c.finds.length ? ' · ' + c.finds.join(', ') : ''}"><span class="sl">${c.secTh}</span><div class="nm"><span>${esc(c.short)}</span><div class="tr"><i style="width:${c.p / maxP * 100}%;background:${c.p >= 5 ? 'var(--amb)' : 'var(--ind-l)'}"></i></div></div><span class="pc">${fmtPct(c.p)}</span></div>`).join('')}
-      <button type="button" class="lnk" id="cp-more" aria-expanded="${this.showAllCp}">${this.showAllCp ? 'ย่อเหลือ 6 จุด' : `ดูครบ ${CPS.length} จุด`}</button></section>`;
-
-    /* carriers */
-    const cg = {}; this.list(0, 'carrier').forEach(r => { const g = cg[r.carrier] || (cg[r.carrier] = { n: 0, fl: 0, k: 0 }); g.n++; if (r.overall) g.k++; if (r.overall === 'fail') g.fl++; });
-    const cRows = Object.entries(cg).sort((a, b) => b[1].n - a[1].n).slice(0, 3);
-    const tot = Object.values(cg).reduce((a, g) => ({ n: a.n + g.n, fl: a.fl + g.fl, k: a.k + g.k }), { n: 0, fl: 0, k: 0 });
-    const ccard = (name, g, isTot) => { const r = pct(g.fl, g.k); return `<${isTot ? 'div' : 'button type="button"'} class="card cc${isTot ? ' total' : ''}${!isTot && f.carrier === name ? ' on' : ''}"${isTot ? '' : ` data-carrier="${esc(name)}" aria-pressed="${f.carrier === name}"`}>
-      <span class="n" title="${esc(name)}">${esc(name)}</span><span class="v"><b style="color:${r > 100 - TARGET ? 'var(--amb-d)' : 'var(--d-tx)'}">${fmtPct(r)}</b><span>ไม่ผ่าน</span></span><span class="s">${g.n} คัน</span></${isTot ? 'div' : 'button'}>`; };
-    const carr = `<section class="sec"><div class="sec-h"><h2>บริษัทขนส่ง</h2><span class="m">อัตราไม่ผ่าน · แตะเพื่อกรอง</span></div><div class="carr">${cRows.map(([n, g]) => ccard(n, g)).join('')}${ccard(Object.keys(cg).length > 1 ? 'รวมทุกบริษัท' : 'รวม', tot, true)}</div></section>`;
-
-    /* recent fails */
+        <div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1"><div class="k">จุดเสี่ยงอันดับ 1 · ${esc(top.secTh)}</div><div class="t">${esc(top.short)}</div>
+        <div class="d">พบสกปรก ${top.dirty} คัน (${fmtPct(top.p)})${top.finds.length ? ' · ส่วนใหญ่เป็น' + esc(top.finds.slice(0, 2).join('และ')) : ''}</div></div>
+        <button type="button" class="lnk" data-goto="points" style="align-self:center">ดูทุกจุด ›</button></section>`
+      : `<section class="risk good"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div style="display:flex;flex-direction:column;gap:2px"><div class="k">จุดเสี่ยง</div><div class="t">ไม่พบจุดสกปรกในช่วงนี้</div></div></section>`;
+    const chart = `<section class="card sec"><div class="sec-h"><h2>แนวโน้มรายสัปดาห์</h2><div class="legend"><span><span class="dot" style="background:var(--ind)"></span>ผ่าน</span><span><span class="dot" style="background:var(--amb)"></span>ไม่ผ่าน</span><span><span class="dot" style="background:#111827"></span>% ผ่าน</span></div></div>${this.chartSVG()}</section>`;
+    const secs = `<section class="sec"><div class="sec-h"><h2>ผลแยกส่วน</h2><span class="m">% ผ่าน</span></div><div class="secs">${SECTIONS.map(sx => {
+      const k = L.filter(r => r.sec[sx.tag]).length, ok = L.filter(r => r.sec[sx.tag] === 'pass').length, p = pct(ok, k);
+      return `<div class="card sc"><div class="mini">${this.ring(p, 64, 8, p >= TARGET ? '#6366F1' : '#F59E0B', '#EEF2FF')}<b>${Math.round(p)}%</b></div><span class="n">${sx.th}</span><span class="s">ไม่ผ่าน ${k - ok} คัน</span></div>`;
+    }).join('')}</div></section>`;
     const fails = L.filter(r => r.overall === 'fail').sort((a, b) => (b.saved || 0) - (a.saved || 0));
-    const fShown = this.showAllFails ? fails.slice(0, 60) : fails.slice(0, 4);
-    const fl = `<section class="card sec" style="gap:8px"><div class="sec-h"><h2>ไม่ผ่านล่าสุด</h2>${fails.length > 4 ? `<button type="button" class="lnk" id="fl-more" style="min-height:24px" aria-expanded="${this.showAllFails}">${this.showAllFails ? 'ย่อ' : 'ทั้งหมด ' + fails.length}</button>` : ''}</div>
-      ${fShown.length ? fShown.map(r => `<button type="button" class="fl" data-rec="${esc(r.id)}"><span class="dot" style="background:var(--amb);flex:none"></span>
-        <span class="mid"><span class="a">${esc(r.plate)} <span>· ${esc(r.farm)}</span></span><span class="b">${esc(fmtD(r.date))}${r.time ? ' ' + esc(r.time) : ''} · ${esc(r.carrier)}</span></span>
-        <span class="pt">${SECTIONS.filter(s => r.sec[s.tag] === 'fail').map(s => s.short).join('+') || '-'}</span><span class="ph">รูป ${r.photos} ›</span></button>`).join('') : '<div class="empty-row">ไม่มีรถที่ไม่ผ่านในช่วงนี้</div>'}</section>`;
-
-    return `<div style="display:flex;flex-direction:column;gap:16px">${kpis}${risk}<div class="grid2">${wk}${farms}</div><div class="grid2">${cp}<div class="col2">${carr}${fl}</div></div></div>`;
+    const recent = `<section class="card sec" style="gap:4px"><div class="sec-h"><h2>ไม่ผ่านล่าสุด</h2><span class="m">${fails.length} คัน</span></div>
+      ${fails.length ? fails.slice(0, 4).map(r => this.vrowHTML(r)).join('') : '<div class="empty-row">ไม่มีรถที่ไม่ผ่านในช่วงนี้ 🎉</div>'}
+      ${fails.length > 4 ? '<button type="button" class="seeall" data-goto="trucks" data-vf="fail">ดูรถที่ไม่ผ่านทั้งหมด ›</button>' : ''}</section>`;
+    return `<div class="stack">${hero}${kpi}${risk}<div class="grid2">${chart}<div class="stack">${secs}${recent}</div></div></div>`;
+  },
+  farmsHTML(L) {
+    const f = this.f;
+    const fg = {}; this.list(0, 'farm').forEach(r => {
+      const g = fg[r.farm] || (fg[r.farm] = { n: 0, p: 0, fl: 0, b: {} }); g.n++; if (r.overall === 'pass') g.p++; else if (r.overall === 'fail') g.fl++; g.b[r.batch] = (g.b[r.batch] || 0) + 1; });
+    const farms = Object.entries(fg).sort((a, b) => b[1].n - a[1].n);
+    const farmCards = farms.map(([name, g]) => { const p = pct(g.p, g.p + g.fl);
+      return `<button type="button" class="card fcard${f.farm === name ? ' on' : ''}" data-farm="${esc(name)}" aria-pressed="${f.farm === name}">
+        <div class="mini">${this.ring(p, 52, 7, p >= TARGET ? '#6366F1' : '#F59E0B', '#EEF2FF')}<b>${Math.round(p)}%</b></div>
+        <div style="min-width:0"><div class="nm">${esc(name)}</div><div class="meta">${g.n} คัน · ไม่ผ่าน ${g.fl}</div>
+          <div class="bt">${Object.entries(g.b).sort((a, b) => (parseFloat(b[0]) || 0) - (parseFloat(a[0]) || 0)).slice(0, 4).map(([bn, c]) => `<span class="bchip${c < SOP_MIN ? ' short' : ''}">รุ่น ${esc(bn)} · ${c}/${SOP_MIN}</span>`).join('')}</div></div>
+        <span class="fgo">${f.farm === name ? '✓' : '›'}</span></button>`; }).join('');
+    const cg = {}; this.list(0, 'carrier').forEach(r => { const g = cg[r.carrier] || (cg[r.carrier] = { n: 0, fl: 0, k: 0 }); g.n++; if (r.overall) g.k++; if (r.overall === 'fail') g.fl++; });
+    const carr = Object.entries(cg).sort((a, b) => pct(b[1].fl, b[1].k) - pct(a[1].fl, a[1].k));
+    const maxR = Math.max(10, ...carr.map(([, g]) => pct(g.fl, g.k)));
+    const carrRows = carr.map(([name, g]) => { const r = pct(g.fl, g.k);
+      return `<button type="button" class="frow${f.carrier === name ? ' on' : ''}" data-carrier="${esc(name)}" aria-pressed="${f.carrier === name}"><span class="ft"><span class="fname">${esc(name)}</span><span class="fs"><span class="mono" style="color:${r > 100 - TARGET ? 'var(--amb-d)' : 'inherit'}">${fmtPct(r)}</span> ไม่ผ่าน · ${g.n} คัน</span></span><span class="fbar"><b style="width:${r / maxR * 100}%"></b></span></button>`; }).join('');
+    return `<div class="stack"><section class="sec"><div class="sec-h"><h2>ฟาร์ม</h2><span class="m">แตะเพื่อกรอง · รุ่นสีส้ม = ยังไม่ครบ ${SOP_MIN} คัน</span></div><div class="farmgrid stack" style="gap:8px">${farmCards}</div></section>
+      ${this.heatB()}
+      <section class="card sec"><div class="sec-h"><h2>บริษัทขนส่ง</h2><span class="m">อัตราไม่ผ่าน · แตะเพื่อกรอง</span></div>${carrRows || '<div class="empty-row">ไม่มีข้อมูล</div>'}</section></div>`;
+  },
+  pointsHTML(L, S) {
+    const maxP = Math.max(5, ...S.cps.map(c => c.p));
+    const grp = SECTIONS.map(sx => { const items = S.cps.filter(c => c.sec === sx.tag);
+      const k = L.filter(r => r.sec[sx.tag]).length, fl = L.filter(r => r.sec[sx.tag] === 'fail').length;
+      return `<section class="card sec cgroup" style="gap:8px"><h3>${sx.th}<span>ไม่ผ่าน ${fl}/${k} คัน</span></h3>
+        ${items.map(c => `<div class="cp" title="${esc(c.th)}"><span class="sl" style="background:${c.p >= 5 ? 'var(--amb-xl)' : 'var(--ind-xl)'};color:${c.p >= 5 ? 'var(--amb-dd)' : 'var(--ind-dd)'}">${c.dirty}</span><div class="nm"><span>${esc(c.short)}</span><div class="tr"><i style="width:${c.p / maxP * 100}%;background:${c.p >= 5 ? 'var(--amb)' : 'var(--ind-l)'}"></i></div>${c.finds.length ? `<span style="font-size:11px;color:var(--d-mute)">${esc(c.finds.join(', '))}</span>` : ''}</div><span class="pc">${fmtPct(c.p)}</span></div>`).join('')}</section>`; }).join('');
+    return `<div class="stack">${this.truckMapB(L, S)}<div class="sec-h" style="padding:0 2px"><h2 style="font-size:15px">จุดตรวจที่พบสกปรก</h2><span class="m">ตัวเลขซ้าย = จำนวนคัน · % ของรถที่ตรวจ</span></div><div class="cpgrid stack">${grp}</div></div>`;
+  },
+  vrowHTML(r) {
+    const bad = r.overall === 'fail', parts = SECTIONS.filter(s => r.sec[s.tag] === 'fail').map(s => s.short).join('+');
+    return `<button type="button" class="vrow" data-rec="${esc(r.id)}"><span class="st ${bad ? 'bad' : 'ok'}">${bad ? '✕' : '✓'}</span>
+      <span style="min-width:0;display:flex;flex-direction:column"><span class="a">${esc(r.plate)} <span>${esc(r.province || '')}</span></span><span class="b">${esc(r.farm)} · รุ่น ${esc(r.batch)} · ${esc(r.carrier)}</span></span>
+      <span class="r">${bad ? `<span class="tag">${esc(parts || 'ไม่ผ่าน')}</span>` : '<span class="tag ok">ผ่าน</span>'}<span>${esc(fmtD(r.date))}${r.time ? ' ' + esc(r.time) : ''}</span></span></button>`;
+  },
+  trucksHTML(L) {
+    const q = this.vq.trim().toUpperCase().replace(/[\s-]/g, '');
+    let rows = L.filter(r => this.vf === 'all' || (this.vf === 'fail' ? r.overall === 'fail' : r.overall === 'pass'));
+    if (q) rows = rows.filter(r => (r.plate + r.farm + r.carrier).toUpperCase().replace(/[\s-]/g, '').includes(q));
+    rows.sort((a, b) => (b.saved || 0) - (a.saved || 0));
+    let out = '', day = '';
+    rows.slice(0, 200).forEach(r => { const d = r.date ? `${r.date.getDate()} ${MON[r.date.getMonth()]} ${r.date.getFullYear() + 543}` : '—'; if (d !== day) { day = d; out += `<div class="daygrp">${d}</div>`; } out += this.vrowHTML(r); });
+    const cnt = k => L.filter(r => k === 'all' || (k === 'fail' ? r.overall === 'fail' : r.overall === 'pass')).length;
+    return `<div class="stack" style="gap:12px">
+      <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="vq" type="search" inputmode="search" placeholder="ค้นหาทะเบียน ฟาร์ม หรือบริษัทขนส่ง" value="${esc(this.vq)}" autocomplete="off"></label>
+      <div class="seg2" role="group" aria-label="กรองผล">${[['all', 'ทั้งหมด'], ['fail', 'ไม่ผ่าน'], ['pass', 'ผ่าน']].map(([k, l]) => `<button type="button" data-vf="${k}" class="${this.vf === k ? 'on' : ''}" aria-pressed="${this.vf === k}">${l} ${cnt(k)}</button>`).join('')}</div>
+      <section class="card" style="padding:0 12px 6px">${out || '<div class="empty-row" style="padding:16px 0">ไม่พบรถตามที่ค้นหา</div>'}${rows.length > 200 ? `<div class="empty-row">แสดง 200 จาก ${rows.length} คัน · ส่งออก Excel เพื่อดูทั้งหมด</div>` : ''}</section></div>`;
+  },
+  /* ===== style B ===== */
+  heatColor(p) { if (p == null) return null; return p >= TARGET ? '#34D399' : p >= 75 ? '#FBBF24' : '#F87171'; },
+  spark(vals, color, max) {
+    const pts = vals.map((v, i) => [i, v]).filter(x => x[1] != null); if (pts.length < 2) return '';
+    const W = 120, H = 28, n = vals.length - 1 || 1, mx = max || Math.max(1, ...pts.map(p => p[1]));
+    const d = pts.map(([i, v]) => `${(i / n * W).toFixed(1)},${(H - 3 - v / mx * (H - 6)).toFixed(1)}`).join(' ');
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${d}" fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>`;
+  },
+  htmlB(L) {
+    const S = this.stats(L), f = this.f, wk = this.weeks();
+    const prev = f.weeks ? this.list(1) : null, PS = prev ? this.stats(prev) : null;
+    const okB = S.batches.filter(x => x >= SOP_MIN).length;
+    const dl = (cur, pv, goodUp, unit) => { if (pv == null) return ''; const d = Math.round((cur - pv) * 10) / 10; if (!d) return '<span>± 0</span>'; const good = goodUp ? d > 0 : d < 0; return `<span style="color:${good ? '#34D399' : '#F87171'}">${d > 0 ? '▲' : '▼'} ${Math.abs(d)}${unit || ''}</span>`; };
+    const kp = `<section class="bk4">
+      <div class="card bk"><span class="l">อัตราผ่านทั้งคัน</span><span class="v" style="color:${S.rate >= TARGET ? '#34D399' : '#FBBF24'}">${fmtPct(S.rate)}</span><span class="s">${dl(S.rate, PS && PS.pass + PS.fail ? PS.rate : null, true, ' จุด')}<span>เป้า ${TARGET}%</span></span>${this.spark(wk.map(x => x.rate), S.rate >= TARGET ? '#34D399' : '#FBBF24', 100)}</div>
+      <div class="card bk"><span class="l">รถที่ตรวจ</span><span class="v">${S.n}</span><span class="s">${dl(S.n, PS ? PS.n : null, true)}<span>${S.farms} ฟาร์ม</span></span>${this.spark(wk.map(x => x.n), '#FF9A4D')}</div>
+      <div class="card bk"><span class="l">ไม่ผ่าน</span><span class="v" style="color:${S.fail ? '#F87171' : '#34D399'}">${S.fail}</span><span class="s">${dl(S.fail, PS ? PS.fail : null, false)}<span>คัน</span></span>${this.spark(wk.map(x => x.n ? x.f : null), '#F87171')}</div>
+      <div class="card bk"><span class="l">รุ่นครบ SOP</span><span class="v">${okB}<small>/${S.batches.length}</small></span><span class="s"><span>≥ ${SOP_MIN} คันต่อรุ่น</span></span>
+        <div style="display:flex;gap:3px;margin-top:10px;flex-wrap:wrap">${S.batches.slice().sort((a, b) => b - a).slice(0, 24).map(x => `<i style="flex:1 1 6px;max-width:18px;height:8px;border-radius:4px;background:${x >= SOP_MIN ? '#34D399' : 'rgba(255,255,255,.14)'}"></i>`).join('')}</div></div>
+    </section>`;
+    return `<div class="stack">${kp}${this.truckMapB(L, S)}<div class="bgrid">${this.heatB(L)}<div class="stack">${this.leadB()}${this.failsB(L)}</div></div></div>`;
+  },
+  truckMapB(L, S) {
+    const by = {}; S.cps.forEach(c => { by[c.key] = c; });
+    const col = p => p >= 8 ? '#EF4444' : p >= 4 ? '#F59E0B' : p > 0 ? '#FCD34D' : '#10B981';
+    // side view of a catching truck: crates on the module, cab on the right
+    const HS = [['Module_edges', 60, 22], ['Module_around', 236, 60], ['Crates_out_l', 52, 96], ['Crates_in_l', 100, 96], ['Crates_out_r', 152, 96], ['Crates_in_r', 200, 96],
+      ['Module_under_frame', 150, 128], ['Body_rope_hooks', 214, 120], ['Body_side_lights', 112, 138], ['Body_mudguards', 72, 150], ['Body_tail_rear', 14, 128], ['Body_tail_front', 330, 132]];
+    const sel = this.hotKey && by[this.hotKey] ? this.hotKey : (S.cps[0] && S.cps[0].dirty ? S.cps[0].key : HS[0][0]);
+    let crates = '';
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) crates += `<rect x="${30 + c * 23}" y="${30 + r * 19}" width="20" height="16" rx="2" fill="${r >= 2 ? 'rgba(99,102,241,.16)' : 'rgba(99,102,241,.07)'}" stroke="rgba(99,102,241,.30)"/>`;
+    const truck = `<g>
+      <rect x="22" y="22" width="222" height="96" rx="4" fill="none" stroke="#94A3B8" stroke-width="2"/>${crates}
+      <rect x="16" y="118" width="300" height="10" rx="2" fill="#CBD5E1"/>
+      <path d="M252 62h50l22 30v36h-72z" fill="#EEF2FF" stroke="#94A3B8" stroke-width="2"/><path d="M262 70h36l14 20h-50z" fill="#C7D2FE"/>
+      ${[72, 112, 282].map(x => `<circle cx="${x}" cy="136" r="14" fill="#fff" stroke="#64748B" stroke-width="3"/><circle cx="${x}" cy="136" r="5" fill="#94A3B8"/>`).join('')}
+    </g>`;
+    const hs = HS.map(([k, x, y]) => { const c = by[k] || { p: 0, dirty: 0 }, r = 6 + Math.min(10, c.p * .9);
+      return `<g class="hot${k === sel ? ' sel' : ''}" data-hot="${k}"><circle cx="${x}" cy="${y}" r="${r + 7}" fill="${col(c.p)}" opacity=".18"/><circle class="halo" cx="${x}" cy="${y}" r="${r}" fill="${col(c.p)}"/><text x="${x}" y="${y + 3.5}" text-anchor="middle" font-size="9" font-weight="700" fill="#111827">${c.dirty || ''}</text></g>`; }).join('');
+    const c = by[sel] || {};
+    const info = `<div class="hotinfo"><span style="width:12px;height:12px;border-radius:50%;background:${col(c.p || 0)};flex:none"></span><div style="min-width:0"><b>${esc(c.secTh || '')} · ${esc(c.th || '')}</b><br>พบสกปรก ${c.dirty || 0} คัน (${fmtPct(c.p || 0)} ของรถที่ตรวจ)${c.finds && c.finds.length ? ' · ' + esc(c.finds.slice(0, 2).join(', ')) : ''}</div></div>`;
+    return `<section class="card" style="padding:14px"><div class="bh"><h2>แผนที่จุดเสี่ยงบนตัวรถ</h2><span>แตะจุดเพื่อดูรายละเอียด · ตัวเลข = จำนวนคัน</span></div>
+      <svg class="truckmap" viewBox="0 0 344 168" role="img" aria-label="แผนภาพรถจับไก่ แสดงจุดตรวจ 12 จุด">${truck}${hs}</svg>${info}
+      <div class="scale"><i style="background:#10B981"></i>สะอาด<i style="background:#FCD34D;margin-left:6px"></i>&lt;4%<i style="background:#F59E0B;margin-left:6px"></i>4–8%<i style="background:#EF4444;margin-left:6px"></i>≥8%</div></section>`;
+  },
+  heatB() {
+    const f = this.f, nW = Math.min(f.weeks || 12, 12), cur = weekStart(new Date());
+    const cols = Array.from({ length: nW }, (_, i) => { const ws = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() - (nW - 1 - i) * 7); return { ws, we: ws.getTime() + 7 * DAY, label: 'ส.' + isoWeek(ws) }; });
+    const base = this.all.filter(r => this.matchDims(r, f, 'farm') && r.date && r.overall);
+    const farms = [...new Set(base.filter(r => r.date >= cols[0].ws).map(r => r.farm))];
+    const rows = farms.map(fm => ({ fm, cells: cols.map(c => { const rs = base.filter(r => r.farm === fm && r.date >= c.ws && r.date.getTime() < c.we); return rs.length ? { n: rs.length, p: pct(rs.filter(r => r.overall === 'pass').length, rs.length) } : null; }) }))
+      .sort((a, b) => b.cells.filter(Boolean).length - a.cells.filter(Boolean).length);
+    const body = rows.map(r => `<tr class="${f.farm === r.fm ? 'on' : ''}"><td class="fn" data-farm="${esc(r.fm)}" title="${esc(r.fm)}">${esc(r.fm)}</td>${r.cells.map((c, i) => c ? `<td class="c" style="background:${this.heatColor(c.p)}" title="${esc(`${r.fm} ${cols[i].label}: ${c.n} คัน ผ่าน ${fmtPct(c.p)}`)}">${Math.round(c.p)}</td>` : '<td class="c none">·</td>').join('')}</tr>`).join('');
+    return `<section class="card" style="padding:14px"><div class="bh"><h2>ฟาร์ม × สัปดาห์</h2><span>% ผ่าน · แตะชื่อฟาร์มเพื่อกรอง</span></div>
+      <div class="heat-wrap"><table class="heat"><thead><tr><th class="fn"></th>${cols.map(c => `<th>${c.label}</th>`).join('')}</tr></thead><tbody>${body || `<tr><td class="fn">ไม่มีข้อมูล</td></tr>`}</tbody></table></div>
+      <div class="scale"><i style="background:#34D399;border-radius:3px"></i>≥ ${TARGET}%<i style="background:#FBBF24;border-radius:3px;margin-left:6px"></i>75–${TARGET}%<i style="background:#F87171;border-radius:3px;margin-left:6px"></i>&lt; 75%</div></section>`;
+  },
+  leadB() {
+    const f = this.f, cg = {};
+    this.list(0, 'carrier').forEach(r => { const g = cg[r.carrier] || (cg[r.carrier] = { n: 0, fl: 0, k: 0 }); g.n++; if (r.overall) g.k++; if (r.overall === 'fail') g.fl++; });
+    const rows = Object.entries(cg).map(([n, g]) => [n, g, pct(g.k - g.fl, g.k)]).sort((a, b) => b[2] - a[2]);
+    return `<section class="card" style="padding:14px"><div class="bh"><h2>อันดับบริษัทขนส่ง</h2><span>% ผ่าน · แตะเพื่อกรอง</span></div><div class="lead">${rows.map(([n, g, p], i) => `<button type="button" class="ld${f.carrier === n ? ' on' : ''}" data-carrier="${esc(n)}"><span class="rk">${i + 1}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(n)}</span><span class="br"><i style="width:${p}%;background:${this.heatColor(p)}"></i></span></span><span class="pc" style="color:${this.heatColor(p)}">${Math.round(p)}%<small style="display:block;font:400 10px/14px var(--f-ui);color:var(--d-mute);text-align:right">${g.n} คัน</small></span></button>`).join('') || '<div class="empty-row">ไม่มีข้อมูล</div>'}</div></section>`;
+  },
+  failsB(L) {
+    const fails = L.filter(r => r.overall === 'fail').sort((a, b) => (b.saved || 0) - (a.saved || 0));
+    const shown = this.showAllB ? fails.slice(0, 60) : fails.slice(0, 5);
+    return `<section class="card" style="padding:14px 14px 6px"><div class="bh"><h2>ไม่ผ่านล่าสุด</h2><span>${fails.length} คัน</span></div>${shown.map(r => this.vrowHTML(r)).join('') || '<div class="empty-row">ไม่มีรถที่ไม่ผ่านในช่วงนี้</div>'}
+      ${fails.length > 5 ? `<button type="button" class="lnk" id="b-more" style="margin:4px 0 6px">${this.showAllB ? 'ย่อ' : `ดูทั้งหมด ${fails.length} คัน`}</button>` : ''}</section>`;
   },
   bindBody() {
     const body = $('#d-body');
     body.querySelectorAll('[data-farm]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.farm; this.f.farm = this.f.farm === v ? '' : v; this.f.batch = ''; this.render(); }));
     body.querySelectorAll('[data-carrier]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.carrier; this.f.carrier = this.f.carrier === v ? '' : v; this.render(); }));
     body.querySelectorAll('[data-rec]').forEach(b => b.addEventListener('click', () => this.detail(b.dataset.rec)));
-    const cm = $('#cp-more'); cm && cm.addEventListener('click', () => { this.showAllCp = !this.showAllCp; this.render(); });
-    const fm = $('#fl-more'); fm && fm.addEventListener('click', () => { this.showAllFails = !this.showAllFails; this.render(); });
+    body.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => { this.tab = b.dataset.goto; if (b.dataset.vf) this.vf = b.dataset.vf; this.render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
+    body.querySelectorAll('[data-hot]').forEach(g => g.addEventListener('click', () => { this.hotKey = g.dataset.hot; this.render(); }));
+    const bm = $('#b-more'); bm && bm.addEventListener('click', () => { this.showAllB = !this.showAllB; this.render(); });
+    body.querySelectorAll('.wkb').forEach(g => g.addEventListener('click', () => { this.selWeek = +g.dataset.wk; this.render(); }));
+    body.querySelectorAll('.seg2 [data-vf]').forEach(b => b.addEventListener('click', () => { this.vf = b.dataset.vf; this.render(); }));
+    const vq = $('#vq'); if (vq) vq.addEventListener('input', () => { this.vq = vq.value; const pos = vq.selectionStart; this.render(); const n = $('#vq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) { /* ignore */ } });
   },
   detail(id) {
     const r = this.all.find(x => x.id === id); if (!r) return;
