@@ -756,6 +756,7 @@ const CRATE_COLORS = {
   green: ['#2fa84f', 'เขียว'], yellow: ['#f2c21b', 'เหลือง'], mixed: [null, 'คละสี'],
 };
 const SOP_MIN = 5;
+const FARMS = ['ท่าคล้อ', 'ท่าศาลา', 'จำปาหอม', 'คำใหญ่', 'ชะอม', 'โพธิ์งาม', 'มวกเหล็ก', 'ทับกวาง', 'เตาปูน', 'ป่าไผ่', 'บ้านธาตุ', 'บ้านธาตุ1'];
 const PROVINCES = ['ลพบุรี', 'สระบุรี', 'พระนครศรีอยุธยา', 'นครราชสีมา', 'สิงห์บุรี', 'อ่างทอง', 'ชัยนาท', 'นครปฐม', 'ปทุมธานี', 'สุพรรณบุรี', 'เพชรบูรณ์', 'ชลบุรี', 'ฉะเชิงเทรา', 'นครนายก', 'ปราจีนบุรี', 'กรุงเทพมหานคร'];
 
 class Store extends EventTarget {
@@ -763,6 +764,12 @@ class Store extends EventTarget {
     super();
     this.lists = Persist.get('lists', Store.defaultLists());
     this.batch = Persist.get('batch', Store.defaultBatch());
+    if (!Persist.get('farmsV2', false)) {   // one-time: standard farm list; keep farms the user added; Tha Khlo → ท่าคล้อ
+      const extra = (this.lists.farm || []).filter(f => f !== 'Tha Khlo' && !FARMS.includes(f));
+      this.lists.farm = FARMS.concat(extra);
+      if (this.batch.farm === 'Tha Khlo') this.batch.farm = 'ท่าคล้อ';
+      Persist.set('lists', this.lists); Persist.set('batch', this.batch); Persist.set('farmsV2', true);
+    }
     this.saved = Persist.get('saved', []);
     this.photos = {}; // vehicleId -> {section: [dataURL]}, mirrored to IndexedDB so a reload keeps them
     this.recPhotos = {}; // saved record id -> {section: [dataURL]} for sending
@@ -770,8 +777,8 @@ class Store extends EventTarget {
     this.vehicle = draft && draft.sections ? draft : this.blankVehicle();
     this._t = 0;
   }
-  static defaultLists() { return { business: ['Saraburi Broiler Chicken'], farm: ['Tha Khlo'], carrier: ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)'] }; }
-  static defaultBatch() { return { business: 'Saraburi Broiler Chicken', farm: 'Tha Khlo', batchNo: '', inspector: '', date: todayISO() }; }
+  static defaultLists() { return { business: ['Saraburi Broiler Chicken'], farm: FARMS.slice(), carrier: ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)'] }; }
+  static defaultBatch() { return { business: 'Saraburi Broiler Chicken', farm: 'ท่าคล้อ', batchNo: '', inspector: '', date: todayISO() }; }
   blankVehicle() {
     const sections = {};
     for (const k in SECTIONS) sections[k] = { items: {}, note: '' };

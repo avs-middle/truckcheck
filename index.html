@@ -458,7 +458,7 @@ function deviceRecords() {
 /* Deterministic sample so the screen can be tried before real data exists */
 function sampleRecords() {
   let s = 20261021; const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648;
-  const farms = ['Tha Khlo', 'สระบุรีเหนือ', 'แก่งคอย', 'พระพุทธบาท'];
+  const farms = ['ท่าคล้อ', 'ท่าศาลา', 'จำปาหอม', 'มวกเหล็ก'];
   const carriers = ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)', 'บริษัทขนส่ง B (ตัวอย่าง)', 'บริษัทขนส่ง C (ตัวอย่าง)'];
   const risk = { Crates_in_r: .11, Crates_in_l: .09, Body_mudguards: .07, Crates_out_r: .06, Module_under_frame: .05, Crates_out_l: .04, Body_rope_hooks: .03, Module_edges: .02 };
   const out = [], today = new Date();
