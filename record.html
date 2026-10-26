@@ -1503,7 +1503,7 @@ class World {
   setFarmName(name) {
     const cv = this.signCv, g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height);
     g.fillStyle = 'rgba(154,106,53,.88)'; g.font = '700 46px "Silkscreen", "Chakra Petch", monospace'; g.textBaseline = 'middle'; g.textAlign = 'center';
-    fitText(g, `${(name || 'FARM').toUpperCase()}  ·  HOUSE 20`, cv.width / 2, cv.height / 2 + 2, cv.width - 40);
+    void name; fitText(g, 'CPF SARABURI FARM', cv.width / 2, cv.height / 2 + 2, cv.width - 40);   // fixed sign on the house wall
     this.signTex.needsUpdate = true;
   }
   buildCheckpoint() {
