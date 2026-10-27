@@ -138,7 +138,7 @@ td.ed{white-space:nowrap}
 .co.off{opacity:0;visibility:hidden}
 .co-dot{position:absolute;left:-6px;top:-6px;width:12px;height:12px;background:var(--paper);border:2px solid var(--ink)}
 .co-line{position:absolute;left:-1px;top:-34px;width:2px;height:28px;background:var(--ink)}
-.co-tag{position:absolute;left:-2px;bottom:32px;display:flex;align-items:center;gap:7px;padding:6px 8px;white-space:nowrap;background:var(--paper);border:2px solid var(--ink);box-shadow:3px 3px 0 rgba(13,27,76,.4);font:700 10px/1 var(--f-display);letter-spacing:.05em;text-transform:uppercase;color:var(--ink);cursor:pointer;pointer-events:auto;transition:transform .25s var(--ease-pop),background .2s}
+.co-tag{position:absolute;left:calc(-2px + var(--dx,0px));bottom:32px;display:flex;align-items:center;gap:7px;padding:6px 8px;white-space:nowrap;background:var(--paper);border:2px solid var(--ink);box-shadow:3px 3px 0 rgba(13,27,76,.4);font:700 10px/1 var(--f-display);letter-spacing:.05em;text-transform:uppercase;color:var(--ink);cursor:pointer;pointer-events:auto;transition:transform .25s var(--ease-pop),background .2s}
 .co-tag:hover,.co.hot .co-tag{transform:translateY(-4px);background:#fff}
 .co-th{font:600 12px/1 var(--f-thai);color:var(--muted);text-transform:none;letter-spacing:0}
 .co-s{padding:4px 6px;background:var(--chrome);font:700 9px/1 var(--f-display);display:inline-flex;gap:4px;align-items:center}
@@ -339,6 +339,19 @@ a.btn{text-decoration:none;align-self:flex-start}
   .win{max-height:calc(100% - 120px)}
   #toasts{top:calc(env(safe-area-inset-top,0px) + 168px)}
   .win-body{padding:12px}
+}
+/* ---------- phones held sideways (short landscape, windows dock at the side) ---------- */
+@media (min-width:640px) and (max-height:519px){
+  #dock{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+  #app .win.side{top:calc(env(safe-area-inset-top,0px) + 64px)!important;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);max-height:none}
+  #app .win-body{padding:10px 12px;gap:10px}
+  #app .win-foot{padding:6px 12px}
+  #app .win-bar{padding-top:3px;padding-bottom:3px}
+}
+@media (min-width:640px) and (max-width:759px) and (max-height:519px){
+  #dock .sep,#dock [data-open="log"],#dock [data-open="send"],#dock #setbtn{display:none}
+  #dock .more{display:inline-flex}
+  html #moremenu{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -2125,9 +2138,9 @@ class Callouts {
   add(key, label, th, getWorld) {
     const el = document.createElement('div'); el.className = 'co';
     el.innerHTML = `<i class="co-dot"></i><i class="co-line"></i><button type="button" class="co-tag" data-key="${key}"><span>${th || label}</span><span class="co-s"></span></button>`;
-    this.layer.appendChild(el); this.items.set(key, { el, getWorld, s: el.querySelector('.co-s') });
+    this.layer.appendChild(el); this.items.set(key, { el, getWorld, s: el.querySelector('.co-s'), tag: el.querySelector('.co-tag'), tw: 0 });
   }
-  status(key, html, cls) { const it = this.items.get(key); if (!it) return; it.s.innerHTML = html; ['done', 'bad', 'need'].forEach(c => it.el.classList.toggle(c, cls.includes(c))); }
+  status(key, html, cls) { const it = this.items.get(key); if (!it) return; it.s.innerHTML = html; it.tw = 0; ['done', 'bad', 'need'].forEach(c => it.el.classList.toggle(c, cls.includes(c))); }
   hot(key) { this.items.forEach((it, k) => it.el.classList.toggle('hot', k === key)); }
   burst(key) {
     const it = this.items.get(key); if (!it) return;
@@ -2139,7 +2152,13 @@ class Callouts {
       it.getWorld(this.v); this.v.project(cam);
       const vis = this.v.z < 1 && Math.abs(this.v.x) < 1.1 && Math.abs(this.v.y) < 1.1;
       it.el.classList.toggle('off', !vis);
-      if (vis) it.el.style.transform = `translate3d(${((this.v.x + 1) / 2 * w).toFixed(1)}px,${((1 - this.v.y) / 2 * h).toFixed(1)}px,0)`;
+      if (!vis) return;
+      const x = (this.v.x + 1) / 2 * w;
+      it.el.style.transform = `translate3d(${x.toFixed(1)}px,${((1 - this.v.y) / 2 * h).toFixed(1)}px,0)`;
+      // keep the label on screen even when its anchor sits at the edge
+      const tw = it.tw || (it.tw = it.tag.offsetWidth), left = x - 2;
+      const dx = left < 8 ? 8 - left : left + tw > w - 8 ? Math.min(0, w - 8 - tw - left) : 0;
+      if (dx !== it.dx) { it.dx = dx; it.el.style.setProperty('--dx', dx.toFixed(1) + 'px'); }
     });
   }
 }

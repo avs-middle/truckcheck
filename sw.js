@@ -1,5 +1,5 @@
 /* TruckCheck offline cache. Bump VERSION whenever a page changes so phones pick up the new copy. */
-const VERSION = 'truckcheck-v18';
+const VERSION = 'truckcheck-v19';
 const SHELL = ['./', './index.html', './record.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 const LIBS = [
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
