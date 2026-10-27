@@ -548,14 +548,14 @@ a.btn{text-decoration:none;align-self:flex-start}
   #top{flex-wrap:nowrap;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 8px) 10px 0;align-items:stretch}
   .brand{flex:none;padding:6px 8px}
   .brand>div{display:none}
-  .vstrip{order:0;flex:1;min-width:0;width:auto;margin-left:0;display:grid;grid-template-columns:auto auto minmax(0,1fr);grid-template-areas:"plate prov time" "car car car";align-content:center;padding:6px 10px;column-gap:10px;row-gap:1px}
+  .vstrip{order:0;flex:1;min-width:0;width:auto;margin-left:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"plate prov time" "car car car";align-content:center;padding:6px 10px;column-gap:10px;row-gap:1px}
   .vstrip .cell{padding:0;border:0!important;min-width:0}
   .vstrip .cell small{display:none}
   .vstrip .cell[data-f=plate]{grid-area:plate}
   .vstrip .cell[data-f=province]{grid-area:prov}
   .vstrip .cell[data-f=time]{grid-area:time;justify-self:end}
   .vstrip .cell[data-f=company]{grid-area:car}
-  .vstrip .cell b{font-size:15px;line-height:1.25}
+  .vstrip .cell b{font-size:15px;line-height:1.25;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .vstrip .cell[data-f=company] b{font-size:12px;font-weight:500;color:var(--muted)}
   .vstrip .cell.req b{font-size:0}
   .vstrip .cell.req b::after{content:attr(data-ph);font-size:13px;color:var(--signal)}
@@ -592,6 +592,8 @@ a.btn{text-decoration:none;align-self:flex-start}
   .opt-card small{font-size:11px}
 }
 @media (max-width:360px){
+  .vstrip{grid-template-areas:"plate prov prov" "car car time"}
+  .vstrip .cell[data-f=time] b{font-size:12px;font-weight:600;color:var(--muted)}
   .row{grid-template-columns:1fr}
   .seg{justify-self:start}
 }
