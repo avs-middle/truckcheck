@@ -1613,8 +1613,9 @@ class World {
     add(new THREE.CylinderGeometry(.06, .06, 8.4, 6), m.pipe, X - .24, 4.45, 0, 'arch', me => { me.rotation.x = Math.PI / 2; });
     for (let i = 0; i < 7; i++) add(new THREE.CylinderGeometry(.05, .02, .18, 5), m.pipe, X - .24, 4.32, -3.3 + i * 1.1, 'arch');
     const scv = makeCanvas(512, 64), sg = scv.getContext('2d'); sg.fillStyle = '#ffffff'; sg.fillRect(0, 0, 512, 64); sg.fillStyle = '#2a6fdb'; sg.fillRect(0, 0, 512, 6); sg.fillRect(0, 58, 512, 6);
-    sg.fillStyle = '#0d1b4c'; sg.font = '700 26px "Silkscreen", monospace'; sg.textBaseline = 'middle'; sg.textAlign = 'center'; sg.fillText('DISINFECTION ZONE', 150, 33);
-    sg.font = '700 26px "Chakra Petch", sans-serif'; sg.fillText('พ่นยาฆ่าเชื้อ', 400, 34);
+    sg.fillStyle = '#0d1b4c'; sg.font = '700 28px "Chakra Petch", sans-serif'; sg.textBaseline = 'middle'; sg.textAlign = 'center'; fitText(sg, 'DISINFECTION ZONE', 156, 33, 272);
+    sg.fillStyle = '#2a6fdb'; sg.fillRect(305, 18, 3, 30); sg.fillStyle = '#0d1b4c';
+    fitText(sg, 'พ่นยาฆ่าเชื้อ', 410, 34, 180);
     const smat = new THREE.MeshStandardMaterial({ map: texFrom(scv), roughness: .8 });
     [[-.17, -Math.PI / 2], [.17, Math.PI / 2]].forEach(([dx, ry]) => { const p = new THREE.Mesh(new THREE.PlaneGeometry(5.6, .7), smat); p.position.set(X + dx, 4.7, 0); p.rotation.y = ry; p.userData.section = 'arch'; this.scene.add(p); this.pick.push(p); });
     this.mist = new Particles(COARSE ? 260 : 420, { size: .2, color: '#f2fbff', opacity: .55, gravity: -.6, drag: 1.6 });
