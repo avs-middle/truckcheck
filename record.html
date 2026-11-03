@@ -184,6 +184,9 @@ select{appearance:none;-webkit-appearance:none;background:#fff url("data:image/s
 textarea{min-height:64px;resize:vertical}
 .combo{display:flex;gap:6px}
 .addrow{display:flex;gap:6px}
+.addrow input{min-width:0;flex:1}
+.batch-hint{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;font-size:12px;color:var(--muted)}
+.batch-hint b{color:var(--ink)}
 .req-star{color:var(--signal)}
 fieldset{border:2px solid var(--ink);padding:12px;margin:0;background:#fff;min-width:0}
 legend{font:700 10px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;background:var(--signal);color:#fff;border:2px solid var(--ink)}
@@ -798,6 +801,7 @@ class Store extends EventTarget {
       if (this.batch.farm === 'Tha Khlo') this.batch.farm = 'ท่าคล้อ';
       Persist.set('lists', this.lists); Persist.set('batch', this.batch); Persist.set('farmsV2', true);
     }
+    if (!Array.isArray(this.lists.province)) { this.lists.province = PROVINCES.slice(); Persist.set('lists', this.lists); }   // provinces became an editable list
     this.saved = Persist.get('saved', []);
     this.photos = {}; // vehicleId -> {section: [dataURL]}, mirrored to IndexedDB so a reload keeps them
     this.recPhotos = {}; // saved record id -> {section: [dataURL]} for sending
@@ -846,7 +850,7 @@ class Store extends EventTarget {
     this.editing = null; Persist.set('edit', null); Persist.set('draft', this.vehicle);
     this.emit('all');
   }
-  static defaultLists() { return { business: ['Saraburi Broiler Chicken'], farm: FARMS.slice(), carrier: ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)'] }; }
+  static defaultLists() { return { business: ['Saraburi Broiler Chicken'], farm: FARMS.slice(), province: PROVINCES.slice(), carrier: ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)'] }; }
   static defaultBatch() { return { business: 'Saraburi Broiler Chicken', farm: 'ท่าคล้อ', batchNo: '', inspector: '', date: todayISO() }; }
   blankVehicle() {
     const sections = {};
@@ -920,6 +924,7 @@ class Store extends EventTarget {
       plate: v.plate.trim(), province: v.province.trim(), company: v.company.trim(), time: v.time, crate: v.crate,
       sections: {},
     };
+    if (b.farm && /^\d+$/.test(String(b.batchNo || '').trim())) { const lb = Persist.get('lastBatch', {}); lb[b.farm] = String(b.batchNo).trim(); Persist.set('lastBatch', lb); }
     for (const k in SECTIONS) {
       const s = this.section(k);
       rec.sections[k] = { result: s.result, items: JSON.parse(JSON.stringify(v.sections[k].items)), note: v.sections[k].note || '', photoCount: s.photos };
@@ -2599,11 +2604,20 @@ class App {
   }
   renderSettingsLists(body) {
     const box = $('#set-lists', body); if (!box) return;
-    const s = this.store, groups = [['business', 'กิจการ', s.batch.business], ['farm', 'ฟาร์ม', s.batch.farm], ['carrier', 'บริษัทขนส่ง', s.vehicle.company]];
+    const s = this.store, groups = [['business', 'กิจการ', s.batch.business], ['farm', 'ฟาร์ม', s.batch.farm], ['province', 'จังหวัด', s.vehicle.province], ['carrier', 'บริษัทขนส่ง', s.vehicle.company]];
     box.innerHTML = groups.map(([k, label, cur]) => `<div class="field"><span class="lbl">${label}</span><div class="list-chips">${s.lists[k].length ? s.lists[k].map(v => `<span class="lchip ${v === cur ? 'sel' : ''}" data-list="${k}" data-v="${esc(v)}"><span>${esc(v)}</span><button type="button" aria-label="ลบ ${esc(v)}">×</button></span>`).join('') : '<span class="note">ยังไม่มีรายการ</span>'}</div></div>`).join('');
     $$('.lchip', box).forEach(ch => armConfirm(ch.querySelector('button'), { armedText: 'ลบ', sfx: this.sfx, onArm: () => ch.classList.add('armed'), onDisarm: () => ch.classList.remove('armed'), onConfirm: () => {
       s.removeListItem(ch.dataset.list, ch.dataset.v); this.renderSettingsLists(body); this.renderCarriers(); this.refreshDropdowns(); this.sfx.close(); Toast.show(`ลบ <b>${esc(ch.dataset.v)}</b> แล้ว`);
     } }));
+  }
+  renderBatchHint(body) {
+    const box = $('#batch-hint', body); if (!box) return;
+    const s = this.store, last = (Persist.get('lastBatch', {}) || {})[s.batch.farm], cur = String(s.batch.batchNo || '');
+    if (!last || !/^\d+$/.test(last)) { box.hidden = true; return; }
+    const next = String(+last + 1);
+    if (cur === last || cur === next) { box.hidden = true; return; }
+    box.hidden = false;
+    box.innerHTML = `<span>รุ่นล่าสุดของฟาร์มนี้ <b>${esc(last)}</b></span>` + [[last, 'รุ่นเดิม'], [next, 'รุ่นใหม่']].map(([v, t]) => `<button type="button" class="btn small" data-batch="${v}">${t} ${v}</button>`).join('');
   }
   refreshDropdowns() {
     const s = this.store;
@@ -2662,7 +2676,7 @@ class App {
           <div class="field"><label for="f-farm"><span class="n">2</span>ฟาร์ม</label>
             <div class="combo"><span data-dd="farm"></span><button type="button" class="btn sq" data-add="farm" aria-label="เพิ่มฟาร์ม">+</button></div>
             <div class="addrow" data-row="farm" hidden><input id="f-farm-new" placeholder="ชื่อฟาร์มใหม่" autocomplete="off"><button type="button" class="btn" data-ok="farm">เพิ่ม</button></div></div>
-          <div class="field"><label for="f-batch"><span class="n">3</span>รุ่นการเลี้ยง</label><input id="f-batch" value="${esc(s.batch.batchNo)}" placeholder="เช่น 5/2569" autocomplete="off"></div>
+          <div class="field"><label for="f-batch"><span class="n">3</span>รุ่นการเลี้ยง</label><input id="f-batch" value="${esc(s.batch.batchNo)}" placeholder="เช่น 695" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off"><div class="batch-hint" id="batch-hint" hidden></div></div>
           <div class="field"><label for="f-inspector"><span class="n">4</span>ผู้ตรวจ</label>
             <span data-dd="inspector"></span></div>
           <div class="field"><span class="lbl"><span class="n">5</span>วันที่ตรวจ</span>
@@ -2673,10 +2687,17 @@ class App {
         const mount = (key, ps) => { const slot = $(`[data-dd="${key}"]`, body); slot.replaceWith(ps.el); return ps; };
         this.houseSel = {
           business: mount('business', new PixelSelect({ id: 'f-business', options: listOpts('business'), value: s.batch.business, placeholder: 'เลือกกิจการ', addLabel: '+ เพิ่มกิจการ', onAdd: () => showAdd('business'), onChange: v => s.setBatch('business', v), sfx: this.sfx })),
-          farm: mount('farm', new PixelSelect({ id: 'f-farm', options: listOpts('farm'), value: s.batch.farm, placeholder: 'เลือกฟาร์ม', addLabel: '+ เพิ่มฟาร์ม', onAdd: () => showAdd('farm'), onChange: v => s.setBatch('farm', v), sfx: this.sfx })),
+          farm: mount('farm', new PixelSelect({ id: 'f-farm', options: listOpts('farm'), value: s.batch.farm, placeholder: 'เลือกฟาร์ม', addLabel: '+ เพิ่มฟาร์ม', onAdd: () => showAdd('farm'), onChange: v => { s.setBatch('farm', v); this.renderBatchHint(body); }, sfx: this.sfx })),
           inspector: mount('inspector', new PixelSelect({ id: 'f-inspector', options: Object.entries(INSPECTORS).map(([k, [en, th]]) => ({ value: k, label: th })), value: s.batch.inspector, placeholder: 'เลือกผู้ตรวจ', onChange: v => s.setBatch('inspector', v), sfx: this.sfx })),
         };
-        body.addEventListener('input', e => { if (e.target.id === 'f-batch') s.setBatch('batchNo', e.target.value); });
+        body.addEventListener('input', e => {
+          if (e.target.id !== 'f-batch') return;
+          const t = e.target, d = t.value.replace(/[^0-9]/g, '');   // batch numbers run in sequence: digits only
+          if (d !== t.value) t.value = d;
+          s.setBatch('batchNo', d); this.renderBatchHint(body);
+        });
+        body.addEventListener('click', e => { const h = e.target.closest('[data-batch]'); if (!h) return; const t = $('#f-batch', body); t.value = h.dataset.batch; s.setBatch('batchNo', t.value); this.renderBatchHint(body); this.sfx.tick(); });
+        this.renderBatchHint(body);
         body.addEventListener('click', e => {
           const a = e.target.closest('[data-add]'); if (a) { const row = $(`[data-row="${a.dataset.add}"]`, body); row.hidden = !row.hidden; if (!row.hidden) row.querySelector('input').focus(); this.sfx.blip(); }
           const ok = e.target.closest('[data-ok]'); if (ok) this.addOption(body, ok.dataset.ok);
@@ -2706,7 +2727,8 @@ class App {
         let html = '';
         if (key === 'body') html += `<fieldset><legend>ข้อมูลรถ · ต้องกรอก</legend><div class="grid2">
             <div class="field"><label for="v-plate">ทะเบียน</label><input id="v-plate" value="${esc(v.plate)}" placeholder="70-3451" autocomplete="off" maxlength="12"></div>
-            <div class="field"><label for="v-province">จังหวัด</label><input id="v-province" list="dl-province" value="${esc(v.province)}" placeholder="ลพบุรี" autocomplete="off"></div>
+            <div class="field"><label for="v-province">จังหวัด</label><span data-dd="province"></span>
+              <div class="addrow" data-row="province" hidden><input id="f-province-new" placeholder="ชื่อจังหวัด" autocomplete="off"><button type="button" class="btn" data-ok="province">เพิ่ม</button></div></div>
             <div class="field span2"><label for="v-company">บริษัทขนส่ง</label>
               <div class="combo"><span data-dd="company"></span><button type="button" class="btn sq" data-add="carrier" aria-label="เพิ่มบริษัทขนส่ง">+</button></div>
               <div class="addrow" data-row="carrier" hidden><input id="f-carrier-new" placeholder="ชื่อบริษัทขนส่งใหม่" autocomplete="off"><button type="button" class="btn" data-ok="carrier">เพิ่ม</button></div></div>
@@ -2720,6 +2742,19 @@ class App {
         body.innerHTML = html;
         if (key === 'body') {
           if (v.company && !s.lists.carrier.includes(v.company)) s.addList('carrier', v.company);
+          if (v.province && !s.lists.province.includes(v.province.trim())) s.addList('province', v.province);
+          const provOpts = () => s.lists.province.map(c => ({ value: c, label: c }));
+          const prow = $('[data-row="province"]', body), pinp = $('#f-province-new', body);
+          const pps = new PixelSelect({ id: 'v-province', options: provOpts(), value: v.province, placeholder: 'เลือกจังหวัด', addLabel: '+ เพิ่มจังหวัด',
+            onAdd: () => { prow.hidden = false; pinp.focus(); }, onChange: val => s.setVehicle('province', val), sfx: this.sfx });
+          $('[data-dd="province"]', body).replaceWith(pps.el);
+          const addProvince = () => {
+            const val = pinp.value.trim(); if (!val) { pinp.focus(); return; }
+            s.addList('province', val); s.setVehicle('province', val); pps.setOptions(provOpts(), val);
+            pinp.value = ''; prow.hidden = true; this.sfx.check(); Toast.show(`เพิ่ม <b>${esc(val)}</b> แล้ว`, 'ok');
+          };
+          body.addEventListener('click', e => { if (e.target.closest('[data-ok="province"]')) addProvince(); });
+          pinp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addProvince(); } });
           const carrierOpts = () => s.lists.carrier.map(c => ({ value: c, label: c }));
           const row = $('[data-row="carrier"]', body), inp = $('#f-carrier-new', body);
           const ps = new PixelSelect({ id: 'v-company', options: carrierOpts(), value: v.company, placeholder: 'เลือกบริษัทขนส่ง', addLabel: '+ เพิ่มบริษัทขนส่ง',
@@ -2742,7 +2777,6 @@ class App {
         body.addEventListener('input', e => {
           const t = e.target;
           if (t.id === 'v-plate') { const up = t.value.toUpperCase(); if (up !== t.value) t.value = up; s.setVehicle('plate', up); this.renderPlateAlert(true); }
-          if (t.id === 'v-province') s.setVehicle('province', t.value);
           if (t.id === 'v-time') s.setVehicle('time', t.value);
           if (t.id === 'note-' + key) s.setNote(key, t.value);
         });
