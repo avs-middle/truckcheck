@@ -256,6 +256,12 @@ legend{font:700 10px/1 var(--f-display);letter-spacing:.06em;text-transform:uppe
 .dd-opt.dd-add:hover,.dd-opt.dd-add:focus-visible{background:#e6f3ff}
 
 /* calendar */
+.cal-bg{position:fixed;inset:0;z-index:60;background:rgba(13,27,76,.18)}
+.cal-pop{position:fixed;z-index:61;max-width:calc(100vw - 16px)}
+.cal-pop{background:#fff;border-radius:18px;box-shadow:0 18px 40px rgba(13,27,76,.3);padding:6px}
+html .cal-pop .cal{border:0;box-shadow:none;border-radius:12px;animation:none}
+.cal-ft{display:flex;justify-content:space-between;gap:8px;padding:2px 8px 6px}
+.cal-ft .btn{min-height:36px;padding:0 16px}
 .cal{border:2px solid var(--ink);background:#fff;padding:8px;box-shadow:3px 3px 0 rgba(13,27,76,.3);animation:popin .3s var(--ease-out)}
 .cal-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
 .cal-t{flex:1;text-align:center;font:700 12px/1.1 var(--f-display);letter-spacing:.05em}
@@ -2685,7 +2691,7 @@ class App {
             <span data-dd="inspector"></span></div>
           <div class="field"><span class="lbl"><span class="n">5</span>วันที่ตรวจ</span>
             <button type="button" class="btn" id="f-date" style="justify-content:space-between;font-size:12px;padding:11px 12px" aria-expanded="false"><span id="f-date-t">${fmtDate(s.batch.date)}</span><span aria-hidden="true">▦</span></button>
-            <div id="f-cal" hidden></div></div>`;
+            </div>`;
         const listOpts = list => s.lists[list].map(o => ({ value: o, label: o }));
         const showAdd = list => { const row = $(`[data-row="${list}"]`, body); row.hidden = false; row.querySelector('input').focus(); };
         const mount = (key, ps) => { const slot = $(`[data-dd="${key}"]`, body); slot.replaceWith(ps.el); return ps; };
@@ -2707,14 +2713,41 @@ class App {
           const ok = e.target.closest('[data-ok]'); if (ok) this.addOption(body, ok.dataset.ok);
         });
         body.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id && e.target.id.endsWith('-new')) { e.preventDefault(); this.addOption(body, e.target.id.split('-')[1]); } });
-        const dateBtn = $('#f-date', body), calBox = $('#f-cal', body); let cal = null;
+        const dateBtn = $('#f-date', body);
         dateBtn.addEventListener('click', () => {
-          calBox.hidden = !calBox.hidden; dateBtn.setAttribute('aria-expanded', String(!calBox.hidden)); this.sfx.blip();
-          if (!cal) cal = new PixelCalendar(calBox, s.batch.date, iso => { s.setBatch('date', iso); $('#f-date-t', body).textContent = fmtDate(iso); this.sfx.tick(); setTimeout(() => { calBox.hidden = true; dateBtn.setAttribute('aria-expanded', 'false'); }, 220); });
+          if (this.calPop) { this.closeCal(); return; }
+          this.sfx.blip(); dateBtn.setAttribute('aria-expanded', 'true');
+          // small calendar popup anchored to the date field (the field sits at the bottom of a scrolling window)
+          const bg = document.createElement('div'); bg.className = 'cal-bg';
+          const pop = document.createElement('div'); pop.className = 'cal-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'เลือกวันที่ตรวจ');
+          document.body.append(bg, pop);
+          const calRoot = document.createElement('div'); pop.appendChild(calRoot);
+          new PixelCalendar(calRoot, s.batch.date, iso => {
+            s.setBatch('date', iso); $('#f-date-t', body).textContent = fmtDate(iso); this.sfx.tick();
+            setTimeout(() => this.closeCal(), 180);
+          });
+          const today = document.createElement('button'); today.type = 'button'; today.className = 'btn small cal-today'; today.textContent = 'วันนี้';
+          today.addEventListener('click', () => { const iso = todayISO(); s.setBatch('date', iso); $('#f-date-t', body).textContent = fmtDate(iso); this.sfx.tick(); this.closeCal(); });
+          const ft = document.createElement('div'); ft.className = 'cal-ft'; ft.appendChild(today);
+          const x = document.createElement('button'); x.type = 'button'; x.className = 'btn small'; x.textContent = 'ปิด'; x.addEventListener('click', () => this.closeCal()); ft.appendChild(x);
+          pop.appendChild(ft);
+          pop.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); this.closeCal(); dateBtn.focus(); } });
+          const r = dateBtn.getBoundingClientRect(), W = innerWidth, H = innerHeight, pw = Math.min(300, W - 16), ph = pop.offsetHeight;
+          pop.style.width = pw + 'px';
+          pop.style.left = Math.max(8, Math.min(W - pw - 8, r.right - pw)) + 'px';
+          const below = r.bottom + 6, above = r.top - 6 - pop.offsetHeight;
+          pop.style.top = (below + pop.offsetHeight <= H - 8 ? below : Math.max(8, above >= 8 ? above : (H - pop.offsetHeight) / 2)) + 'px';
+          bg.addEventListener('pointerdown', () => this.closeCal());
+          this.calPop = { bg, pop, btn: dateBtn };
+          const sel = pop.querySelector('.sel') || pop.querySelector('[data-d]'); sel && sel.focus({ preventScroll: true });
         });
       },
     });
     this.refreshHUD();
+  }
+  closeCal() {
+    const c = this.calPop; if (!c) return; this.calPop = null;
+    c.bg.remove(); c.pop.remove(); c.btn.setAttribute('aria-expanded', 'false');
   }
   addOption(body, list) {
     const inp = $(`#f-${list}-new`, body), v = inp.value.trim(); if (!v) { inp.focus(); return; }
