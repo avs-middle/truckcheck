@@ -462,7 +462,7 @@ button{font:inherit;color:inherit}
         <span class="ic" style="background:#0d1b4c"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg></span>
         <span class="tx">
           <span class="t1">ดูสรุปผล <span class="lockpill"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>สำหรับสัตวแพทย์</span></span>
-          <span class="t2">กราฟผลตรวจ แยกฟาร์ม รุ่น และบริษัทขนส่ง</span>
+          <span class="t2">กราฟผลตรวจ แยกฟาร์ม รุ่น และจุดตรวจ</span>
         </span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d1b4c" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
       </button>
@@ -851,7 +851,7 @@ const Dash = {
     const f = this.f, per = PERIODS.find(p => p[0] === f.weeks);
     const chev = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
     const chip = (k, on, label) => `<button type="button" class="chip${on ? ' on' : ''}" data-chip="${k}" aria-haspopup="dialog">${esc(label)}${chev}</button>`;
-    $('#d-chips').innerHTML = chip('weeks', true, per[1]) + chip('farm', !!f.farm, f.farm || 'ทุกฟาร์ม') + chip('batch', !!f.batch, f.batch ? 'รุ่น ' + f.batch : 'ทุกรุ่น') + chip('carrier', !!f.carrier, f.carrier || 'ทุกบริษัทขนส่ง')
+    $('#d-chips').innerHTML = chip('weeks', true, per[1]) + chip('farm', !!f.farm, f.farm || 'ทุกฟาร์ม') + chip('batch', !!f.batch, f.batch ? 'รุ่น ' + f.batch : 'ทุกรุ่น')
       + (f.farm || f.batch || f.carrier ? '<button type="button" class="chip clear" data-chip="clear">ล้างตัวกรอง</button>' : '');
     $('#d-chips').querySelectorAll('[data-chip]').forEach(b => b.addEventListener('click', () => this.chip(b.dataset.chip)));
   },
@@ -932,7 +932,7 @@ const Dash = {
     return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(wk.map(x => `${x.label} ${x.n} คัน ${x.rate == null ? '' : 'ผ่าน ' + fmtPct(x.rate)}`).join(', '))}">${g}</svg>${read}`;
   },
   tabsHTML(L) {
-    const T = [['over', 'ภาพรวม'], ['farms', 'ฟาร์ม & ขนส่ง'], ['points', 'จุดตรวจ'], ['trucks', 'รายการรถ', String(L.length)]];
+    const T = [['over', 'ภาพรวม'], ['farms', 'ฟาร์ม'], ['points', 'จุดตรวจ'], ['trucks', 'รายการรถ', String(L.length)]];
     $('#d-tabs').innerHTML = T.map(([k, l, c]) => `<button type="button" class="tab${this.tab === k ? ' on' : ''}" role="tab" aria-selected="${this.tab === k}" data-tab="${k}">${l}${c ? `<span class="cnt">${c}</span>` : ''}</button>`).join('');
     $('#d-tabs').querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { this.tab = b.dataset.tab; this.render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
   },
@@ -991,14 +991,8 @@ const Dash = {
         <div style="min-width:0"><div class="nm">${esc(name)}</div><div class="meta">${g.n} คัน · ไม่ผ่าน ${g.fl}</div>
           <div class="bt">${Object.entries(g.b).sort((a, b) => (parseFloat(b[0]) || 0) - (parseFloat(a[0]) || 0)).slice(0, 4).map(([bn, c]) => `<span class="bchip${c < SOP_MIN ? ' short' : ''}">รุ่น ${esc(bn)} · ${c}/${SOP_MIN}</span>`).join('')}</div></div>
         <span class="fgo">${f.farm === name ? '✓' : '›'}</span></button>`; }).join('');
-    const cg = {}; this.list(0, 'carrier').forEach(r => { const g = cg[r.carrier] || (cg[r.carrier] = { n: 0, fl: 0, k: 0 }); g.n++; if (r.overall) g.k++; if (r.overall === 'fail') g.fl++; });
-    const carr = Object.entries(cg).sort((a, b) => pct(b[1].fl, b[1].k) - pct(a[1].fl, a[1].k));
-    const maxR = Math.max(10, ...carr.map(([, g]) => pct(g.fl, g.k)));
-    const carrRows = carr.map(([name, g]) => { const r = pct(g.fl, g.k);
-      return `<button type="button" class="frow${f.carrier === name ? ' on' : ''}" data-carrier="${esc(name)}" aria-pressed="${f.carrier === name}"><span class="ft"><span class="fname">${esc(name)}</span><span class="fs"><span class="mono" style="color:${r > 100 - TARGET ? 'var(--amb-d)' : 'inherit'}">${fmtPct(r)}</span> ไม่ผ่าน · ${g.n} คัน</span></span><span class="fbar"><b style="width:${r / maxR * 100}%"></b></span></button>`; }).join('');
     return `<div class="stack"><section class="sec"><div class="sec-h"><h2>ฟาร์ม</h2><span class="m">แตะเพื่อกรอง · รุ่นสีส้ม = ยังไม่ครบ ${SOP_MIN} คัน</span></div><div class="farmgrid stack" style="gap:8px">${farmCards}</div></section>
-      ${this.heatB()}
-      <section class="card sec"><div class="sec-h"><h2>บริษัทขนส่ง</h2><span class="m">อัตราไม่ผ่าน · แตะเพื่อกรอง</span></div>${carrRows || '<div class="empty-row">ไม่มีข้อมูล</div>'}</section></div>`;
+      ${this.heatB()}</div>`;
   },
   pointsHTML(L, S) {
     const maxP = Math.max(5, ...S.cps.map(c => c.p));
@@ -1011,19 +1005,19 @@ const Dash = {
   vrowHTML(r) {
     const bad = r.overall === 'fail', parts = SECTIONS.filter(s => r.sec[s.tag] === 'fail').map(s => s.short).join('+');
     return `<button type="button" class="vrow" data-rec="${esc(r.id)}"><span class="st ${bad ? 'bad' : 'ok'}">${bad ? '✕' : '✓'}</span>
-      <span style="min-width:0;display:flex;flex-direction:column"><span class="a">${esc(r.plate)} <span>${esc(r.province || '')}</span></span><span class="b">${esc(r.farm)} · รุ่น ${esc(r.batch)} · ${esc(r.carrier)}</span></span>
+      <span style="min-width:0;display:flex;flex-direction:column"><span class="a">${esc(r.plate)} <span>${esc(r.province || '')}</span></span><span class="b">${esc(r.farm)} · รุ่น ${esc(r.batch)}</span></span>
       <span class="r">${bad ? `<span class="tag">${esc(parts || 'ไม่ผ่าน')}</span>` : '<span class="tag ok">ผ่าน</span>'}<span>${esc(fmtD(r.date))}${r.time ? ' ' + esc(r.time) : ''}</span></span></button>`;
   },
   trucksHTML(L) {
     const q = this.vq.trim().toUpperCase().replace(/[\s-]/g, '');
     let rows = L.filter(r => this.vf === 'all' || (this.vf === 'fail' ? r.overall === 'fail' : r.overall === 'pass'));
-    if (q) rows = rows.filter(r => (r.plate + r.farm + r.carrier).toUpperCase().replace(/[\s-]/g, '').includes(q));
+    if (q) rows = rows.filter(r => (r.plate + r.province + r.farm).toUpperCase().replace(/[\s-]/g, '').includes(q));
     rows.sort((a, b) => (b.saved || 0) - (a.saved || 0));
     let out = '', day = '';
     rows.slice(0, 200).forEach(r => { const d = r.date ? `${r.date.getDate()} ${MON[r.date.getMonth()]} ${r.date.getFullYear() + 543}` : '—'; if (d !== day) { day = d; out += `<div class="daygrp">${d}</div>`; } out += this.vrowHTML(r); });
     const cnt = k => L.filter(r => k === 'all' || (k === 'fail' ? r.overall === 'fail' : r.overall === 'pass')).length;
     return `<div class="stack" style="gap:12px">
-      <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="vq" type="search" inputmode="search" placeholder="ค้นหาทะเบียน ฟาร์ม หรือบริษัทขนส่ง" value="${esc(this.vq)}" autocomplete="off"></label>
+      <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="vq" type="search" inputmode="search" placeholder="ค้นหาทะเบียน จังหวัด หรือฟาร์ม" value="${esc(this.vq)}" autocomplete="off"></label>
       <div class="seg2" role="group" aria-label="กรองผล">${[['all', 'ทั้งหมด'], ['fail', 'ไม่ผ่าน'], ['pass', 'ผ่าน']].map(([k, l]) => `<button type="button" data-vf="${k}" class="${this.vf === k ? 'on' : ''}" aria-pressed="${this.vf === k}">${l} ${cnt(k)}</button>`).join('')}</div>
       <section class="card" style="padding:0 12px 6px">${out || '<div class="empty-row" style="padding:16px 0">ไม่พบรถตามที่ค้นหา</div>'}${rows.length > 200 ? `<div class="empty-row">แสดง 200 จาก ${rows.length} คัน · ส่งออก Excel เพื่อดูทั้งหมด</div>` : ''}</section></div>`;
   },
@@ -1159,7 +1153,7 @@ const Dash = {
     const secs = SECTIONS.map(s => `<div class="dsec"><h4><span>${s.th}</span><span style="color:${r.sec[s.tag] === 'fail' ? 'var(--amb-d)' : r.sec[s.tag] === 'pass' ? 'var(--grn)' : 'var(--d-mute)'}">${r.sec[s.tag] === 'fail' ? 'ไม่ผ่าน' : r.sec[s.tag] === 'pass' ? 'ผ่าน' : '-'}</span></h4><ul>
       ${s.items.map(([iid, th]) => { const v = r.items[`${s.tag}_${iid}`], fnd = r.F[th] || []; return `<li><span class="s ${v === 'dirty' ? 'd' : v === 'clean' ? 'c' : 'n'}">${v === 'dirty' ? 'สกปรก' : v === 'clean' ? 'สะอาด' : '-'}</span><span>${esc(th)}${v === 'dirty' && fnd.length ? ' · พบ ' + esc(fnd.join(', ')) : ''}</span></li>`; }).join('')}</ul></div>`).join('');
     openSheet(`${r.plate} ${r.province}`.trim(), `<dl class="dl">${row('ผลรวม', r.overall === 'fail' ? 'ไม่ผ่าน' : r.overall === 'pass' ? 'ผ่าน' : '-')}${row('ฟาร์ม', r.farm)}${row('รุ่นการเลี้ยง', r.batch)}${row('วันที่ตรวจ', r.date ? `${r.date.getDate()} ${MON[r.date.getMonth()]} ${r.date.getFullYear()}${r.time ? ' · ' + r.time : ''}` : '')}
-      ${row('บริษัทขนส่ง', r.carrier)}${row('ผู้ตรวจ', r.insp)}${row('คันที่', r.vno ? String(r.vno) : '')}${row('สีกล่อง', r.crate)}${row('รูปถ่าย', r.photos ? `${r.photos} รูป` : 'ไม่มีรูป')}${r.x ? Object.entries(r.x).map(([k, v]) => row(k, String(v))).join('') : ''}</dl>
+      ${row('ผู้ตรวจ', r.insp)}${row('คันที่', r.vno ? String(r.vno) : '')}${row('รูปถ่าย', r.photos ? `${r.photos} รูป` : 'ไม่มีรูป')}${r.x ? Object.entries(r.x).map(([k, v]) => row(k, String(v))).join('') : ''}</dl>
       ${r.folder ? `<a class="pbtn sec2" style="text-decoration:none;align-self:flex-start;margin-bottom:6px" href="${esc(r.folder)}" target="_blank" rel="noopener">เปิดโฟลเดอร์รูปใน SharePoint ↗</a>` : ''}${secs}`);
   },
 
@@ -1188,7 +1182,7 @@ const Dash = {
     const extraKeys = [...new Set(L.flatMap(r => r.x ? Object.keys(r.x) : []))];
     const ins = L.map(r => {
       const o = { InspectionID: r.id, InspectionDate: isoD(r.date), Year: r.date ? r.date.getFullYear() : '', Week: r.date ? isoWeek(r.date) : '', Business: r.business, Farm: r.farm, RearingBatch: r.batch,
-        Inspector: r.insp, Plate: r.plate, Province: r.province, Carrier: r.carrier, CheckTime: r.time, VehicleNo: r.vno == null ? '' : r.vno,
+        Inspector: r.insp, Plate: r.plate, Province: r.province, CheckTime: r.time, VehicleNo: r.vno == null ? '' : r.vno,
         SavedAt: r.saved ? r.saved.toISOString() : '', OverallResult: yn(r.overall), Pass: r.overall === 'pass' ? 1 : r.overall === 'fail' ? 0 : '' };
       SECTIONS.forEach(s => { o[s.tag + 'Result'] = yn(r.sec[s.tag]); });
       CPS.forEach(c => { o[c.key] = sv(r.items[c.key]); });
@@ -1202,7 +1196,7 @@ const Dash = {
     const cps = [];
     L.forEach(r => CPS.forEach(c => {
       const fnd = r.F[c.th] || [];
-      cps.push({ InspectionID: r.id, InspectionDate: isoD(r.date), Farm: r.farm, RearingBatch: r.batch, Carrier: r.carrier, Section: c.sec, SectionTH: SECTIONS.find(s => s.tag === c.sec).th,
+      cps.push({ InspectionID: r.id, InspectionDate: isoD(r.date), Farm: r.farm, RearingBatch: r.batch, Section: c.sec, SectionTH: SECTIONS.find(s => s.tag === c.sec).th,
         CheckpointKey: c.key, Checkpoint: c.th, Status: sv(r.items[c.key]), Dirty: r.items[c.key] === 'dirty' ? 1 : 0,
         ...(hasF ? { Feather: fnd.includes('ขนไก่') ? 1 : 0, Manure: fnd.includes('ขี้ไก่') ? 1 : 0, OldLitter: fnd.includes('แกลบเก่า') ? 1 : 0 } : {}) });
     }));

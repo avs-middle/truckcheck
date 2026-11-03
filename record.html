@@ -560,15 +560,13 @@ a.btn{text-decoration:none;align-self:flex-start}
   #top{flex-wrap:nowrap;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 8px) 10px 0;align-items:stretch}
   .brand{flex:none;padding:6px 8px}
   .brand>div{display:none}
-  .vstrip{order:0;flex:1;min-width:0;width:auto;margin-left:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"plate prov time" "car car car";align-content:center;padding:6px 10px;column-gap:10px;row-gap:1px}
+  .vstrip{order:0;flex:1;min-width:0;width:auto;margin-left:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"plate prov time";align-content:center;padding:6px 10px;column-gap:10px;row-gap:1px}
   .vstrip .cell{padding:0;border:0!important;min-width:0}
   .vstrip .cell small{display:none}
   .vstrip .cell[data-f=plate]{grid-area:plate}
   .vstrip .cell[data-f=province]{grid-area:prov}
   .vstrip .cell[data-f=time]{grid-area:time;justify-self:end}
-  .vstrip .cell[data-f=company]{grid-area:car}
   .vstrip .cell b{font-size:15px;line-height:1.25;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .vstrip .cell[data-f=company] b{font-size:12px;font-weight:500;color:var(--muted)}
   .vstrip .cell.req b{font-size:0}
   .vstrip .cell.req b::after{content:attr(data-ph);font-size:13px;color:var(--signal)}
   .vcount{padding:5px 9px;display:flex;flex-direction:column;justify-content:center}
@@ -604,8 +602,10 @@ a.btn{text-decoration:none;align-self:flex-start}
   .opt-card small{font-size:11px}
 }
 @media (max-width:360px){
-  .vstrip{grid-template-areas:"plate prov prov" "car car time"}
   .vstrip .cell[data-f=time] b{font-size:12px;font-weight:600;color:var(--muted)}
+  .vstrip{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"plate time" "prov prov"}
+  .vstrip .cell[data-f=province] b{font-size:12px;font-weight:500;color:var(--muted)}
+  .field:has(#v-time){grid-column:1/-1}
   .row{grid-template-columns:1fr}
   .seg{justify-self:start}
 }
@@ -638,7 +638,6 @@ a.btn{text-decoration:none;align-self:flex-start}
     <button class="vstrip" id="vstrip" type="button" aria-label="ข้อมูลรถ ต้องกรอกทุกคัน">
       <span class="cell" data-f="plate" data-ph="ทะเบียน ?"><small>ทะเบียน</small><b>—</b></span>
       <span class="cell" data-f="province" data-ph="จังหวัด ?"><small>จังหวัด</small><b>—</b></span>
-      <span class="cell" data-f="company" data-ph="บริษัทขนส่ง ?"><small>บริษัทขนส่ง</small><b>—</b></span>
       <span class="cell" data-f="time" data-ph="เวลา ?"><small>เวลา</small><b>—</b></span>
     </button>
     <div class="vcount" aria-live="polite"><small>คันที่</small><b id="vno">01</b><span class="sop" id="sopdots" title="SOP: ตรวจอย่างน้อย 5 คันต่อรุ่น"></span></div>
@@ -788,7 +787,7 @@ const SECTIONS = {
   },
 };
 const FINDINGS = [['feather', 'Feathers', 'ขนไก่'], ['manure', 'Manure', 'ขี้ไก่'], ['litter', 'Old litter', 'แกลบเก่า']];
-const VEHICLE_FIELDS = [['plate', 'Plate', 'ทะเบียน'], ['province', 'Province', 'จังหวัด'], ['company', 'Carrier', 'บริษัทขนส่ง'], ['time', 'Check time', 'เวลาตรวจ']];
+const VEHICLE_FIELDS = [['plate', 'Plate', 'ทะเบียน'], ['province', 'Province', 'จังหวัด'], ['time', 'Check time', 'เวลาตรวจ']];
 const HOUSE_FIELDS = [['business', 'Business'], ['farm', 'Farm'], ['batchNo', 'Rearing batch'], ['inspector', 'Inspector'], ['date', 'Inspection date']];
 const INSPECTORS = { vet: ['Veterinarian', 'สัตวแพทย์'], staff: ['Farm staff', 'เจ้าหน้าที่ฟาร์ม'] };
 const CRATE_COLORS = {
@@ -910,7 +909,7 @@ class Store extends EventTarget {
     const sec = this.vehicle.sections[key]; let done = 0, dirty = false;
     SECTIONS[key].items.forEach(([id]) => { const s = sec.items[id]; if (s && s.status) { done++; if (s.status === 'dirty') dirty = true; } });
     let total = SECTIONS[key].items.length;
-    if (key === 'body') { total += 4; done += VEHICLE_FIELDS.filter(([f]) => String(this.vehicle[f] || '').trim()).length; }
+    if (key === 'body') { total += VEHICLE_FIELDS.length; done += VEHICLE_FIELDS.filter(([f]) => String(this.vehicle[f] || '').trim()).length; }
     const photos = this.photosOf(key).length, needPhoto = photos === 0;
     total += 1; if (!needPhoto) done++;
     const complete = done === total;
@@ -1105,7 +1104,7 @@ const Mail = {
     const L = [
       `รายงานผลตรวจรถจับไก่ · คันที่ ${pad2(rec.vehicleNo)} · ผลรวมทั้งคัน: ${this.res(rec.overall)}`, '',
       `กิจการ: ${rec.business}`, `ฟาร์ม: ${rec.farm}`, `รุ่นการเลี้ยง: ${rec.batchNo}`, `ผู้ตรวจ: ${this.insp(rec.inspector)}`, `วันที่ตรวจ: ${fmtDate(rec.date)}`,
-      `ทะเบียน: ${rec.plate}`, `จังหวัด: ${rec.province}`, `บริษัทขนส่ง: ${rec.company}`, `เวลาตรวจ: ${rec.time}`,
+      `ทะเบียน: ${rec.plate}`, `จังหวัด: ${rec.province}`, `เวลาตรวจ: ${rec.time}`,
       `สีกล่อง: ${CRATE_COLORS[rec.crate] ? CRATE_COLORS[rec.crate][1] : (rec.crate || '-')}`, `เวลาบันทึก: ${fmtStamp(rec.savedAt)}`, '',
     ];
     const tally = { feather: 0, manure: 0, litter: 0 };
@@ -1150,7 +1149,7 @@ const Excel = {
         InspectionID: r.id, VehicleNo: r.vehicleNo, Business: r.business, Farm: r.farm, RearingBatch: r.batchNo,
         Inspector: INSPECTORS[r.inspector] ? INSPECTORS[r.inspector][0] : r.inspector,
         InspectionDate: r.date ? new Date(r.date + 'T00:00:00') : null, CheckTime: r.time,
-        SavedAt: new Date(r.savedAt), Plate: r.plate, Province: r.province, Carrier: r.company,
+        SavedAt: new Date(r.savedAt), Plate: r.plate, Province: r.province,
         CrateColour: r.crate, BodyResult: r.sections.body.result, ModuleResult: r.sections.module.result,
         CratesResult: r.sections.crates.result, OverallResult: r.overall,
         DirtyPoints: items.filter(i => i.status === 'dirty').length,
@@ -2498,6 +2497,7 @@ class App {
   renderCarriers() { $('#dl-carrier').innerHTML = this.store.lists.carrier.map(c => `<option value="${esc(c)}">`).join(''); }
   onStore(scope) {
     if (scope === 'vehicle' || scope === 'all') { const v = this.store.vehicle; this.truck.setInfo({ plate: v.plate, province: v.province, company: v.company }); }
+    if (scope === 'vehicle' && this.wm.has('sec-body')) { const st = this.store.section('body'), pt = $('#prog-body'); if (pt && !st.complete && !st.onlyPhoto) pt.textContent = `ทำแล้ว ${st.done} จาก ${st.total}`; }
     if (scope === 'house' || scope === 'all') this.world.setFarmName(this.store.batch.farm);
     if (SECTIONS[scope] || scope === 'all') {
       const ev = this.truck.grime.sync(this.store.vehicle, false);
@@ -2614,7 +2614,7 @@ class App {
   }
   renderSettingsLists(body) {
     const box = $('#set-lists', body); if (!box) return;
-    const s = this.store, groups = [['business', 'กิจการ', s.batch.business], ['farm', 'ฟาร์ม', s.batch.farm], ['province', 'จังหวัด', s.vehicle.province], ['carrier', 'บริษัทขนส่ง', s.vehicle.company]];
+    const s = this.store, groups = [['business', 'กิจการ', s.batch.business], ['farm', 'ฟาร์ม', s.batch.farm], ['province', 'จังหวัด', s.vehicle.province]];
     box.innerHTML = groups.map(([k, label, cur]) => `<div class="field"><span class="lbl">${label}</span><div class="list-chips">${s.lists[k].length ? s.lists[k].map(v => `<span class="lchip ${v === cur ? 'sel' : ''}" data-list="${k}" data-v="${esc(v)}"><span>${esc(v)}</span><button type="button" aria-label="ลบ ${esc(v)}">×</button></span>`).join('') : '<span class="note">ยังไม่มีรายการ</span>'}</div></div>`).join('');
     $$('.lchip', box).forEach(ch => armConfirm(ch.querySelector('button'), { armedText: 'ลบ', sfx: this.sfx, onArm: () => ch.classList.add('armed'), onDisarm: () => ch.classList.remove('armed'), onConfirm: () => {
       s.removeListItem(ch.dataset.list, ch.dataset.v); this.renderSettingsLists(body); this.renderCarriers(); this.refreshDropdowns(); this.sfx.close(); Toast.show(`ลบ <b>${esc(ch.dataset.v)}</b> แล้ว`);
@@ -2766,9 +2766,6 @@ class App {
             <div class="field"><label for="v-plate">ทะเบียน</label><input id="v-plate" value="${esc(v.plate)}" placeholder="70-3451" autocomplete="off" maxlength="12"></div>
             <div class="field"><label for="v-province">จังหวัด</label><span data-dd="province"></span>
               <div class="addrow" data-row="province" hidden><input id="f-province-new" placeholder="ชื่อจังหวัด" autocomplete="off"><button type="button" class="btn" data-ok="province">เพิ่ม</button></div></div>
-            <div class="field span2"><label for="v-company">บริษัทขนส่ง</label>
-              <div class="combo"><span data-dd="company"></span><button type="button" class="btn sq" data-add="carrier" aria-label="เพิ่มบริษัทขนส่ง">+</button></div>
-              <div class="addrow" data-row="carrier" hidden><input id="f-carrier-new" placeholder="ชื่อบริษัทขนส่งใหม่" autocomplete="off"><button type="button" class="btn" data-ok="carrier">เพิ่ม</button></div></div>
             <div class="field"><label for="v-time">เวลาตรวจ</label><input id="v-time" type="time" value="${esc(v.time)}"></div></div><p class="plate-alert" id="plate-alert" role="alert" hidden></p></fieldset>`;
         // crate colour is fixed to red: no picker
         html += `<div class="never"><span class="lbl">ไม่ควรพบ</span>${FINDINGS.map(f => `<span>${f[2]}</span>`).join('')}</div>
@@ -2778,7 +2775,6 @@ class App {
           <div class="field"><label for="note-${key}">หมายเหตุ</label><textarea id="note-${key}" placeholder="สิ่งที่อยากแจ้งสัตวแพทย์">${esc(v.sections[key].note)}</textarea></div>`;
         body.innerHTML = html;
         if (key === 'body') {
-          if (v.company && !s.lists.carrier.includes(v.company)) s.addList('carrier', v.company);
           if (v.province && !s.lists.province.includes(v.province.trim())) s.addList('province', v.province);
           const provOpts = () => s.lists.province.map(c => ({ value: c, label: c }));
           const prow = $('[data-row="province"]', body), pinp = $('#f-province-new', body);
@@ -2792,21 +2788,6 @@ class App {
           };
           body.addEventListener('click', e => { if (e.target.closest('[data-ok="province"]')) addProvince(); });
           pinp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addProvince(); } });
-          const carrierOpts = () => s.lists.carrier.map(c => ({ value: c, label: c }));
-          const row = $('[data-row="carrier"]', body), inp = $('#f-carrier-new', body);
-          const ps = new PixelSelect({ id: 'v-company', options: carrierOpts(), value: v.company, placeholder: 'เลือกบริษัทขนส่ง', addLabel: '+ เพิ่มบริษัทขนส่ง',
-            onAdd: () => { row.hidden = false; inp.focus(); }, onChange: val => s.setVehicle('company', val), sfx: this.sfx });
-          $('[data-dd="company"]', body).replaceWith(ps.el);
-          const addCarrier = () => {
-            const val = inp.value.trim(); if (!val) { inp.focus(); return; }
-            s.addList('carrier', val); s.setVehicle('company', val); ps.setOptions(carrierOpts(), val); this.renderCarriers();
-            inp.value = ''; row.hidden = true; this.sfx.check(); Toast.show(`เพิ่ม <b>${esc(val)}</b> แล้ว`, 'ok');
-          };
-          body.addEventListener('click', e => {
-            if (e.target.closest('[data-add="carrier"]')) { row.hidden = !row.hidden; if (!row.hidden) inp.focus(); this.sfx.blip(); }
-            if (e.target.closest('[data-ok="carrier"]')) addCarrier();
-          });
-          inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addCarrier(); } });
         }
         const foot = document.createElement('div'); foot.className = 'win-foot';
         foot.innerHTML = `<span class="grow progress-txt" id="prog-${key}"></span><button type="button" class="btn go" data-done>เสร็จ</button>`; el.appendChild(foot);
@@ -2935,7 +2916,7 @@ class App {
       title: 'บันทึกรถคันนี้แล้ว',
       build: (body, el) => {
         const res = k => { const r = rec.sections[k].result; return `<div class="${r}"><small>${SECTIONS[k].th}</small><b>${r === 'dirty' ? 'ไม่ผ่าน' : 'ผ่าน'}</b></div>`; };
-        body.innerHTML = `<div class="saved-hero"><span class="big ${rec.overall === 'dirty' ? 'bad' : ''}">${rec.overall === 'dirty' ? ICON_BANG(4) : ICON_CHECK(4)}</span><div><h3>${esc(rec.plate)} ${esc(rec.province)}</h3><p>${esc(rec.company)} · ${esc(rec.time)} · ผ่านซุ้มพ่นยาฆ่าเชื้อแล้ว</p></div></div>
+        body.innerHTML = `<div class="saved-hero"><span class="big ${rec.overall === 'dirty' ? 'bad' : ''}">${rec.overall === 'dirty' ? ICON_BANG(4) : ICON_CHECK(4)}</span><div><h3>${esc(rec.plate)} ${esc(rec.province)}</h3><p>${esc(rec.time)} · ผ่านซุ้มพ่นยาฆ่าเชื้อแล้ว</p></div></div>
           <div class="res">${Object.keys(SECTIONS).map(res).join('')}</div>
           <div class="field"><span class="lbl">ความคืบหน้าตาม SOP<span class="th">อย่างน้อย ${SOP_MIN} คัน/รุ่น</span></span><div class="meter5">${Array.from({ length: SOP_MIN }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>
           <p class="note">${n >= SOP_MIN ? `ตรวจแล้ว ${n} คัน ครบขั้นต่ำตาม SOP` : `ตรวจแล้ว ${n} จาก ${SOP_MIN} คันของรุ่นนี้`}</p></div>
