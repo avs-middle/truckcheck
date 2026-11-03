@@ -795,6 +795,7 @@ const CRATE_COLORS = {
   green: ['#2fa84f', 'เขียว'], yellow: ['#f2c21b', 'เหลือง'], mixed: [null, 'คละสี'],
 };
 const SOP_MIN = 5;
+const BUSINESSES = ['ไก่เนื้อสระบุรี', 'ไก่เนื้อโคราช', 'ไก่เนื้อมีนบุรี'];   // each has its own dashboard PIN
 const FARMS = ['ท่าคล้อ', 'ท่าศาลา', 'จำปาหอม', 'คำใหญ่', 'ชะอม', 'โพธิ์งาม', 'มวกเหล็ก', 'ทับกวาง', 'เตาปูน', 'ป่าไผ่', 'บ้านธาตุ', 'บ้านธาตุ1'];
 const PROVINCES = ['ลพบุรี', 'สระบุรี', 'พระนครศรีอยุธยา', 'นครราชสีมา', 'สิงห์บุรี', 'อ่างทอง', 'ชัยนาท', 'นครปฐม', 'ปทุมธานี', 'สุพรรณบุรี', 'เพชรบูรณ์', 'ชลบุรี', 'ฉะเชิงเทรา', 'นครนายก', 'ปราจีนบุรี', 'กรุงเทพมหานคร'];
 
@@ -808,6 +809,12 @@ class Store extends EventTarget {
       this.lists.farm = FARMS.concat(extra);
       if (this.batch.farm === 'Tha Khlo') this.batch.farm = 'ท่าคล้อ';
       Persist.set('lists', this.lists); Persist.set('batch', this.batch); Persist.set('farmsV2', true);
+    }
+    if (!Persist.get('bizV1', false)) {   // one-time: the three businesses in Thai; the old English name becomes ไก่เนื้อสระบุรี
+      const extra = (this.lists.business || []).filter(b => b !== 'Saraburi Broiler Chicken' && !BUSINESSES.includes(b));
+      this.lists.business = BUSINESSES.concat(extra);
+      if (!this.batch.business || this.batch.business === 'Saraburi Broiler Chicken') this.batch.business = BUSINESSES[0];
+      Persist.set('lists', this.lists); Persist.set('batch', this.batch); Persist.set('bizV1', true);
     }
     if (!Array.isArray(this.lists.province)) { this.lists.province = PROVINCES.slice(); Persist.set('lists', this.lists); }   // provinces became an editable list
     this.saved = Persist.get('saved', []);
@@ -858,8 +865,8 @@ class Store extends EventTarget {
     this.editing = null; Persist.set('edit', null); Persist.set('draft', this.vehicle);
     this.emit('all');
   }
-  static defaultLists() { return { business: ['Saraburi Broiler Chicken'], farm: FARMS.slice(), province: PROVINCES.slice(), carrier: ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)'] }; }
-  static defaultBatch() { return { business: 'Saraburi Broiler Chicken', farm: 'ท่าคล้อ', batchNo: '', inspector: '', date: todayISO() }; }
+  static defaultLists() { return { business: BUSINESSES.slice(), farm: FARMS.slice(), province: PROVINCES.slice(), carrier: ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)'] }; }
+  static defaultBatch() { return { business: BUSINESSES[0], farm: 'ท่าคล้อ', batchNo: '', inspector: '', date: todayISO() }; }
   blankVehicle() {
     const sections = {};
     for (const k in SECTIONS) sections[k] = { items: {}, note: '' };

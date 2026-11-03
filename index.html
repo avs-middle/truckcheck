@@ -357,6 +357,7 @@ button{font:inherit;color:inherit}
 .t3d-views button:hover,.t3d-views button.on{background:#fff;color:#4338CA;box-shadow:0 1px 3px rgba(15,23,42,.12)}
 .bh.tmh{flex-wrap:wrap;row-gap:4px}
 .bh.tmh span{flex-basis:100%;order:3}
+.scope{display:inline-flex;align-items:center;font:600 11px/1 var(--f-ui);padding:4px 9px;border-radius:99px;background:#EEF2FF;color:#4338CA;margin-right:6px}
 .tmsw{display:inline-flex;background:var(--d-bg);border-radius:99px;padding:2px;margin-left:auto}
 .tmsw button{border:0;background:transparent;font:700 12px/1 var(--f-ui);color:var(--d-mute);padding:0 14px;min-height:34px;min-width:44px;border-radius:99px;cursor:pointer}
 .tmsw button.on{background:#fff;color:#4338CA;box-shadow:0 1px 3px rgba(15,23,42,.15)}
@@ -531,7 +532,15 @@ button{font:inherit;color:inherit}
 const API = 'https://script.google.com/macros/s/AKfycbzUTYlTzEVQ5KhmYf1KrShl0CFHYNMpzJNdwrBPgYkEJGzntW7q0ctb5loK3gGUepc2/exec';
 const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 const TARGET = 90, SOP_MIN = 5, PIN_MAX = 8;
-const K_CODE = 'tc:pin', K_CACHE = 'tc:listcache';
+const K_CODE = 'tc:pin', K_CACHE = 'tc:listcache', K_SCOPE = 'tc:scope';
+/* each PIN sees one business ('*' = admin sees all); the Apps Script filters the data, this page only labels it */
+function normBiz(b) {
+  const s = String(b || '').trim(), l = s.toLowerCase();
+  if (/สระบุรี|saraburi/.test(l)) return 'ไก่เนื้อสระบุรี';
+  if (/โคราช|นครราชสีมา|korat|khorat|nakhon ?ratchasima/.test(l)) return 'ไก่เนื้อโคราช';
+  if (/มีนบุรี|min ?buri/.test(l)) return 'ไก่เนื้อมีนบุรี';
+  return s;
+}
 try { localStorage.removeItem('tc:code'); localStorage.removeItem('tc:dashcache'); sessionStorage.removeItem('tc:code'); } catch (e) { /* keys from the earlier code gate */ }
 
 /* Same checkpoints as the recording app (record.html SECTIONS) */
@@ -557,7 +566,8 @@ const store = {
   del(k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } try { sessionStorage.removeItem(k); } catch (e) { /* ignore */ } },
 };
 const getCode = () => store.get(K_CODE) || store.get(K_CODE, true) || '';
-const setCode = (c, remember) => { store.del(K_CODE); store.set(K_CODE, c, !remember); };
+const setCode = (c, remember, scope) => { store.del(K_CODE); store.del(K_SCOPE); store.del(K_CACHE); store.set(K_CODE, c, !remember); store.set(K_SCOPE, scope || '', !remember); };
+const getScope = () => store.get(K_SCOPE) || store.get(K_SCOPE, true) || '';
 const pct = (a, b) => b ? a / b * 100 : 0;
 const fmtPct = v => (Math.round(v * 10) / 10).toString().replace(/\.0$/, '') + '%';
 const fmtD = d => d ? `${d.getDate()} ${MON[d.getMonth()]}` : '—';
@@ -591,7 +601,7 @@ function norm(d) {
   let overall = res(d.OverallResult);
   if (!overall) overall = Object.values(sec).includes('fail') ? 'fail' : Object.values(sec).some(Boolean) ? 'pass' : null;
   return {
-    id: d.InspectionID, business: d.Business || '', farm: d.Farm || '(ไม่ระบุฟาร์ม)', batch: String(d.RearingBatch || '').trim() || '-', insp: d.Inspector || '',
+    id: d.InspectionID, business: d.Business || '', biz: normBiz(d.Business) || '(ไม่ระบุกิจการ)', farm: d.Farm || '(ไม่ระบุฟาร์ม)', batch: String(d.RearingBatch || '').trim() || '-', insp: d.Inspector || '',
     plate: d.Plate || '-', province: d.Province || '', carrier: d.Carrier || '(ไม่ระบุบริษัท)', time: d.CheckTime || '', vno: d.VehicleNo,
     date, saved: saved && !isNaN(saved) ? saved : date, overall, sec, items, F: d.F || {}, crate: d.Crate || '',
     photos: +d.PhotoCount || 0, folder: /^https?:\/\//.test(d.PhotoFolder || '') ? d.PhotoFolder : '', x: d._x || null, raw: d,
@@ -633,7 +643,7 @@ function sampleRecords() {
       const day = new Date(today.getFullYear(), today.getMonth(), today.getDate() - w * 7 - Math.floor(rnd() * 5));
       if (day > today) return;
       for (let v = 0; v < n; v++) {
-        const d = { InspectionID: `demo-${w}-${fi}-${v}`, Business: 'Saraburi Broiler Chicken', Farm: farm, RearingBatch: batch, Inspector: rnd() < .6 ? 'สัตวแพทย์' : 'เจ้าหน้าที่ฟาร์ม',
+        const d = { InspectionID: `demo-${w}-${fi}-${v}`, Business: ['ไก่เนื้อสระบุรี', 'ไก่เนื้อโคราช', 'ไก่เนื้อมีนบุรี'][fi % 3], Farm: farm, RearingBatch: batch, Inspector: rnd() < .6 ? 'สัตวแพทย์' : 'เจ้าหน้าที่ฟาร์ม',
           InspectionDate: isoD(day), Plate: `${70 + Math.floor(rnd() * 15)}-${1000 + Math.floor(rnd() * 8999)}`, Province: rnd() < .7 ? 'สระบุรี' : 'ลพบุรี',
           Carrier: carriers[Math.floor(rnd() * carriers.length)], CheckTime: `${pad2(5 + Math.floor(rnd() * 16))}:${pad2(Math.floor(rnd() * 60))}`, VehicleNo: v + 1,
           SavedAt: new Date(day.getTime() + (8 + v) * 36e5).toISOString(), F: {}, PhotoCount: 3 + Math.floor(rnd() * 3) };
@@ -726,10 +736,10 @@ $('#codeform').addEventListener('submit', async e => {
     setErr(r && r.error === 'locked' ? 'ใส่ PIN ผิดหลายครั้ง ระบบล็อกไว้ 15 นาที' : r && r.error === 'network' ? 'เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง' : r && r.service ? 'ระบบยังไม่พร้อม: ต้องอัปเดต Apps Script ก่อน' : 'PIN ไม่ถูกต้อง ลองใหม่อีกครั้ง');
     return;
   }
-  setCode(pin, $('#remember').checked); Pin.v = ''; setErr('');
+  setCode(pin, $('#remember').checked, r.scope || '*'); Dash.reset(); Pin.v = ''; setErr('');   // a new PIN never reuses data loaded for another one
   history.replaceState(history.state, '', '#dash'); route();
 });
-$('#d-forget').addEventListener('click', () => { store.del(K_CODE); store.del(K_CACHE); Dash.reset(); toast('ลบ PIN ออกจากเครื่องนี้แล้ว'); history.replaceState(null, '', location.pathname + location.search); route(); });
+$('#d-forget').addEventListener('click', () => { store.del(K_CODE); store.del(K_CACHE); store.del(K_SCOPE); Dash.reset(); toast('ลบ PIN ออกจากเครื่องนี้แล้ว'); history.replaceState(null, '', location.pathname + location.search); route(); });
 
 /* ===== Bottom sheet ===== */
 let lastFocus = null;
@@ -758,8 +768,8 @@ const optList = (opts, cur) => opts.map(([v, label, count]) => `<button type="bu
 
 /* ===== Dashboard ===== */
 const Dash = {
-  all: null, src: null, f: { weeks: 6, farm: '', batch: '', carrier: '' }, showAllCp: false, showAllFails: false, loading: false, tab: 'over', tm: (() => { try { return localStorage.getItem('tc:tm') || '3d'; } catch (e) { return '3d'; } })(), vq: '', vf: 'all', selWeek: -1, hotKey: '', showAllB: false,
-  reset() { this.all = null; this.src = null; this.f = { weeks: 6, farm: '', batch: '', carrier: '' }; },
+  all: null, src: null, f: { weeks: 6, farm: '', batch: '', biz: '' }, showAllCp: false, showAllFails: false, loading: false, tab: 'over', tm: (() => { try { return localStorage.getItem('tc:tm') || '3d'; } catch (e) { return '3d'; } })(), vq: '', vf: 'all', selWeek: -1, hotKey: '', showAllB: false,
+  reset() { this.all = null; this.src = null; this.f = { weeks: 6, farm: '', batch: '', biz: '' }; },
   open() { if (!this.all && !this.loading) this.load(false); else this.render(); },
   async load(force) {
     const code = getCode(); if (!code) return;
@@ -769,13 +779,15 @@ const Dash = {
     try {
       const r = await api(code, 'data', force);
       if (r && r.ok === false && (r.error === 'bad pin' || r.error === 'locked')) {
-        store.del(K_CODE); store.del(K_CACHE); this.reset();
+        store.del(K_CODE); store.del(K_CACHE); store.del(K_SCOPE); this.reset();
         history.replaceState(history.state, '', '#code'); route(); setErr(r.error === 'locked' ? 'ใส่ PIN ผิดหลายครั้ง ระบบล็อกไว้ 15 นาที' : 'PIN ถูกเปลี่ยนแล้ว กรุณาใส่ PIN ใหม่'); return;
       }
       if (r && r.ok && Array.isArray(r.records)) {
         const at = r.snapshotAt || r.generatedAt || new Date().toISOString();
+        const scope = r.scope || '*';
+        if (scope !== getScope()) { const rem = !!store.get(K_CODE); store.set(K_SCOPE, scope, !rem); }
         this.all = r.records.map(norm); this.src = { kind: 'server', at: new Date(at) };
-        store.set(K_CACHE, JSON.stringify({ at, records: r.records }));
+        store.set(K_CACHE, JSON.stringify({ at, scope, records: r.records }));
         if (!r.snapshotAt) banner = ['info', '<b>ยังไม่ได้รับข้อมูลจาก Microsoft List</b> รอ Flow TruckCheck-Snapshot ส่งข้อมูลรอบแรก (ทุก 1 ชั่วโมง)'];
         else if (r.warn) banner = ['info', esc(r.warn)];
         else if (Date.now() - new Date(r.snapshotAt) > 26 * 36e5) banner = ['warn', `<b>ข้อมูลไม่อัปเดต</b> List ส่งข้อมูลมาล่าสุด ${esc(fmtDT(new Date(r.snapshotAt)))} · ตรวจสอบ Flow TruckCheck-Snapshot`];
@@ -795,8 +807,9 @@ const Dash = {
   },
   fallback() {
     let c = null; try { c = JSON.parse(store.get(K_CACHE)); } catch (e) { c = null; }
-    if (c && Array.isArray(c.records)) { this.all = c.records.map(norm); this.src = { kind: 'cache', at: new Date(c.at) }; return; }
-    this.all = deviceRecords().map(norm); this.src = { kind: 'device', at: new Date() };
+    const scope = getScope() || '*';
+    if (c && Array.isArray(c.records) && (c.scope || '*') === scope) { this.all = c.records.map(norm); this.src = { kind: 'cache', at: new Date(c.at) }; return; }
+    this.all = deviceRecords().map(norm).filter(r => scope === '*' || r.biz === scope); this.src = { kind: 'device', at: new Date() };
   },
   useSample() { this.all = sampleRecords().map(norm); this.src = { kind: 'sample', at: new Date() }; this.banner = null; this.render(); },
   skeleton() {
@@ -814,7 +827,7 @@ const Dash = {
     return ws >= lo - 36e5 && ws <= hi + 36e5;
   },
   matchDims(r, f = this.f, skip) {
-    return (skip === 'farm' || !f.farm || r.farm === f.farm) && (skip === 'batch' || !f.batch || r.batch === f.batch) && (skip === 'carrier' || !f.carrier || r.carrier === f.carrier);
+    return (skip === 'farm' || !f.farm || r.farm === f.farm) && (skip === 'batch' || !f.batch || r.batch === f.batch) && (skip === 'biz' || !f.biz || r.biz === f.biz);
   },
   list(offset = 0, skip) { return this.all.filter(r => this.inPeriod(r, this.f.weeks, offset) && this.matchDims(r, this.f, skip)); },
 
@@ -837,14 +850,15 @@ const Dash = {
       ${offerClear ? '<button class="pbtn" type="button" id="e-clear">ดูทั้งหมด</button>' : ''}
       <button class="pbtn sec2" type="button" id="e-reload">โหลดใหม่</button>
       ${offerSample ? '<button class="pbtn" type="button" id="e-sample">ดูข้อมูลตัวอย่าง</button>' : ''}</div></div>`;
-    const c = $('#e-clear'); c && c.addEventListener('click', () => { this.f = { weeks: 0, farm: '', batch: '', carrier: '' }; this.render(); });
+    const c = $('#e-clear'); c && c.addEventListener('click', () => { this.f = { weeks: 0, farm: '', batch: '', biz: '' }; this.render(); });
     $('#e-reload').addEventListener('click', () => this.load(true));
     const s = $('#e-sample'); s && s.addEventListener('click', () => this.useSample());
   },
   renderSrc() {
     const s = this.src, n = this.all.length;
     const label = { server: ['#10B981', 'ข้อมูลจาก Microsoft List'], cache: ['#F59E0B', 'ข้อมูลที่เคยโหลดไว้'], device: ['#9CA3AF', 'ข้อมูลในเครื่องนี้ (รุ่นปัจจุบัน)'], sample: ['#6366F1', 'ข้อมูลตัวอย่าง'] }[s.kind];
-    $('#d-src').innerHTML = `<span style="display:inline-flex;align-items:center;gap:5px"><span class="dot" style="background:${label[0]}"></span>${label[1]}</span><span>· ${s.kind === 'server' || s.kind === 'cache' ? 'List ส่งมาเมื่อ' : 'อัปเดต'} ${esc(fmtDT(s.at))}</span><span>· ${n} คันในระบบ</span>${s.kind === 'sample' ? '<button type="button" class="lnk" id="d-real" style="min-height:20px">กลับไปข้อมูลจริง</button>' : ''}`;
+    const sc = getScope();
+    $('#d-src').innerHTML = (sc ? `<span class="scope">${sc === '*' ? 'ผู้ดูแล · ทุกกิจการ' : esc(sc)}</span>` : '') + `<span style="display:inline-flex;align-items:center;gap:5px"><span class="dot" style="background:${label[0]}"></span>${label[1]}</span><span>· ${s.kind === 'server' || s.kind === 'cache' ? 'List ส่งมาเมื่อ' : 'อัปเดต'} ${esc(fmtDT(s.at))}</span><span>· ${n} คันในระบบ</span>${s.kind === 'sample' ? '<button type="button" class="lnk" id="d-real" style="min-height:20px">กลับไปข้อมูลจริง</button>' : ''}`;
     const rr = $('#d-real'); rr && rr.addEventListener('click', () => { this.all = null; this.load(true); });
   },
   renderChips() {
@@ -852,20 +866,21 @@ const Dash = {
     const chev = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
     const chip = (k, on, label) => `<button type="button" class="chip${on ? ' on' : ''}" data-chip="${k}" aria-haspopup="dialog">${esc(label)}${chev}</button>`;
     $('#d-chips').innerHTML = chip('weeks', true, per[1]) + chip('farm', !!f.farm, f.farm || 'ทุกฟาร์ม') + chip('batch', !!f.batch, f.batch ? 'รุ่น ' + f.batch : 'ทุกรุ่น')
-      + (f.farm || f.batch || f.carrier ? '<button type="button" class="chip clear" data-chip="clear">ล้างตัวกรอง</button>' : '');
+      + (getScope() === '*' && new Set(this.all.map(r => r.biz)).size > 1 ? chip('biz', !!f.biz, f.biz || 'ทุกกิจการ') : '')
+      + (f.farm || f.batch || f.biz ? '<button type="button" class="chip clear" data-chip="clear">ล้างตัวกรอง</button>' : '');
     $('#d-chips').querySelectorAll('[data-chip]').forEach(b => b.addEventListener('click', () => this.chip(b.dataset.chip)));
   },
   chip(k) {
     const f = this.f;
-    if (k === 'clear') { f.farm = f.batch = f.carrier = ''; return this.render(); }
+    if (k === 'clear') { f.farm = f.batch = f.biz = ''; return this.render(); }
     if (k === 'weeks') return openSheet('ช่วงเวลา', optList(PERIODS.map(([v, l]) => [String(v), l]), String(f.weeks)), b => b.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => { f.weeks = +o.dataset.v; this.selWeek = -1; closeSheet(); this.render(); })));
     const base = this.all.filter(r => this.inPeriod(r, f.weeks, 0) && this.matchDims(r, f, k));
     const cnt = {}; base.forEach(r => { const v = r[k]; cnt[v] = (cnt[v] || 0) + 1; });
     let keys = Object.keys(cnt);
     keys = k === 'batch' ? keys.sort((a, b) => (parseFloat(b) || 0) - (parseFloat(a) || 0) || a.localeCompare(b, 'th')) : keys.sort((a, b) => cnt[b] - cnt[a] || a.localeCompare(b, 'th'));
     if (f[k] && !keys.includes(f[k])) keys.unshift(f[k]);
-    const allLabel = { farm: 'ทุกฟาร์ม', batch: 'ทุกรุ่น', carrier: 'ทุกบริษัทขนส่ง' }[k];
-    const title = { farm: 'ฟาร์ม', batch: f.farm ? `รุ่นการเลี้ยง · ${f.farm}` : 'รุ่นการเลี้ยง', carrier: 'บริษัทขนส่ง' }[k];
+    const allLabel = { farm: 'ทุกฟาร์ม', batch: 'ทุกรุ่น', biz: 'ทุกกิจการ' }[k];
+    const title = { farm: 'ฟาร์ม', batch: f.farm ? `รุ่นการเลี้ยง · ${f.farm}` : 'รุ่นการเลี้ยง', biz: 'กิจการ' }[k];
     const opts = [['', allLabel, base.length]].concat(keys.map(v => [v, k === 'batch' ? `รุ่น ${v}${f.farm ? '' : ''}` : v, cnt[v] || 0]));
     openSheet(title, optList(opts, f[k]), b => b.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => { f[k] = o.dataset.v; closeSheet(); this.render(); })));
   },
@@ -949,7 +964,7 @@ const Dash = {
     const PS = prev ? this.stats(prev) : null, pr = PS && PS.pass + PS.fail ? PS.rate : null;
     const okB = S.batches.filter(x => x >= SOP_MIN).length, good = S.rate >= TARGET;
     const per = PERIODS.find(p => p[0] === f.weeks)[1];
-    const scope = [f.farm, f.batch && 'รุ่น ' + f.batch, f.carrier].filter(Boolean).join(' · ') || 'ทุกฟาร์ม';
+    const scope = [f.biz, f.farm, f.batch && 'รุ่น ' + f.batch].filter(Boolean).join(' · ') || 'ทุกฟาร์ม';
     const hero = `<section class="dhero${good ? '' : ' warn'}">
       <div class="ring">${this.ring(S.rate, 112, 12, '#fff', 'rgba(255,255,255,.22)')}<div class="rv"><b>${Math.round(S.rate)}%</b><small>ผ่านทั้งคัน</small></div></div>
       <div class="hero-t"><div class="hero-k">${esc(per)} · ${esc(scope)}</div>
@@ -1124,7 +1139,7 @@ const Dash = {
     const f = this.f, cg = {};
     this.list(0, 'carrier').forEach(r => { const g = cg[r.carrier] || (cg[r.carrier] = { n: 0, fl: 0, k: 0 }); g.n++; if (r.overall) g.k++; if (r.overall === 'fail') g.fl++; });
     const rows = Object.entries(cg).map(([n, g]) => [n, g, pct(g.k - g.fl, g.k)]).sort((a, b) => b[2] - a[2]);
-    return `<section class="card" style="padding:14px"><div class="bh"><h2>อันดับบริษัทขนส่ง</h2><span>% ผ่าน · แตะเพื่อกรอง</span></div><div class="lead">${rows.map(([n, g, p], i) => `<button type="button" class="ld${f.carrier === n ? ' on' : ''}" data-carrier="${esc(n)}"><span class="rk">${i + 1}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(n)}</span><span class="br"><i style="width:${p}%;background:${this.heatColor(p)}"></i></span></span><span class="pc" style="color:${this.heatColor(p)}">${Math.round(p)}%<small style="display:block;font:400 10px/14px var(--f-ui);color:var(--d-mute);text-align:right">${g.n} คัน</small></span></button>`).join('') || '<div class="empty-row">ไม่มีข้อมูล</div>'}</div></section>`;
+    return `<section class="card" style="padding:14px"><div class="bh"><h2>อันดับบริษัทขนส่ง</h2><span>% ผ่าน · แตะเพื่อกรอง</span></div><div class="lead">${rows.map(([n, g, p], i) => `<button type="button" class="ld${f.biz === n ? ' on' : ''}" data-carrier="${esc(n)}"><span class="rk">${i + 1}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(n)}</span><span class="br"><i style="width:${p}%;background:${this.heatColor(p)}"></i></span></span><span class="pc" style="color:${this.heatColor(p)}">${Math.round(p)}%<small style="display:block;font:400 10px/14px var(--f-ui);color:var(--d-mute);text-align:right">${g.n} คัน</small></span></button>`).join('') || '<div class="empty-row">ไม่มีข้อมูล</div>'}</div></section>`;
   },
   failsB(L) {
     const fails = L.filter(r => r.overall === 'fail').sort((a, b) => (b.saved || 0) - (a.saved || 0));
@@ -1135,7 +1150,7 @@ const Dash = {
   bindBody() {
     const body = $('#d-body');
     body.querySelectorAll('[data-farm]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.farm; this.f.farm = this.f.farm === v ? '' : v; this.f.batch = ''; this.render(); }));
-    body.querySelectorAll('[data-carrier]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.carrier; this.f.carrier = this.f.carrier === v ? '' : v; this.render(); }));
+    body.querySelectorAll('[data-carrier]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.carrier; this.f.biz = this.f.biz === v ? '' : v; this.render(); }));
     body.querySelectorAll('[data-rec]').forEach(b => b.addEventListener('click', () => this.detail(b.dataset.rec)));
     body.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => { this.tab = b.dataset.goto; if (b.dataset.vf) this.vf = b.dataset.vf; this.render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
     body.querySelectorAll('[data-tm]').forEach(b => b.addEventListener('click', () => { this.tm = b.dataset.tm; try { localStorage.setItem('tc:tm', this.tm); } catch (e) { /* private mode */ } this.render(); }));
@@ -1153,7 +1168,7 @@ const Dash = {
     const secs = SECTIONS.map(s => `<div class="dsec"><h4><span>${s.th}</span><span style="color:${r.sec[s.tag] === 'fail' ? 'var(--amb-d)' : r.sec[s.tag] === 'pass' ? 'var(--grn)' : 'var(--d-mute)'}">${r.sec[s.tag] === 'fail' ? 'ไม่ผ่าน' : r.sec[s.tag] === 'pass' ? 'ผ่าน' : '-'}</span></h4><ul>
       ${s.items.map(([iid, th]) => { const v = r.items[`${s.tag}_${iid}`], fnd = r.F[th] || []; return `<li><span class="s ${v === 'dirty' ? 'd' : v === 'clean' ? 'c' : 'n'}">${v === 'dirty' ? 'สกปรก' : v === 'clean' ? 'สะอาด' : '-'}</span><span>${esc(th)}${v === 'dirty' && fnd.length ? ' · พบ ' + esc(fnd.join(', ')) : ''}</span></li>`; }).join('')}</ul></div>`).join('');
     openSheet(`${r.plate} ${r.province}`.trim(), `<dl class="dl">${row('ผลรวม', r.overall === 'fail' ? 'ไม่ผ่าน' : r.overall === 'pass' ? 'ผ่าน' : '-')}${row('ฟาร์ม', r.farm)}${row('รุ่นการเลี้ยง', r.batch)}${row('วันที่ตรวจ', r.date ? `${r.date.getDate()} ${MON[r.date.getMonth()]} ${r.date.getFullYear()}${r.time ? ' · ' + r.time : ''}` : '')}
-      ${row('ผู้ตรวจ', r.insp)}${row('คันที่', r.vno ? String(r.vno) : '')}${row('รูปถ่าย', r.photos ? `${r.photos} รูป` : 'ไม่มีรูป')}${r.x ? Object.entries(r.x).map(([k, v]) => row(k, String(v))).join('') : ''}</dl>
+      ${row('กิจการ', r.biz)}${row('ผู้ตรวจ', r.insp)}${row('คันที่', r.vno ? String(r.vno) : '')}${row('รูปถ่าย', r.photos ? `${r.photos} รูป` : 'ไม่มีรูป')}${r.x ? Object.entries(r.x).map(([k, v]) => row(k, String(v))).join('') : ''}</dl>
       ${r.folder ? `<a class="pbtn sec2" style="text-decoration:none;align-self:flex-start;margin-bottom:6px" href="${esc(r.folder)}" target="_blank" rel="noopener">เปิดโฟลเดอร์รูปใน SharePoint ↗</a>` : ''}${secs}`);
   },
 
@@ -1181,7 +1196,7 @@ const Dash = {
     const hasF = L.some(r => Object.keys(r.F).length);
     const extraKeys = [...new Set(L.flatMap(r => r.x ? Object.keys(r.x) : []))];
     const ins = L.map(r => {
-      const o = { InspectionID: r.id, InspectionDate: isoD(r.date), Year: r.date ? r.date.getFullYear() : '', Week: r.date ? isoWeek(r.date) : '', Business: r.business, Farm: r.farm, RearingBatch: r.batch,
+      const o = { InspectionID: r.id, InspectionDate: isoD(r.date), Year: r.date ? r.date.getFullYear() : '', Week: r.date ? isoWeek(r.date) : '', Business: r.biz, Farm: r.farm, RearingBatch: r.batch,
         Inspector: r.insp, Plate: r.plate, Province: r.province, CheckTime: r.time, VehicleNo: r.vno == null ? '' : r.vno,
         SavedAt: r.saved ? r.saved.toISOString() : '', OverallResult: yn(r.overall), Pass: r.overall === 'pass' ? 1 : r.overall === 'fail' ? 0 : '' };
       SECTIONS.forEach(s => { o[s.tag + 'Result'] = yn(r.sec[s.tag]); });
@@ -1204,7 +1219,7 @@ const Dash = {
   },
   fileBase() {
     const f = this.f, parts = ['TruckCheck', isoD(new Date())];
-    if (this.xScope !== 'all') { parts.push(f.weeks ? f.weeks + 'wk' : 'all'); if (f.farm) parts.push(f.farm); if (f.batch) parts.push('batch' + f.batch); if (f.carrier) parts.push(f.carrier.slice(0, 20)); }
+    if (this.xScope !== 'all') { parts.push(f.weeks ? f.weeks + 'wk' : 'all'); if (f.farm) parts.push(f.farm); if (f.batch) parts.push('batch' + f.batch); if (f.biz) parts.push(f.biz.slice(0, 20)); }
     else parts.push('all');
     if (this.src.kind === 'sample') parts.push('SAMPLE');
     return parts.join('_').replace(/[\\/:*?"<>|\s()]+/g, '-');
@@ -1221,7 +1236,7 @@ const Dash = {
         const XLSX = await loadXLSX();
         const S = this.stats(L), f = this.f;
         const sum = [['TruckCheck · สรุปผลตรวจรถจับไก่'], [], ['ส่งออกเมื่อ', fmtDT(new Date()) + ' ' + new Date().getFullYear()], ['แหล่งข้อมูล', { server: 'Microsoft List (ผ่าน Flow TruckCheck-Snapshot)', cache: 'ข้อมูลที่เคยโหลดไว้', device: 'ข้อมูลในเครื่อง', sample: 'ข้อมูลตัวอย่าง' }[this.src.kind]],
-          ['ช่วงข้อมูล', this.xScope === 'all' ? 'ทั้งหมดที่โหลด' : (PERIODS.find(p => p[0] === f.weeks)[1] + (f.farm ? ' · ' + f.farm : '') + (f.batch ? ' · รุ่น ' + f.batch : '') + (f.carrier ? ' · ' + f.carrier : ''))], [],
+          ['ช่วงข้อมูล', this.xScope === 'all' ? 'ทั้งหมดที่โหลด' : (PERIODS.find(p => p[0] === f.weeks)[1] + (f.farm ? ' · ' + f.farm : '') + (f.batch ? ' · รุ่น ' + f.batch : '') + (f.biz ? ' · ' + f.biz : ''))], [],
           ['รถที่ตรวจ (คัน)', S.n], ['ผ่าน (คัน)', S.pass], ['ไม่ผ่าน (คัน)', S.fail], ['อัตราผ่าน (%)', Math.round(S.rate * 10) / 10], ['เป้าหมาย (%)', TARGET], ['รุ่นที่ตรวจครบ SOP', `${S.batches.filter(x => x >= SOP_MIN).length}/${S.batches.length}`], [],
           ['จุดตรวจ', 'ส่วน', 'สกปรก (คัน)', '% ของรถ', 'สิ่งที่พบบ่อย']].concat(S.cps.map(c => [c.th, c.secTh, c.dirty, Math.round(c.p * 10) / 10, c.finds.slice(0, 3).join(', ')]));
         const wb = XLSX.utils.book_new();
