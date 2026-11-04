@@ -1,9 +1,10 @@
 /* TruckCheck offline cache. Bump VERSION whenever a page changes so phones pick up the new copy. */
-const VERSION = 'truckcheck-v26';
+const VERSION = 'truckcheck-v27';
 const SHELL = ['./', './index.html', './record.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 const LIBS = [
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
 ];
 
 self.addEventListener('install', e => {

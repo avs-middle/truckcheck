@@ -454,6 +454,7 @@ a.btn{text-decoration:none;align-self:flex-start}
 :root[data-ui="real"] .dd-list{border:1px solid var(--line);border-radius:var(--r-md);box-shadow:0 16px 36px rgba(12,28,56,.2);padding:4px}
 :root[data-ui="real"] .dd-opt{border:0;border-radius:8px;font-weight:500}
 :root[data-ui="real"] .dd-opt[aria-selected="true"]{background:rgba(29,111,224,.1);color:var(--aqua)}
+.dd-grp{position:sticky;top:-4px;z-index:1;padding:8px 10px 4px;font:700 11px/1.2 var(--f-body);color:var(--muted);background:#fff;letter-spacing:.02em}
 :root[data-ui="real"] .dd-opt.dd-add{font:600 13px/1.25 var(--f-body);letter-spacing:0;text-transform:none}
 :root[data-ui="real"] fieldset{border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;background:rgba(255,255,255,.65)}
 :root[data-ui="real"] legend{font:600 11px/1 var(--f-body);letter-spacing:.06em;border:0;border-radius:999px;padding:5px 10px}
@@ -683,7 +684,7 @@ a.btn{text-decoration:none;align-self:flex-start}
 </div>
 
 <datalist id="dl-province"></datalist>
-<datalist id="dl-carrier"></datalist>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -796,7 +797,15 @@ const CRATE_COLORS = {
 };
 const SOP_MIN = 5;
 const BUSINESSES = ['ไก่เนื้อสระบุรี', 'ไก่เนื้อโคราช', 'ไก่เนื้อมีนบุรี'];   // each has its own dashboard PIN
-const FARMS = ['ท่าคล้อ', 'ท่าศาลา', 'จำปาหอม', 'คำใหญ่', 'ชะอม', 'โพธิ์งาม', 'มวกเหล็ก', 'ทับกวาง', 'เตาปูน', 'ป่าไผ่', 'บ้านธาตุ', 'บ้านธาตุ1'];
+const FARMS_BY_BIZ = {
+  'ไก่เนื้อสระบุรี': ['ท่าคล้อ', 'ท่าศาลา', 'จำปาหอม', 'คำใหญ่', 'ชะอม', 'โพธิ์งาม', 'มวกเหล็ก', 'ทับกวาง', 'เตาปูน', 'ป่าไผ่', 'บ้านธาตุ', 'บ้านธาตุ1'],
+  'ไก่เนื้อมีนบุรี': ['กรอกสมบูรณ์', 'ศรีมโหสถ', 'โคกไทย', 'คลองรั้ง 1', 'คลองรั้ง 2', 'เกาะขนุน', 'หนองว่านเหลือง 1', 'หนองว่านเหลือง 2', 'สนามชัยเขต', 'ลำมหาชัย', 'อ่างหมา', 'เกาะโพธิ์', 'หนองเลง', 'อ่างเวียน', 'บ้านบึง', 'ห้วยชุมพร'],
+  'ไก่เนื้อโคราช': ['ทุ่งอรุณ', 'สวนหอม 1', 'สวนหอม 2', 'อวยชัย 1', 'อวยชัย 2', 'ทุ่งรวงทอง 1', 'ทุ่งรวงทอง 2', 'ทุ่งรวงทอง 3', 'ใหม่พัฒนา 1', 'ใหม่พัฒนา 2', 'ใหม่พัฒนา 3', 'เขาแก้ว 1', 'เขาแก้ว 2', 'เขาแก้ว 3'],
+};
+const FARMS = [].concat(...Object.values(FARMS_BY_BIZ));
+const farmKey = f => String(f || '').replace(/^\s*ฟาร์ม\s*/, '').replace(/\s+/g, '');   // "ฟาร์มสวนหอม 1" = "สวนหอม1"
+const FARM_BIZ = {}; Object.keys(FARMS_BY_BIZ).forEach(b => FARMS_BY_BIZ[b].forEach(f => { FARM_BIZ[farmKey(f)] = b; }));
+const bizOfFarm = f => FARM_BIZ[farmKey(f)] || '';
 const PROVINCES = ['ลพบุรี', 'สระบุรี', 'พระนครศรีอยุธยา', 'นครราชสีมา', 'สิงห์บุรี', 'อ่างทอง', 'ชัยนาท', 'นครปฐม', 'ปทุมธานี', 'สุพรรณบุรี', 'เพชรบูรณ์', 'ชลบุรี', 'ฉะเชิงเทรา', 'นครนายก', 'ปราจีนบุรี', 'กรุงเทพมหานคร'];
 
 class Store extends EventTarget {
@@ -816,6 +825,16 @@ class Store extends EventTarget {
       if (!this.batch.business || this.batch.business === 'Saraburi Broiler Chicken') this.batch.business = BUSINESSES[0];
       Persist.set('lists', this.lists); Persist.set('batch', this.batch); Persist.set('bizV1', true);
     }
+    if (!Persist.get('farmsV3', false)) {   // one-time: farms of all three businesses; keep farms the user added
+      const known = new Set(FARMS.map(farmKey));
+      const extra = (this.lists.farm || []).filter(f => !known.has(farmKey(f)));
+      this.lists.farm = FARMS.concat(extra);
+      Persist.set('lists', this.lists); Persist.set('farmsV3', true);
+    }
+    // new day → the inspection date follows today (not while a night shift is still going: last activity under 8 h ago)
+    const lastActive = +Persist.get('lastActive', 0) || 0;
+    this.dateRolled = false;
+    if (this.batch.date !== todayISO() && Date.now() - lastActive > 8 * 36e5) { this.batch.date = todayISO(); Persist.set('batch', this.batch); this.dateRolled = true; }
     if (!Array.isArray(this.lists.province)) { this.lists.province = PROVINCES.slice(); Persist.set('lists', this.lists); }   // provinces became an editable list
     this.saved = Persist.get('saved', []);
     this.photos = {}; // vehicleId -> {section: [dataURL]}, mirrored to IndexedDB so a reload keeps them
@@ -865,14 +884,20 @@ class Store extends EventTarget {
     this.editing = null; Persist.set('edit', null); Persist.set('draft', this.vehicle);
     this.emit('all');
   }
-  static defaultLists() { return { business: BUSINESSES.slice(), farm: FARMS.slice(), province: PROVINCES.slice(), carrier: ['สุระชัยบรรทุกสัตว์ปีก (โชคชัย)'] }; }
+  static defaultLists() { return { business: BUSINESSES.slice(), farm: FARMS.slice(), province: PROVINCES.slice() }; }
   static defaultBatch() { return { business: BUSINESSES[0], farm: 'ท่าคล้อ', batchNo: '', inspector: '', date: todayISO() }; }
   blankVehicle() {
     const sections = {};
     for (const k in SECTIONS) sections[k] = { items: {}, note: '' };
     return { id: uid(), plate: '', province: '', company: '', time: nowHM(), crate: 'red', sections };
   }
-  emit(scope) { this.dispatchEvent(new CustomEvent('change', { detail: { scope } })); this.persistSoon(); }
+  emit(scope) { this.dispatchEvent(new CustomEvent('change', { detail: { scope } })); this.persistSoon(); this.touch(); }
+  touch() { const now = Date.now(); if (now - (this._touched || 0) > 60000) { this._touched = now; Persist.set('lastActive', now); } }
+  rollDate() {   // app resumed after a long break on a later day
+    const last = +Persist.get('lastActive', 0) || 0;
+    if (this.batch.date === todayISO() || Date.now() - last < 8 * 36e5) return false;
+    this.setBatch('date', todayISO()); return true;
+  }
   persistSoon() {
     clearTimeout(this._t);
     this._t = setTimeout(() => { Persist.set('draft', this.vehicle); Persist.set('batch', this.batch); Persist.set('lists', this.lists); }, 250);
@@ -1058,7 +1083,7 @@ const Alerts = {
     try {
       const r = await fetch(`${SEND_URL}?action=alerts&token=${encodeURIComponent(SEND_TOKEN)}&_=${Date.now()}`, { cache: 'no-store' });
       const j = await r.json();
-      if (j && j.ok && j.plates) { this.data = { at: j.at || null, fetched: new Date().toISOString(), plates: j.plates }; Persist.set('alerts', this.data); return true; }
+      if (j && j.ok && j.plates) { this.data = { at: j.at || null, fetched: new Date().toISOString(), plates: j.plates, batches: j.batches || {} }; Persist.set('alerts', this.data); return true; }
     } catch (e) { /* offline or old script: keep the last copy */ }
     return false;
   },
@@ -2353,7 +2378,8 @@ class PixelSelect {
   render() {
     const o = this.o, cur = o.options.find(x => x.value === o.value), v = this.btn.querySelector('.dd-v');
     v.textContent = cur ? cur.label : (o.placeholder || 'เลือก'); v.classList.toggle('dd-ph', !cur);
-    this.list.innerHTML = o.options.map(x => `<button type="button" class="dd-opt" role="option" data-v="${esc(x.value)}" aria-selected="${x.value === o.value}"><span>${esc(x.label)}</span>${ICON_CHECK(2)}</button>`).join('') +
+    let grp = null;
+    this.list.innerHTML = o.options.map(x => (x.group && x.group !== grp ? `<div class="dd-grp" role="presentation">${esc(grp = x.group)}</div>` : '') + `<button type="button" class="dd-opt" role="option" data-v="${esc(x.value)}" aria-selected="${x.value === o.value}"><span>${esc(x.label)}</span>${ICON_CHECK(2)}</button>`).join('') +
       (o.addLabel ? `<button type="button" class="dd-opt dd-add">${esc(o.addLabel)}</button>` : '');
   }
   setOptions(options, value) { this.o.options = options; this.o.value = value; this.render(); }
@@ -2465,7 +2491,6 @@ class App {
   /* ---------- HUD ---------- */
   setupUI() {
     $('#dl-province').innerHTML = PROVINCES.map(p => `<option value="${p}">`).join('');
-    this.renderCarriers();
     this.callouts = new Callouts($('#callouts'), (k, r) => this.open(k, r), k => this.setHover(k, true));
     const v = new THREE.Vector3(), tr = this.truck.root;
     this.callouts.add('house', 'ข้อมูลฟาร์ม', 'ข้อมูลฟาร์ม', o => o.set(-8, 4.9, -9));
@@ -2498,10 +2523,14 @@ class App {
     this.store.addEventListener('change', e => this.onStore(e.detail.scope));
     this.refreshHUD(true);
     addEventListener('resize', () => { this.stage.resize(); this.wm.reclamp(); });
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) this.clock = performance.now(); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) return;
+      this.clock = performance.now();
+      if (this.store.rollDate()) { Toast.show(`วันที่ตรวจเป็นวันนี้แล้ว · <b>${esc(fmtDate(todayISO()))}</b>`, 'ok'); const t = $('#f-date-t'); if (t) t.textContent = fmtDate(todayISO()); }
+    });
+    if (this.store.dateRolled) setTimeout(() => Toast.show(`วันที่ตรวจเป็นวันนี้แล้ว · <b>${esc(fmtDate(todayISO()))}</b>`, 'ok'), 1200);
     addEventListener('pagehide', () => { try { disposeObject(this.stage.scene); this.stage.renderer.dispose(); } catch (e) { /* page closing */ } });
   }
-  renderCarriers() { $('#dl-carrier').innerHTML = this.store.lists.carrier.map(c => `<option value="${esc(c)}">`).join(''); }
   onStore(scope) {
     if (scope === 'vehicle' || scope === 'all') { const v = this.store.vehicle; this.truck.setInfo({ plate: v.plate, province: v.province, company: v.company }); }
     if (scope === 'vehicle' && this.wm.has('sec-body')) { const st = this.store.section('body'), pt = $('#prog-body'); if (pt && !st.complete && !st.onlyPhoto) pt.textContent = `ทำแล้ว ${st.done} จาก ${st.total}`; }
@@ -2624,12 +2653,14 @@ class App {
     const s = this.store, groups = [['business', 'กิจการ', s.batch.business], ['farm', 'ฟาร์ม', s.batch.farm], ['province', 'จังหวัด', s.vehicle.province]];
     box.innerHTML = groups.map(([k, label, cur]) => `<div class="field"><span class="lbl">${label}</span><div class="list-chips">${s.lists[k].length ? s.lists[k].map(v => `<span class="lchip ${v === cur ? 'sel' : ''}" data-list="${k}" data-v="${esc(v)}"><span>${esc(v)}</span><button type="button" aria-label="ลบ ${esc(v)}">×</button></span>`).join('') : '<span class="note">ยังไม่มีรายการ</span>'}</div></div>`).join('');
     $$('.lchip', box).forEach(ch => armConfirm(ch.querySelector('button'), { armedText: 'ลบ', sfx: this.sfx, onArm: () => ch.classList.add('armed'), onDisarm: () => ch.classList.remove('armed'), onConfirm: () => {
-      s.removeListItem(ch.dataset.list, ch.dataset.v); this.renderSettingsLists(body); this.renderCarriers(); this.refreshDropdowns(); this.sfx.close(); Toast.show(`ลบ <b>${esc(ch.dataset.v)}</b> แล้ว`);
+      s.removeListItem(ch.dataset.list, ch.dataset.v); this.renderSettingsLists(body); this.refreshDropdowns(); this.sfx.close(); Toast.show(`ลบ <b>${esc(ch.dataset.v)}</b> แล้ว`);
     } }));
   }
   renderBatchHint(body) {
     const box = $('#batch-hint', body); if (!box) return;
-    const s = this.store, last = (Persist.get('lastBatch', {}) || {})[s.batch.farm], cur = String(s.batch.batchNo || '');
+    const s = this.store, cur = String(s.batch.batchNo || '');
+    const mine = (Persist.get('lastBatch', {}) || {})[s.batch.farm], srv = Alerts.data && Alerts.data.batches ? Alerts.data.batches[farmKey(s.batch.farm)] : null;
+    const last = [mine, srv && srv.no].filter(x => /^\d+$/.test(String(x || ''))).sort((a, b) => b - a)[0];
     if (!last || !/^\d+$/.test(last)) { box.hidden = true; return; }
     const next = String(+last + 1);
     if (cur === last || cur === next) { box.hidden = true; return; }
@@ -2638,7 +2669,7 @@ class App {
   }
   refreshDropdowns() {
     const s = this.store;
-    if (this.houseSel && this.wm.has('house')) { ['business', 'farm'].forEach(k => this.houseSel[k].setOptions(s.lists[k].map(o => ({ value: o, label: o })), s.batch[k])); }
+    if (this.houseSel && this.wm.has('house')) { this.wm.close('house', true); this.openHouse(); }
     if (this.wm.has('sec-body')) { this.wm.close('sec-body', true); this.openSection('body'); }
   }
   resetTruckStage() {
@@ -2699,12 +2730,19 @@ class App {
           <div class="field"><span class="lbl"><span class="n">5</span>วันที่ตรวจ</span>
             <button type="button" class="btn" id="f-date" style="justify-content:space-between;font-size:12px;padding:11px 12px" aria-expanded="false"><span id="f-date-t">${fmtDate(s.batch.date)}</span><span aria-hidden="true">▦</span></button>
             </div>`;
-        const listOpts = list => s.lists[list].map(o => ({ value: o, label: o }));
+        const listOpts = list => list !== 'farm' ? s.lists[list].map(o => ({ value: o, label: o }))
+          : BUSINESSES.flatMap(b => s.lists.farm.filter(f => bizOfFarm(f) === b).map(f => ({ value: f, label: f, group: b })))
+              .concat(s.lists.farm.filter(f => !bizOfFarm(f)).map(f => ({ value: f, label: f, group: 'ฟาร์มอื่น ๆ' })));
         const showAdd = list => { const row = $(`[data-row="${list}"]`, body); row.hidden = false; row.querySelector('input').focus(); };
         const mount = (key, ps) => { const slot = $(`[data-dd="${key}"]`, body); slot.replaceWith(ps.el); return ps; };
         this.houseSel = {
           business: mount('business', new PixelSelect({ id: 'f-business', options: listOpts('business'), value: s.batch.business, placeholder: 'เลือกกิจการ', addLabel: '+ เพิ่มกิจการ', onAdd: () => showAdd('business'), onChange: v => s.setBatch('business', v), sfx: this.sfx })),
-          farm: mount('farm', new PixelSelect({ id: 'f-farm', options: listOpts('farm'), value: s.batch.farm, placeholder: 'เลือกฟาร์ม', addLabel: '+ เพิ่มฟาร์ม', onAdd: () => showAdd('farm'), onChange: v => { s.setBatch('farm', v); this.renderBatchHint(body); }, sfx: this.sfx })),
+          farm: mount('farm', new PixelSelect({ id: 'f-farm', options: listOpts('farm'), value: s.batch.farm, placeholder: 'เลือกฟาร์ม', addLabel: '+ เพิ่มฟาร์ม', onAdd: () => showAdd('farm'), onChange: v => {
+            s.setBatch('farm', v);
+            const b = bizOfFarm(v);   // the farm decides the business (dashboard PINs follow it)
+            if (b && s.batch.business !== b) { if (!s.lists.business.includes(b)) s.addList('business', b); s.setBatch('business', b); this.houseSel.business.setOptions(listOpts('business'), b); Toast.show(`กิจการเป็น <b>${esc(b)}</b> ตามฟาร์ม`, 'ok'); }
+            this.renderBatchHint(body);
+          }, sfx: this.sfx })),
           inspector: mount('inspector', new PixelSelect({ id: 'f-inspector', options: Object.entries(INSPECTORS).map(([k, [en, th]]) => ({ value: k, label: th })), value: s.batch.inspector, placeholder: 'เลือกผู้ตรวจ', onChange: v => s.setBatch('inspector', v), sfx: this.sfx })),
         };
         body.addEventListener('input', e => {
