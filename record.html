@@ -798,7 +798,7 @@ const CRATE_COLORS = {
 const SOP_MIN = 5;
 const BUSINESSES = ['ไก่เนื้อสระบุรี', 'ไก่เนื้อโคราช', 'ไก่เนื้อมีนบุรี'];   // each has its own dashboard PIN
 const FARMS_BY_BIZ = {
-  'ไก่เนื้อสระบุรี': ['ท่าคล้อ', 'ท่าศาลา', 'จำปาหอม', 'คำใหญ่', 'ชะอม', 'โพธิ์งาม', 'มวกเหล็ก', 'ทับกวาง', 'เตาปูน', 'ป่าไผ่', 'บ้านธาตุ', 'บ้านธาตุ1'],
+  'ไก่เนื้อสระบุรี': ['ท่าคล้อ', 'ท่าศาลา', 'จำปาหอม', 'คำใหญ่', 'ชะอม', 'โพธิ์งาม', 'มวกเหล็ก', 'ทับกวาง', 'เตาปูน', 'ป่าไผ่', 'ป่าไม้แดง', 'บ้านธาตุ', 'บ้านธาตุ1'],
   'ไก่เนื้อมีนบุรี': ['กรอกสมบูรณ์', 'ศรีมโหสถ', 'โคกไทย', 'คลองรั้ง 1', 'คลองรั้ง 2', 'เกาะขนุน', 'หนองว่านเหลือง 1', 'หนองว่านเหลือง 2', 'สนามชัยเขต', 'ลำมหาชัย', 'อ่างหมา', 'เกาะโพธิ์', 'หนองเลง', 'อ่างเวียน', 'บ้านบึง', 'ห้วยชุมพร'],
   'ไก่เนื้อโคราช': ['ทุ่งอรุณ', 'สวนหอม 1', 'สวนหอม 2', 'อวยชัย 1', 'อวยชัย 2', 'ทุ่งรวงทอง 1', 'ทุ่งรวงทอง 2', 'ทุ่งรวงทอง 3', 'ใหม่พัฒนา 1', 'ใหม่พัฒนา 2', 'ใหม่พัฒนา 3', 'เขาแก้ว 1', 'เขาแก้ว 2', 'เขาแก้ว 3'],
 };
@@ -830,6 +830,11 @@ class Store extends EventTarget {
       const extra = (this.lists.farm || []).filter(f => !known.has(farmKey(f)));
       this.lists.farm = FARMS.concat(extra);
       Persist.set('lists', this.lists); Persist.set('farmsV3', true);
+    }
+    if (!Persist.get('farmsV4', false)) {   // one-time: farms added to the table later (ป่าไม้แดง) appear on phones that already have a list
+      const have = new Set((this.lists.farm || []).map(farmKey));
+      FARMS.forEach(f => { if (!have.has(farmKey(f))) this.lists.farm.push(f); });
+      Persist.set('lists', this.lists); Persist.set('farmsV4', true);
     }
     // new day → the inspection date follows today (not while a night shift is still going: last activity under 8 h ago)
     const lastActive = +Persist.get('lastActive', 0) || 0;
